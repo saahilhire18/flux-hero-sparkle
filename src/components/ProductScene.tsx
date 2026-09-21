@@ -107,10 +107,10 @@ function ProductModel({ slot, index, reducedMotion }: { slot: SlotConfig; index:
 }
 
 class ModelErrorBoundary extends Component<{ children: ReactNode; slot: SlotConfig }, { failed: boolean }> {
-  state = { failed: false };
+  override state = { failed: false };
   static getDerivedStateFromError() { return { failed: true }; }
-  componentDidCatch(error: Error) { console.warn(`[Totalflux 3D] Failed to load ${this.props.slot.model}; showing fallback for ${this.props.slot.id}.`, error); }
-  render() { return this.state.failed ? <FallbackProduct slot={this.props.slot} /> : this.props.children; }
+  override componentDidCatch(error: Error) { console.warn(`[Totalflux 3D] Failed to load ${this.props.slot.model}; showing fallback for ${this.props.slot.id}.`, error); }
+  override render() { return this.state.failed ? <FallbackProduct slot={this.props.slot} /> : this.props.children; }
 }
 
 function FallbackProduct({ slot }: { slot: SlotConfig }) {
