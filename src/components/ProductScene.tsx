@@ -18,11 +18,11 @@ type SlotConfig = {
 
 // Product arrangement: edit this one array when swapping or repositioning models.
 const PRODUCT_SLOTS: SlotConfig[] = [
-  { id: "slot-1", model: "paste-1", targetHeight: 1.0, position: [-1.6, 0, 0.1], rotationY: -0.15 },
-  { id: "slot-2", model: "paste-2", targetHeight: 1.0, position: [-0.8, 0, 0.25], rotationY: -0.08 },
-  { id: "slot-3", model: "paste-3", targetHeight: 1.0, position: [0, 0, 0.3], rotationY: 0 },
-  { id: "slot-4", model: "paste-1", targetHeight: 0.7, position: [0.85, 0, 0.2], rotationY: 0.1 },
-  { id: "slot-5", model: "paste-2", targetHeight: 0.7, position: [1.6, 0, 0.1], rotationY: 0.15 },
+  { id: "slot-1", model: "paste-1", targetHeight: 2.1, position: [-1.48, 0.2, 0.02], rotationY: -0.1 },
+  { id: "slot-2", model: "paste-2", targetHeight: 2.22, position: [-0.74, 0.2, 0.16], rotationY: -0.05 },
+  { id: "slot-3", model: "paste-3", targetHeight: 2.32, position: [0, 0.2, 0.22], rotationY: 0 },
+  { id: "slot-4", model: "paste-1", targetHeight: 2.12, position: [0.74, 0.2, 0.14], rotationY: 0.05 },
+  { id: "slot-5", model: "paste-2", targetHeight: 2.02, position: [1.48, 0.2, 0.02], rotationY: 0.1 },
 ];
 
 const MODEL_PATHS: Record<ModelName, string> = {
@@ -161,10 +161,10 @@ function Scene({ reducedMotion, mobile }: { reducedMotion: boolean; mobile: bool
         <Lightformer intensity={2.2} position={[0, 5, 3]} scale={[8, 3, 1]} color={light} />
         <Lightformer intensity={1.1} position={[-4, 1, 2]} rotation-y={Math.PI / 2} scale={[5, 2, 1]} color={fill} />
       </Environment>
-      <group ref={rig} position={[mobile ? 0.8 : 0, -0.75, 0]}>
-        <mesh position={[0, 0.02, 0.1]} receiveShadow>
-          <cylinderGeometry args={[2.65, 2.76, 0.32, 80, 1, false]} />
-          <meshPhysicalMaterial color={podium} roughness={0.6} clearcoat={0.08} />
+      <group ref={rig} position={[mobile ? 0.72 : 0, -1.03, 0]}>
+        <mesh position={[0, 0.03, 0.08]} receiveShadow>
+          <cylinderGeometry args={[2.25, 2.34, 0.34, 80, 1, false]} />
+          <meshPhysicalMaterial color={podium} roughness={0.68} clearcoat={0.05} />
         </mesh>
         <Suspense fallback={null}>
           {slots.map((slot, index) => (
@@ -175,7 +175,7 @@ function Scene({ reducedMotion, mobile }: { reducedMotion: boolean; mobile: bool
         </Suspense>
         <MintSprig />
       </group>
-      <ContactShadows position={[0, -0.92, 0.1]} opacity={0.22} scale={7} blur={2.8} far={4} />
+      <ContactShadows position={[0, -1.19, 0.08]} opacity={0.13} scale={5.1} blur={3.6} far={2.6} resolution={256} />
       <OrbitControls enablePan={false} enableZoom={false} minAzimuthAngle={-0.14} maxAzimuthAngle={0.14} minPolarAngle={Math.PI / 2.35} maxPolarAngle={Math.PI / 2.1} target={[0, -0.1, 0]} enableDamping />
     </>
   );
@@ -201,7 +201,7 @@ export default function ProductScene() {
 
   return (
     <div ref={containerRef} className="h-full w-full touch-pan-y" aria-hidden="true">
-      <Canvas shadows dpr={[1, 2]} frameloop={visible && !reducedMotion ? "always" : "never"} camera={{ position: [0, mobile ? 0.95 : 1.1, mobile ? 4.8 : 5.8], fov: 31 }} gl={{ alpha: true, antialias: true }} onCreated={({ gl }) => gl.setClearColor(0x000000, 0)}>
+      <Canvas shadows dpr={[1, 2]} frameloop={visible && !reducedMotion ? "always" : "never"} camera={{ position: [0, mobile ? 1.05 : 1.18, mobile ? 6.2 : 6.65], fov: 31 }} gl={{ alpha: true, antialias: true }} onCreated={({ gl }) => gl.setClearColor(0x000000, 0)}>
         <Scene reducedMotion={reducedMotion} mobile={mobile} />
       </Canvas>
     </div>
