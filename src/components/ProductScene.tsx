@@ -161,7 +161,7 @@ function Scene({ reducedMotion, mobile }: { reducedMotion: boolean; mobile: bool
         <Lightformer intensity={2.2} position={[0, 5, 3]} scale={[8, 3, 1]} color={light} />
         <Lightformer intensity={1.1} position={[-4, 1, 2]} rotation-y={Math.PI / 2} scale={[5, 2, 1]} color={fill} />
       </Environment>
-      <group ref={rig} position={[0, -0.75, 0]}>
+      <group ref={rig} position={[mobile ? 0.8 : 0, -0.75, 0]}>
         <mesh position={[0, 0.02, 0.1]} receiveShadow>
           <cylinderGeometry args={[2.65, 2.76, 0.32, 80, 1, false]} />
           <meshPhysicalMaterial color={podium} roughness={0.6} clearcoat={0.08} />
@@ -201,7 +201,7 @@ export default function ProductScene() {
 
   return (
     <div ref={containerRef} className="h-full w-full touch-pan-y" aria-hidden="true">
-      <Canvas shadows dpr={[1, 2]} frameloop={visible && !reducedMotion ? "always" : "never"} camera={{ position: [0, 1.1, 5.1], fov: 31 }} gl={{ alpha: true, antialias: true }} onCreated={({ gl }) => gl.setClearColor(0x000000, 0)}>
+      <Canvas shadows dpr={[1, 2]} frameloop={visible && !reducedMotion ? "always" : "never"} camera={{ position: [0, mobile ? 0.95 : 1.1, mobile ? 4.8 : 5.8], fov: 31 }} gl={{ alpha: true, antialias: true }} onCreated={({ gl }) => gl.setClearColor(0x000000, 0)}>
         <Scene reducedMotion={reducedMotion} mobile={mobile} />
       </Canvas>
     </div>
