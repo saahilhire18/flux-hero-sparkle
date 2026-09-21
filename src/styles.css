@@ -19,6 +19,7 @@
  */
 
 @theme inline {
+  --font-sans: "Poppins", ui-sans-serif, system-ui, sans-serif;
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -59,29 +60,41 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --color-primary-hover: var(--primary-hover);
 }
 
 :root {
-  --radius: 0.625rem;
+  --radius: 0.5rem;
   --background: oklch(1 0 0);
-  --foreground: oklch(0.129 0.042 264.695);
+  --foreground: oklch(0.29 0.055 257);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.129 0.042 264.695);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.129 0.042 264.695);
-  --primary: oklch(0.208 0.042 265.755);
-  --primary-foreground: oklch(0.984 0.003 247.858);
-  --secondary: oklch(0.968 0.007 247.896);
+  --primary: oklch(0.29 0.105 257);
+  --primary-hover: oklch(0.38 0.105 253);
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.965 0.018 240);
   --secondary-foreground: oklch(0.208 0.042 265.755);
-  --muted: oklch(0.968 0.007 247.896);
-  --muted-foreground: oklch(0.554 0.046 257.417);
-  --accent: oklch(0.968 0.007 247.896);
-  --accent-foreground: oklch(0.208 0.042 265.755);
+  --muted: oklch(0.965 0.018 240);
+  --muted-foreground: oklch(0.41 0.04 256);
+  --accent: oklch(0.66 0.12 184);
+  --accent-foreground: oklch(1 0 0);
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.984 0.003 247.858);
-  --border: oklch(0.929 0.013 255.508);
-  --input: oklch(0.929 0.013 255.508);
-  --ring: oklch(0.704 0.04 256.788);
+  --border: oklch(0.88 0.025 243);
+  --input: oklch(0.88 0.025 243);
+  --ring: oklch(0.66 0.12 184);
+  --soft-blue: oklch(0.95 0.026 242);
+  --scene-podium: #f7f9fb;
+  --scene-light: #ffffff;
+  --scene-fill: #d8eff2;
+  --scene-mint: #5eae91;
+  --scene-mint-dark: #377c65;
+  --scene-fallback: #dbeaf5;
+  --shadow-nav: 0 10px 35px color-mix(in oklab, var(--primary) 8%, transparent);
+  --shadow-button: 0 8px 20px color-mix(in oklab, var(--primary) 18%, transparent);
+  --shadow-button-hover: 0 12px 28px color-mix(in oklab, var(--primary) 27%, transparent);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -140,5 +153,57 @@
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
+    font-family: var(--font-sans);
+    letter-spacing: 0;
   }
+}
+
+html { scroll-behavior: smooth; }
+
+@utility hero-surface {
+  background: linear-gradient(118deg, var(--background) 16%, var(--background) 44%, var(--soft-blue) 100%);
+}
+
+@utility hero-ray {
+  background: linear-gradient(128deg, color-mix(in oklab, var(--background) 82%, transparent) 0 18%, transparent 18% 34%, color-mix(in oklab, var(--background) 45%, transparent) 34% 42%, transparent 42%);
+  opacity: 0.9;
+}
+
+@utility hero-ring {
+  border: 1px solid color-mix(in oklab, var(--primary) 9%, transparent);
+  box-shadow: inset 0 0 0 4.5rem color-mix(in oklab, var(--background) 16%, transparent);
+}
+
+@utility foliage-shadow {
+  background:
+    radial-gradient(ellipse at 70% 16%, color-mix(in oklab, var(--accent) 30%, transparent) 0 7%, transparent 8%),
+    radial-gradient(ellipse at 48% 36%, color-mix(in oklab, var(--accent) 28%, transparent) 0 10%, transparent 11%),
+    radial-gradient(ellipse at 78% 54%, color-mix(in oklab, var(--accent) 24%, transparent) 0 12%, transparent 13%),
+    radial-gradient(ellipse at 38% 68%, color-mix(in oklab, var(--accent) 22%, transparent) 0 9%, transparent 10%);
+  filter: blur(18px);
+  transform: rotate(-22deg);
+  opacity: 0.48;
+}
+
+@utility nav-link {
+  position: relative;
+  padding-block: 0.35rem;
+  &::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 1px;
+    background: var(--primary);
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 220ms ease;
+  }
+  &:hover::after { transform: scaleX(1); transform-origin: left; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
 }
