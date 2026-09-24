@@ -1,5 +1,10 @@
+// src/routes/index.tsx
 import { createFileRoute } from "@tanstack/react-router";
 import { Hero } from "@/components/Hero";
+import { FeatureShowcaseSection } from "@/components/FeatureShowcaseSection";
+import { AdvanceShowcaseSection } from "@/components/AdvanceShowcaseSection";
+import { TOOTHPASTE_SECTIONS } from "@/data/toothpaste-features";
+import { ADVANCE_PRODUCT } from "@/data/advance-product";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -16,5 +21,17 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
-  return <Hero />;
+  return (
+    <main>
+      <Hero transitionColor={TOOTHPASTE_SECTIONS[0]?.bg ?? "#EAF1FB"} />
+      {TOOTHPASTE_SECTIONS.map((product, i) => (
+        <FeatureShowcaseSection
+          key={product.id}
+          product={product}
+          nextColor={TOOTHPASTE_SECTIONS[i + 1]?.bg ?? ADVANCE_PRODUCT.bg}
+        />
+      ))}
+      <AdvanceShowcaseSection product={ADVANCE_PRODUCT} />
+    </main>
+  );
 }
