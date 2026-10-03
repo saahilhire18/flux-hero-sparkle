@@ -30,3 +30,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Original high-res product photos: kept locally only (the site uses the small WebP copies in public/)
+public/Mouthwash/
+public/Oralbrush/
+public/Totalflux *.png

@@ -20,6 +20,8 @@
 
 @theme inline {
   --font-sans: "Poppins", ui-sans-serif, system-ui, sans-serif;
+  /* The "Totalflux" name, lettered like the logo */
+  --font-brand: "Comfortaa", "Poppins", ui-sans-serif, system-ui, sans-serif;
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -234,4 +236,252 @@ html { scroll-behavior: smooth; }
 /* src/styles/globals.css (or src/index.css — wherever your global CSS entry is) */
 html {
   scroll-snap-type: y proximity;
+}
+
+/* Hero water bubbles (HeroArt.tsx): a slow bob, each out of step with the others */
+.hero-bubble {
+  animation: hero-bubble-float 7s ease-in-out infinite;
+}
+@keyframes hero-bubble-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+/*
+ * Toothpaste hero tubes (ProductRow.tsx): light falling across each tube, and a shine that
+ * sweeps over it now and then. Both are masked by the tube's own photo (--tube: its url), so
+ * they only ever touch the tube. The light: brighter down the left and near the top, a touch
+ * of shade down the right, as if lit from the upper left. The shine: a soft band crossing
+ * the tube in the first part of each cycle, after --shine-delay.
+ */
+.tube-light,
+.tube-shine {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  -webkit-mask: var(--tube) center / 100% 100% no-repeat;
+  mask: var(--tube) center / 100% 100% no-repeat;
+}
+.tube-light {
+  background:
+    /* A glossy streak down the tube, like light caught on the plastic */
+    linear-gradient(
+      90deg,
+      transparent 9%,
+      rgba(255, 255, 255, 0.5) 15%,
+      rgba(255, 255, 255, 0.12) 19%,
+      transparent 25%
+    ),
+    radial-gradient(ellipse 70% 22% at 32% 10%, rgba(255, 255, 255, 0.35), transparent 70%),
+    /* Lit from the left, shaded towards the right: it reads as round */
+    linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.28) 0%,
+      rgba(255, 255, 255, 0) 34%,
+      rgba(10, 30, 70, 0) 58%,
+      rgba(10, 30, 70, 0.26) 100%
+    );
+}
+.tube-shine {
+  overflow: hidden;
+}
+.tube-shine::after {
+  content: "";
+  position: absolute;
+  top: -20%;
+  bottom: -20%;
+  left: 0;
+  width: 42%;
+  background: linear-gradient(
+    100deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.18) 30%,
+    rgba(255, 255, 255, 0.9) 50%,
+    rgba(255, 255, 255, 0.18) 70%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  /* Hidden between sweeps (and before the first) */
+  opacity: 0;
+  transform: translateX(-450%) skewX(-14deg);
+  animation: tube-shine 7s cubic-bezier(0.45, 0, 0.2, 1) var(--shine-delay, 0s) infinite;
+}
+/* The band is slanted, so on a tall, narrow tube its ends reach well past where its middle is:
+   it starts and ends far off either side (in its own widths), and fades in and out, so none
+   of it is left resting on the tube between sweeps. */
+@keyframes tube-shine {
+  0% {
+    opacity: 0;
+    transform: translateX(-450%) skewX(-14deg);
+  }
+  3%,
+  19% {
+    opacity: 1;
+  }
+  22%,
+  100% {
+    opacity: 0;
+    transform: translateX(450%) skewX(-14deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tube-shine::after {
+    animation: none;
+    opacity: 0;
+  }
+}
+
+/*
+ * Mouthwash hero bubbles (MouthwashHero.tsx): rising through the liquid-coloured glow and
+ * fading out near the top. Each sets its own --rise-duration and --rise-delay (negative, so
+ * they are already mid-rise when the page loads). With reduced motion they don't show.
+ */
+.mw-bubble {
+  opacity: 0;
+  animation: mw-bubble-rise var(--rise-duration, 10s) linear var(--rise-delay, 0s) infinite;
+}
+@keyframes mw-bubble-rise {
+  0% {
+    transform: translateY(0) scale(0.5);
+    opacity: 0;
+  }
+  12% {
+    opacity: 0.9;
+  }
+  80% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(-42vh) scale(1.15);
+    opacity: 0;
+  }
+}
+
+/* A new bubble swells into place, overshooting a little like a freshly blown one */
+.hero-bubble-in {
+  animation: hero-bubble-in 900ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+@keyframes hero-bubble-in {
+  from {
+    scale: 0;
+    opacity: 0;
+  }
+  to {
+    scale: 1;
+    opacity: 1;
+  }
+}
+
+/* Popping: a hole tears open in the film where it was clicked (--hole-x/y) and races across
+   it, while droplets from the rim spray outward (--from-x/y to --to-x/y) and fade. */
+@property --hero-pop-hole {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 0%;
+}
+.hero-pop-film {
+  -webkit-mask-image: radial-gradient(
+    circle at var(--hole-x) var(--hole-y),
+    transparent var(--hero-pop-hole),
+    #000 calc(var(--hero-pop-hole) + 6%)
+  );
+  mask-image: radial-gradient(
+    circle at var(--hole-x) var(--hole-y),
+    transparent var(--hero-pop-hole),
+    #000 calc(var(--hero-pop-hole) + 6%)
+  );
+  animation: hero-pop-film 130ms ease-in forwards;
+}
+@keyframes hero-pop-film {
+  from {
+    --hero-pop-hole: 0%;
+    scale: 1;
+  }
+  to {
+    --hero-pop-hole: 110%;
+    scale: 1.06;
+    opacity: 0.4;
+  }
+}
+.hero-pop-drop {
+  translate: -50% -50%;
+  background: radial-gradient(circle at 35% 30%, #fff 0 25%, rgba(170, 212, 248, 0.9));
+  animation: hero-pop-drop 480ms cubic-bezier(0.15, 0.7, 0.3, 1) 40ms both;
+}
+@keyframes hero-pop-drop {
+  from {
+    transform: translate(var(--from-x), var(--from-y)) scale(1);
+    opacity: 1;
+  }
+  to {
+    transform: translate(var(--to-x), var(--to-y)) scale(0.3);
+    opacity: 0;
+  }
+}
+
+/* Letter effects on hover (TextEffects.tsx): they play while the element marked .letter-fx
+   around the text is hovered (on devices that can hover) or keyboard-focused. --i is each
+   letter's place in the text, so the letters go one after another. */
+
+/* Roll: each letter slides up out of view as a copy of it (::after, parked just below and
+   clipped away) slides up into its place. */
+.letter-roll {
+  display: inline-block;
+  white-space: nowrap;
+  clip-path: inset(-0.05em -0.15em -0.12em);
+}
+.letter-roll > span {
+  position: relative;
+  display: inline-block;
+  white-space: pre;
+  transition: transform 550ms cubic-bezier(0.7, 0, 0.3, 1) calc(var(--i) * 18ms);
+}
+.letter-roll > span::after {
+  content: attr(data-char);
+  position: absolute;
+  left: 0;
+  top: calc(100% + 0.3em);
+}
+.letter-fx:focus-visible .letter-roll > span {
+  transform: translateY(calc(-100% - 0.3em));
+}
+
+/* Wave: a hop runs through the letters; also played once when its element becomes the
+   current one (aria-current). */
+.letter-wave {
+  display: inline-block;
+  white-space: nowrap;
+}
+.letter-wave > span {
+  display: inline-block;
+  white-space: pre;
+}
+.letter-fx:focus-visible .letter-wave > span,
+.letter-fx[aria-current] .letter-wave > span {
+  animation: letter-wave 600ms cubic-bezier(0.3, 0.7, 0.4, 1) calc(var(--i) * 30ms);
+}
+@keyframes letter-wave {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  35% {
+    transform: translateY(-0.35em);
+  }
+  60% {
+    transform: translateY(0.05em);
+  }
+}
+
+@media (hover: hover) {
+  .letter-fx:hover .letter-roll > span {
+    transform: translateY(calc(-100% - 0.3em));
+  }
+  .letter-fx:hover .letter-wave > span {
+    animation: letter-wave 600ms cubic-bezier(0.3, 0.7, 0.4, 1) calc(var(--i) * 30ms);
+  }
 }

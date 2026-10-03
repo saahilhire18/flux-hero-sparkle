@@ -12,6 +12,9 @@ const buttonVariants = cva(
         default: "bg-primary text-primary-foreground shadow hover:bg-primary/90",
         hero:
           "group rounded-full bg-primary text-primary-foreground shadow-[var(--shadow-button)] hover:bg-primary-hover hover:shadow-[var(--shadow-button-hover)]",
+        // Navy frosted glass: translucent primary with a bright top edge
+        glass:
+          "group rounded-full border border-white/25 bg-primary/80 text-primary-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_14px_32px_-12px_rgba(15,40,90,0.55)] backdrop-blur-md hover:bg-primary/90",
         destructive: "bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90",
         outline:
           "border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground",

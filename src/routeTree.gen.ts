@@ -10,33 +10,53 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as MouthwashRouteImport } from './routes/mouthwash'
+import { Route as OralbrushRouteImport } from './routes/oralbrush'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MouthwashRoute = MouthwashRouteImport.update({
+  id: '/mouthwash',
+  path: '/mouthwash',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OralbrushRoute = OralbrushRouteImport.update({
+  id: '/oralbrush',
+  path: '/oralbrush',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/mouthwash': typeof MouthwashRoute
+  '/oralbrush': typeof OralbrushRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/mouthwash': typeof MouthwashRoute
+  '/oralbrush': typeof OralbrushRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/mouthwash': typeof MouthwashRoute
+  '/oralbrush': typeof OralbrushRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/mouthwash' | '/oralbrush'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/mouthwash' | '/oralbrush'
+  id: '__root__' | '/' | '/mouthwash' | '/oralbrush'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  MouthwashRoute: typeof MouthwashRoute
+  OralbrushRoute: typeof OralbrushRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +68,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/mouthwash': {
+      id: '/mouthwash'
+      path: '/mouthwash'
+      fullPath: '/mouthwash'
+      preLoaderRoute: typeof MouthwashRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/oralbrush': {
+      id: '/oralbrush'
+      path: '/oralbrush'
+      fullPath: '/oralbrush'
+      preLoaderRoute: typeof OralbrushRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  MouthwashRoute: MouthwashRoute,
+  OralbrushRoute: OralbrushRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
