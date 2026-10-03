@@ -1,28 +1,32 @@
 // components/Footer.tsx
-import { Facebook, Instagram, Linkedin, Mail, MapPin, Phone, Twitter, Youtube } from "lucide-react";
+import { Facebook, Instagram, Mail, MapPin, Phone, Youtube } from "lucide-react";
+import { AMAZON_STORE, EXTERNAL, SOCIAL_PROFILES } from "@/data/links";
 
 const PRODUCT_LINKS = [
   { label: "Mouthwash", href: "/mouthwash" },
-  { label: "Toothpaste", href: "/" },
+  { label: "Toothpaste", href: "/toothpaste" },
   { label: "Oralbrush", href: "/oralbrush" },
 ];
+/** external: it leaves the site (a new tab). */
 const COMPANY_LINKS = [
-  { label: "Contact Us", href: "#contact-us" },
-  { label: "Buy Online", href: "#where-to-buy" },
+  { label: "Contact Us", href: "#contact-us", external: false },
+  { label: "Buy Online", href: AMAZON_STORE, external: true },
 ];
-// TODO: the brand's real profile URLs
 const SOCIAL_LINKS = [
-  { label: "Facebook", icon: Facebook, href: "#" },
-  { label: "Twitter", icon: Twitter, href: "#" },
-  { label: "LinkedIn", icon: Linkedin, href: "#" },
-  { label: "Instagram", icon: Instagram, href: "#" },
-  { label: "YouTube", icon: Youtube, href: "#" },
+  { label: "Facebook", icon: Facebook, href: SOCIAL_PROFILES.facebook },
+  { label: "Instagram", icon: Instagram, href: SOCIAL_PROFILES.instagram },
+  { label: "YouTube", icon: Youtube, href: SOCIAL_PROFILES.youtube },
 ];
 
 /** From the product booklet (every page's footer). */
 const CONTACT = [
   { label: "Customer care helpline", icon: Phone, text: "1800-532-4561", href: "tel:18005324561" },
-  { label: "Email", icon: Mail, text: "info@neovabiogene.com", href: "mailto:info@neovabiogene.com" },
+  {
+    label: "Email",
+    icon: Mail,
+    text: "info@neovabiogene.com",
+    href: "mailto:info@neovabiogene.com",
+  },
   {
     label: "Address",
     icon: MapPin,
@@ -30,7 +34,8 @@ const CONTACT = [
   },
 ];
 
-const LINK = "text-[0.95rem] font-medium uppercase tracking-wide text-white/90 transition-colors hover:text-white";
+const LINK =
+  "text-[0.95rem] font-medium uppercase tracking-wide text-white/90 transition-colors hover:text-white";
 
 /** Site footer: logo, links, social icons, contact details and the company line. */
 export function Footer() {
@@ -39,7 +44,11 @@ export function Footer() {
     <footer className="bg-primary text-white">
       <div className="mx-auto grid max-w-6xl gap-10 px-6 pb-8 pt-14 sm:px-10 md:grid-cols-2 md:items-center lg:grid-cols-[1.1fr_0.8fr_1fr_1.4fr]">
         {/* The navy logo, turned white for the dark footer */}
-        <a href="#top" aria-label="Totalflux, back to top" className="justify-self-center md:justify-self-start">
+        <a
+          href="#top"
+          aria-label="Totalflux, back to top"
+          className="justify-self-center md:justify-self-start"
+        >
           <img
             src="/logo-transparent.png"
             alt="Totalflux"
@@ -59,14 +68,20 @@ export function Footer() {
 
         <div className="flex flex-col items-center gap-5 md:items-start">
           {COMPANY_LINKS.map((link) => (
-            <a key={link.label} href={link.href} className={LINK}>
+            <a key={link.label} href={link.href} {...(link.external && EXTERNAL)} className={LINK}>
               {link.label}
+              {link.external && <span className="sr-only"> (Amazon, opens in a new tab)</span>}
             </a>
           ))}
           <ul className="flex items-center gap-5">
             {SOCIAL_LINKS.map(({ label, icon: Icon, href }) => (
               <li key={label}>
-                <a href={href} aria-label={label} className="block text-white/90 transition-transform hover:scale-110 hover:text-white">
+                <a
+                  href={href}
+                  {...EXTERNAL}
+                  aria-label={`Totalflux on ${label} (opens in a new tab)`}
+                  className="block text-white/90 transition-transform hover:scale-110 hover:text-white"
+                >
                   <Icon className="size-7" strokeWidth={1.8} />
                 </a>
               </li>
@@ -75,7 +90,10 @@ export function Footer() {
         </div>
 
         {/* Contact details (the "Contact Us" link above comes here) */}
-        <address id="contact-us" className="flex scroll-mt-24 flex-col items-center gap-4 not-italic md:items-start">
+        <address
+          id="contact-us"
+          className="flex scroll-mt-24 flex-col items-center gap-4 not-italic md:items-start"
+        >
           {CONTACT.map(({ label, icon: Icon, text, href }) => {
             const body = (
               <>
@@ -88,7 +106,8 @@ export function Footer() {
                 </span>
               </>
             );
-            const style = "flex max-w-xs items-start gap-3 text-center text-[0.95rem] leading-6 text-white/90 md:text-left";
+            const style =
+              "flex max-w-xs items-start gap-3 text-center text-[0.95rem] leading-6 text-white/90 md:text-left";
             return href ? (
               <a key={label} href={href} className={`${style} transition-colors hover:text-white`}>
                 {body}

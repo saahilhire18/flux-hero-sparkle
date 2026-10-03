@@ -1,73 +1,43 @@
 // src/routes/index.tsx
 import { createFileRoute } from "@tanstack/react-router";
-import { Candy, FlaskConicalOff, ThermometerSnowflake } from "lucide-react";
-import { BrandName } from "@/components/BrandName";
 import { Footer } from "@/components/Footer";
-import { Hero } from "@/components/Hero";
-import { ToothShield } from "@/components/icons/Tooth";
-import { KidoosSection } from "@/components/KidoosSection";
-import { OralHealthSection } from "@/components/OralHealthSection";
-import { ToothpasteRange, TOOTHPASTE_RANGE_END_COLOR } from "@/components/ToothpasteRange";
-import type { OrbitItem } from "@/components/Orbit";
+import { DailyRoutine, ROUTINE_END } from "@/components/home/DailyRoutine";
+import { HomeClosing } from "@/components/home/HomeClosing";
+import { HOME_HERO_END, HomeHero } from "@/components/home/HomeHero";
+import { MatchFinder, MATCH_END } from "@/components/home/MatchFinder";
+import { RangeCards, RANGES_END } from "@/components/home/RangeCards";
 
-// Where the hero and the range meet: the hero fades into this, and the range's background
-// starts from it before blending into each product's colour, so there is no seam.
-const SEAM_COLOR = "#E7EFF8";
-
-/** Where the Kidoos section ends, which the closing section starts from. */
-const KIDOOS_END_COLOR = "#F4F6FF";
-
-/** What the whole toothpaste range promises, around the closing section's figure. */
-const TOOTHPASTE_PROMISES: OrbitItem[] = [
-  { label: "SLS Free, Every Tube", icon: FlaskConicalOff, color: "#2B6CB0" },
-  { label: "Cavity Protection", icon: ToothShield, color: "#178AA0" },
-  { label: "Sensitivity Relief", icon: ThermometerSnowflake, color: "#2E8B57" },
-  { label: "Strawberry Bliss for Kids", icon: Candy, color: "#B83B72" },
-];
+const DESCRIPTION =
+  "Totalflux complete oral care: SLS-free toothpastes, mouthwashes that kill 99.9% of oral germs, and the Oralbrush with a built-in tongue scraper. For every mouth, every age.";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "Totalflux | Complete Oral Care" },
-      {
-        name: "description",
-        content:
-          "Discover Totalflux SLS-free toothpastes for healthy smiles, fresh breath, and everyday cavity protection.",
-      },
+      { name: "description", content: DESCRIPTION },
       { property: "og:title", content: "Totalflux | Complete Oral Care" },
-      { property: "og:description", content: "SLS-free oral care for every mouth and every age." },
+      { property: "og:description", content: DESCRIPTION },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
-  component: Index,
+  component: HomePage,
 });
 
-// The home page (the toothpaste page): the hero steps through the range as you scroll (see
-// Hero), then the adult toothpastes take the stage one at a time (Advance, Sensitive,
-// Essential), then the Kidoos, then why oral health matters. Clicking a tube in the hero goes
-// straight to its product.
-function Index() {
+// The home page: the hero, then the three ranges (each leading to its page), the daily
+// routine, "find your match", and why Totalflux and where to buy. Each section starts from the
+// colour the one above ends with, so they run together.
+function HomePage() {
   return (
-    <main>
-      <Hero transitionColor={SEAM_COLOR} />
-      {/* Target of the hero's "Explore Our Range" button and the navbar's "Toothpaste" link */}
-      <div id="toothpaste">
-        <ToothpasteRange seamColor={SEAM_COLOR} />
-        {/* Starts from Essential's colour, where the range above ends */}
-        <KidoosSection topColor={TOOTHPASTE_RANGE_END_COLOR} />
-      </div>
-      <OralHealthSection
-        topColor={KIDOOS_END_COLOR}
-        promises={TOOTHPASTE_PROMISES}
-        closing={
-          <>
-            Your journey to a better smile: the <BrandName className="font-bold text-primary" />{" "}
-            toothpaste range.
-          </>
-        }
-      />
+    <>
+      <main>
+        <HomeHero />
+        <RangeCards topColor={HOME_HERO_END} />
+        <DailyRoutine topColor={RANGES_END} />
+        <MatchFinder topColor={ROUTINE_END} />
+        <HomeClosing topColor={MATCH_END} />
+      </main>
       <Footer />
-    </main>
+    </>
   );
 }

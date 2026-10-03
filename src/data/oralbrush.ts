@@ -7,6 +7,7 @@
 // Easy to Open, Smart Bristle Design, Gentle Tongue Scraper) and what the photos show.
 import type { LucideIcon } from "lucide-react";
 import { Leaf, Smile, Sparkles, UnfoldVertical } from "lucide-react";
+import { AMAZON_STORE } from "@/data/links";
 
 export type BrushView = "front" | "side" | "open";
 
@@ -23,9 +24,8 @@ export const ORALBRUSH = {
    * icons (about 7:1 on the page's pale blue).
    */
   colors: { sky: "#A9C9EA", ink: "#24507F" },
-  /** The Totalflux store on Amazon India (the live site's "Where to buy"). */
-  buyUrl:
-    "https://www.amazon.in/stores/Totalflux/page/5C4DB79E-4F47-46E5-9771-CEED95C4BE91?lp_asin=B0DP31N8BF&ref_=cm_sw_r_ud_ast_store_6CDA7H9KZ8GSAC1CRMA6",
+  /** The Totalflux store on Amazon India, until the brush has a page of its own there. */
+  buyUrl: AMAZON_STORE,
 };
 
 export type BrushFeature = {

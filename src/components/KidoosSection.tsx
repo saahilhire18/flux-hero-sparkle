@@ -1,17 +1,9 @@
 // components/KidoosSection.tsx
-import { useRef, type PointerEvent } from "react";
+import { useRef } from "react";
 import { Check } from "lucide-react";
-import {
-  motion,
-  MotionConfig,
-  useMotionTemplate,
-  useMotionValue,
-  useReducedMotion,
-  useScroll,
-  useSpring,
-  useTransform,
-} from "motion/react";
+import { motion, MotionConfig, useScroll, useTransform } from "motion/react";
 import { BrandName } from "@/components/BrandName";
+import { useHoverTilt } from "@/hooks/use-hover-tilt";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -81,55 +73,28 @@ function Dots() {
 }
 
 /**
- * On hover the card tilts towards the mouse (up to `tilt` degrees) and its layers come apart
- * in depth: the badge nearest, then the tube, then the words (`depth`, px towards you), so
- * they shift against each other as it turns. A soft glare follows the mouse.
+ * On hover the card tilts towards the mouse (useHoverTilt) and its layers come apart in depth:
+ * the badge nearest, then the tube, then the words (px towards you), so they shift against
+ * each other as it turns. A soft glare follows the mouse.
  */
-const HOVER_3D = { tilt: { x: 9, y: 12 }, depth: { badge: 110, tube: 80, words: 40 }, lift: 1.02 };
-const SPRING = { stiffness: 170, damping: 20, mass: 0.6 };
+const DEPTH = { badge: 110, tube: 80, words: 40 };
 
 /**
  * One Kidoos card: a gradient panel with the age badge, the tube (rising and swaying as the
- * page scrolls) and the product's key points. In 3D on hover (HOVER_3D).
+ * page scrolls) and the product's key points. In 3D on hover.
  */
 function KidooCard({ kidoo, index }: { kidoo: Kidoo; index: number }) {
   const ref = useRef<HTMLElement>(null);
-  const reduceMotion = useReducedMotion();
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
   const tubeY = useTransform(scrollYProgress, [0, 1], [70, -70]);
   const tubeRotate = useTransform(scrollYProgress, [0, 1], index % 2 ? [-14, 6] : [14, -6]);
   const badgeRotate = useTransform(scrollYProgress, [0, 1], [-20, 20]);
 
-  // The mouse over the card (0–1 across and down; the middle when it's not there) and how
-  // far into hover the card is (0–1), all eased
-  const pointerX = useMotionValue(0.5);
-  const pointerY = useMotionValue(0.5);
-  const hovering = useMotionValue(0);
-  const easedX = useSpring(pointerX, SPRING);
-  const easedY = useSpring(pointerY, SPRING);
-  const hover = useSpring(hovering, SPRING);
-  const rotateX = useTransform(easedY, [0, 1], [HOVER_3D.tilt.x, -HOVER_3D.tilt.x]);
-  const rotateY = useTransform(easedX, [0, 1], [-HOVER_3D.tilt.y, HOVER_3D.tilt.y]);
-  const scale = useTransform(hover, [0, 1], [1, HOVER_3D.lift]);
-  const badgeZ = useTransform(hover, [0, 1], [0, HOVER_3D.depth.badge]);
-  const tubeZ = useTransform(hover, [0, 1], [0, HOVER_3D.depth.tube]);
-  const wordsZ = useTransform(hover, [0, 1], [0, HOVER_3D.depth.words]);
-  const glareX = useTransform(easedX, (v) => `${v * 100}%`);
-  const glareY = useTransform(easedY, (v) => `${v * 100}%`);
-  const glare = useMotionTemplate`radial-gradient(circle at ${glareX} ${glareY}, rgba(255,255,255,0.5), rgba(255,255,255,0) 55%)`;
-
-  const onPointerMove = (event: PointerEvent<HTMLElement>) => {
-    if (reduceMotion || event.pointerType !== "mouse") return;
-    const box = event.currentTarget.getBoundingClientRect();
-    pointerX.set((event.clientX - box.left) / box.width);
-    pointerY.set((event.clientY - box.top) / box.height);
-    hovering.set(1);
-  };
-  const onPointerLeave = () => {
-    pointerX.set(0.5);
-    pointerY.set(0.5);
-    hovering.set(0);
-  };
+  const { handlers, style: tiltStyle, hover, glare } = useHoverTilt();
+  const badgeZ = useTransform(hover, [0, 1], [0, DEPTH.badge]);
+  const tubeZ = useTransform(hover, [0, 1], [0, DEPTH.tube]);
+  const wordsZ = useTransform(hover, [0, 1], [0, DEPTH.words]);
+  const { rotateX, rotateY, scale } = tiltStyle;
 
   return (
     <motion.article
@@ -140,8 +105,7 @@ function KidooCard({ kidoo, index }: { kidoo: Kidoo; index: number }) {
       whileInView={{ opacity: 1, y: 0, rotate: 0 }}
       viewport={{ once: true, amount: 0.3 }}
       transition={{ duration: 0.8, delay: index * 0.12, ease: EASE }}
-      onPointerMove={onPointerMove}
-      onPointerLeave={onPointerLeave}
+      {...handlers}
       // preserve-3d (and no overflow clipping here) lets the layers inside sit at their depths
       className="relative rounded-[2.5rem] border border-white/70 p-7 shadow-[0_30px_70px_-35px_rgba(60,40,90,0.45)] transition-shadow duration-300 [transform-style:preserve-3d] hover:shadow-[0_50px_90px_-35px_rgba(60,40,90,0.55)] sm:p-9"
       style={{

@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as MouthwashRouteImport } from './routes/mouthwash'
 import { Route as OralbrushRouteImport } from './routes/oralbrush'
+import { Route as ToothpasteRouteImport } from './routes/toothpaste'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -28,35 +29,44 @@ const OralbrushRoute = OralbrushRouteImport.update({
   path: '/oralbrush',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToothpasteRoute = ToothpasteRouteImport.update({
+  id: '/toothpaste',
+  path: '/toothpaste',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/mouthwash': typeof MouthwashRoute
   '/oralbrush': typeof OralbrushRoute
+  '/toothpaste': typeof ToothpasteRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/mouthwash': typeof MouthwashRoute
   '/oralbrush': typeof OralbrushRoute
+  '/toothpaste': typeof ToothpasteRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/mouthwash': typeof MouthwashRoute
   '/oralbrush': typeof OralbrushRoute
+  '/toothpaste': typeof ToothpasteRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/mouthwash' | '/oralbrush'
+  fullPaths: '/' | '/mouthwash' | '/oralbrush' | '/toothpaste'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/mouthwash' | '/oralbrush'
-  id: '__root__' | '/' | '/mouthwash' | '/oralbrush'
+  to: '/' | '/mouthwash' | '/oralbrush' | '/toothpaste'
+  id: '__root__' | '/' | '/mouthwash' | '/oralbrush' | '/toothpaste'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   MouthwashRoute: typeof MouthwashRoute
   OralbrushRoute: typeof OralbrushRoute
+  ToothpasteRoute: typeof ToothpasteRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -82,6 +92,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OralbrushRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/toothpaste': {
+      id: '/toothpaste'
+      path: '/toothpaste'
+      fullPath: '/toothpaste'
+      preLoaderRoute: typeof ToothpasteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -89,6 +106,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   MouthwashRoute: MouthwashRoute,
   OralbrushRoute: OralbrushRoute,
+  ToothpasteRoute: ToothpasteRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

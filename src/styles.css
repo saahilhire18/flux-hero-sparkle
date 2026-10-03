@@ -335,6 +335,24 @@ html {
   }
 }
 
+/* Home hero (HomeHero.tsx): each floating product bobs gently, at its own pace */
+.float-bob {
+  animation: float-bob var(--bob-duration, 6s) ease-in-out var(--bob-delay, 0s) infinite alternate;
+}
+@keyframes float-bob {
+  from {
+    transform: translateY(-8px);
+  }
+  to {
+    transform: translateY(8px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .float-bob {
+    animation: none;
+  }
+}
+
 /*
  * Mouthwash hero bubbles (MouthwashHero.tsx): rising through the liquid-coloured glow and
  * fading out near the top. Each sets its own --rise-duration and --rise-delay (negative, so

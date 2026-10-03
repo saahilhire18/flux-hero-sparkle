@@ -11,6 +11,7 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { SHARE_IMAGE } from "@/data/site";
 
 function NotFoundComponent() {
   return (
@@ -80,9 +81,16 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { title: "Totalflux" },
       { name: "description", content: "Complete oral care for healthier smiles." },
       { name: "author", content: "Totalflux" },
+      // Share previews: every page shows the brand's picture (pages set their own title and text)
       { property: "og:type", content: "website" },
+      { property: "og:site_name", content: "Totalflux" },
+      { property: "og:image", content: SHARE_IMAGE.url },
+      { property: "og:image:width", content: String(SHARE_IMAGE.width) },
+      { property: "og:image:height", content: String(SHARE_IMAGE.height) },
+      { property: "og:image:alt", content: SHARE_IMAGE.alt },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:image", content: SHARE_IMAGE.url },
+      { name: "theme-color", content: "#24467A" },
     ],
     links: [
       {
