@@ -144,7 +144,7 @@ const RANGES: Range[] = [
 ];
 
 /** How far the card's layers lift towards you while it's hovered (px). */
-const DEPTH = { visual: 70, words: 35 };
+const DEPTH = { visual: 55, words: 28 };
 
 /**
  * One range: its picture over its name, what it is and a link, the whole card leading to the
@@ -163,18 +163,18 @@ function RangeCard({ range, index }: { range: Range; index: number }) {
       viewport={{ once: true, amount: 0.25 }}
       transition={{ duration: 0.8, delay: index * 0.12, ease: EASE }}
       {...handlers}
-      className="group relative flex flex-col rounded-[2.5rem] border border-white/80 shadow-[0_30px_70px_-35px_rgba(20,50,100,0.45)] transition-shadow duration-300 [transform-style:preserve-3d] hover:shadow-[0_50px_90px_-35px_rgba(20,50,100,0.55)]"
+      className="group relative flex flex-col rounded-[2rem] border border-white/80 shadow-[0_30px_70px_-35px_rgba(20,50,100,0.45)] transition-shadow duration-300 [transform-style:preserve-3d] hover:shadow-[0_50px_90px_-35px_rgba(20,50,100,0.55)]"
       style={{ background: range.background, ...style }}
     >
       {/* The picture (clipped to the card's rounded top) */}
       <motion.div
         style={{ z: visualZ }}
-        className="relative aspect-[1.35] overflow-hidden rounded-t-[2.5rem]"
+        className="relative aspect-[1.5] overflow-hidden rounded-t-[2rem]"
       >
         {range.visual}
       </motion.div>
 
-      <motion.div style={{ z: wordsZ }} className="flex flex-1 flex-col px-7 pb-8 pt-2 sm:px-8">
+      <motion.div style={{ z: wordsZ }} className="flex flex-1 flex-col px-6 pb-6 pt-1">
         <p
           className="w-fit rounded-full bg-white/70 px-3 py-1 text-[0.7rem] font-bold uppercase tracking-[0.16em]"
           style={{ color: range.ink }}
@@ -182,18 +182,18 @@ function RangeCard({ range, index }: { range: Range; index: number }) {
           {range.badge}
         </p>
         <h3 id={`${range.id}-card-title`} className="mt-3 leading-[1]">
-          <BrandName className="block text-lg font-bold text-slate-700" />
+          <BrandName className="block text-base font-bold text-slate-700" />
           <span
-            className="text-[clamp(2rem,3vw,2.6rem)] font-black tracking-tight"
+            className="text-[clamp(1.6rem,2.2vw,2rem)] font-black tracking-tight"
             style={{ color: range.ink }}
           >
             {range.name}
           </span>
         </h3>
-        <p className="mt-3 text-[0.95rem] leading-7 text-slate-700">{range.text}</p>
+        <p className="mt-2 text-sm leading-6 text-slate-700">{range.text}</p>
         <span
           aria-hidden="true"
-          className="mt-auto inline-flex items-center gap-2 pt-5 text-sm font-bold"
+          className="mt-auto inline-flex items-center gap-2 pt-4 text-sm font-bold"
           style={{ color: range.ink }}
         >
           {range.link}
@@ -204,7 +204,7 @@ function RangeCard({ range, index }: { range: Range; index: number }) {
       {/* Glare following the mouse, only while hovered */}
       <motion.div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 rounded-[2.5rem]"
+        className="pointer-events-none absolute inset-0 rounded-[2rem]"
         style={{ background: glare, opacity: hover }}
       />
 
@@ -212,7 +212,7 @@ function RangeCard({ range, index }: { range: Range; index: number }) {
       <Link
         to={range.to}
         aria-label={`${range.link}: Totalflux ${range.name}`}
-        className="absolute inset-0 z-10 rounded-[2.5rem] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        className="absolute inset-0 z-10 rounded-[2rem] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
       />
     </motion.article>
   );
@@ -252,7 +252,8 @@ export function RangeCards({ topColor }: { topColor: string }) {
               Three ranges. One complete routine.
             </h2>
           </motion.div>
-          <div className="mt-12 grid gap-8 [perspective:1400px] md:grid-cols-2 lg:grid-cols-3">
+          {/* At most about 1100px across, centred, so the cards stay a comfortable size */}
+          <div className="mx-auto mt-10 grid max-w-[69rem] gap-6 [perspective:1400px] md:grid-cols-2 lg:grid-cols-3">
             {RANGES.map((range, i) => (
               <RangeCard key={range.id} range={range} index={i} />
             ))}
