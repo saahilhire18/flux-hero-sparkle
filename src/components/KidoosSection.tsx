@@ -62,12 +62,12 @@ function Dots() {
   return (
     <div
       aria-hidden="true"
-      className="pointer-events-none absolute inset-0 overflow-hidden rounded-[2.5rem]"
+      className="pointer-events-none absolute inset-0 overflow-hidden rounded-[2rem]"
     >
-      <span className="absolute right-[8%] top-[10%] size-16 rounded-full bg-white/50 blur-[1px]" />
-      <span className="absolute right-[20%] top-[26%] size-5 rounded-full bg-white/70" />
-      <span className="absolute bottom-[12%] left-[6%] size-24 rounded-full bg-white/35" />
-      <span className="absolute bottom-[30%] left-[18%] size-4 rounded-full bg-white/70" />
+      <span className="absolute right-[8%] top-[10%] size-12 rounded-full bg-white/50 blur-[1px]" />
+      <span className="absolute right-[20%] top-[26%] size-4 rounded-full bg-white/70" />
+      <span className="absolute bottom-[12%] left-[6%] size-20 rounded-full bg-white/35" />
+      <span className="absolute bottom-[30%] left-[18%] size-3 rounded-full bg-white/70" />
     </div>
   );
 }
@@ -77,7 +77,7 @@ function Dots() {
  * the badge nearest, then the tube, then the words (px towards you), so they shift against
  * each other as it turns. A soft glare follows the mouse.
  */
-const DEPTH = { badge: 110, tube: 80, words: 40 };
+const DEPTH = { badge: 85, tube: 60, words: 30 };
 
 /**
  * One Kidoos card: a gradient panel with the age badge, the tube (rising and swaying as the
@@ -86,7 +86,7 @@ const DEPTH = { badge: 110, tube: 80, words: 40 };
 function KidooCard({ kidoo, index }: { kidoo: Kidoo; index: number }) {
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
-  const tubeY = useTransform(scrollYProgress, [0, 1], [70, -70]);
+  const tubeY = useTransform(scrollYProgress, [0, 1], [50, -50]);
   const tubeRotate = useTransform(scrollYProgress, [0, 1], index % 2 ? [-14, 6] : [14, -6]);
   const badgeRotate = useTransform(scrollYProgress, [0, 1], [-20, 20]);
 
@@ -107,7 +107,7 @@ function KidooCard({ kidoo, index }: { kidoo: Kidoo; index: number }) {
       transition={{ duration: 0.8, delay: index * 0.12, ease: EASE }}
       {...handlers}
       // preserve-3d (and no overflow clipping here) lets the layers inside sit at their depths
-      className="relative rounded-[2.5rem] border border-white/70 p-7 shadow-[0_30px_70px_-35px_rgba(60,40,90,0.45)] transition-shadow duration-300 [transform-style:preserve-3d] hover:shadow-[0_50px_90px_-35px_rgba(60,40,90,0.55)] sm:p-9"
+      className="relative rounded-[2rem] border border-white/70 p-6 shadow-[0_30px_70px_-35px_rgba(60,40,90,0.45)] transition-shadow duration-300 [transform-style:preserve-3d] hover:shadow-[0_50px_90px_-35px_rgba(60,40,90,0.55)] sm:p-7"
       style={{
         background: kidoo.gradient,
         color: kidoo.ink,
@@ -119,9 +119,9 @@ function KidooCard({ kidoo, index }: { kidoo: Kidoo; index: number }) {
     >
       <Dots />
 
-      <div className="relative grid items-center gap-6 [transform-style:preserve-3d] sm:grid-cols-[auto_1fr]">
+      <div className="relative grid items-center gap-5 [transform-style:preserve-3d] sm:grid-cols-[auto_1fr] sm:gap-x-10">
         {/* Tube with its age badge */}
-        <div className="relative mx-auto h-72 w-36 [transform-style:preserve-3d] sm:h-96 sm:w-44">
+        <div className="relative mx-auto h-60 w-28 [transform-style:preserve-3d] sm:h-72 sm:w-32">
           <motion.img
             src={kidoo.image.src}
             width={kidoo.image.width}
@@ -133,39 +133,39 @@ function KidooCard({ kidoo, index }: { kidoo: Kidoo; index: number }) {
           />
           <motion.span
             style={{ rotate: badgeRotate, z: badgeZ, backgroundColor: kidoo.ink }}
-            className="absolute -right-6 top-2 grid size-20 place-items-center rounded-full text-center text-white shadow-lg ring-4 ring-white/70"
+            className="absolute -right-5 top-1 grid size-16 place-items-center rounded-full text-center text-white shadow-lg ring-4 ring-white/70"
           >
             <span className="leading-none">
-              <span className="block text-2xl font-black">{kidoo.age}</span>
-              <span className="text-[0.65rem] font-semibold uppercase tracking-wider">years</span>
+              <span className="block text-xl font-black">{kidoo.age}</span>
+              <span className="text-[0.58rem] font-semibold uppercase tracking-wider">years</span>
             </span>
           </motion.span>
         </div>
 
         <motion.div style={{ z: wordsZ }}>
-          <p className="inline-flex rounded-full bg-white/60 px-3.5 py-1 text-xs font-bold uppercase tracking-[0.16em] backdrop-blur">
+          <p className="inline-flex rounded-full bg-white/60 px-3 py-1 text-[0.68rem] font-bold uppercase tracking-[0.16em] backdrop-blur">
             {kidoo.tag}
           </p>
           <h3
             id={`${kidoo.id}-title`}
-            className="mt-3 text-3xl font-black leading-tight tracking-tight sm:text-4xl"
+            className="mt-2.5 text-2xl font-black leading-tight tracking-tight sm:text-3xl"
           >
-            <BrandName className="block text-base font-bold tracking-normal opacity-70" />
+            <BrandName className="block text-sm font-bold tracking-normal opacity-70" />
             {kidoo.name}
           </h3>
-          <p className="mt-3 text-[0.95rem] leading-7 opacity-90">{kidoo.summary}</p>
+          <p className="mt-2 text-sm leading-6 opacity-90">{kidoo.summary}</p>
 
-          <ul className="mt-4 flex flex-wrap gap-2">
+          <ul className="mt-3 flex flex-wrap gap-2">
             {kidoo.actives.map(([name, amount]) => (
-              <li key={name} className="rounded-full bg-white/65 px-3 py-1 text-sm backdrop-blur">
+              <li key={name} className="rounded-full bg-white/65 px-3 py-1 text-xs backdrop-blur">
                 {name} <span className="font-bold">{amount}</span>
               </li>
             ))}
           </ul>
 
-          <ul className="mt-4 space-y-2">
+          <ul className="mt-3 space-y-1.5">
             {kidoo.perks.map((perk) => (
-              <li key={perk} className="flex items-center gap-2.5 text-sm font-semibold">
+              <li key={perk} className="flex items-center gap-2 text-[0.82rem] font-semibold">
                 <span
                   className="grid size-5 shrink-0 place-items-center rounded-full text-white"
                   style={{ backgroundColor: kidoo.ink }}
@@ -182,7 +182,7 @@ function KidooCard({ kidoo, index }: { kidoo: Kidoo; index: number }) {
       {/* Glare following the mouse, only while hovered */}
       <motion.div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 rounded-[2.5rem]"
+        className="pointer-events-none absolute inset-0 rounded-[2rem]"
         style={{ background: glare, opacity: hover }}
       />
     </motion.article>
@@ -231,7 +231,8 @@ export function KidoosSection({ topColor = "#DDE4F2" }: { topColor?: string }) {
             </p>
           </motion.div>
 
-          <div className="mt-12 grid gap-8 [perspective:1400px] lg:grid-cols-2">
+          {/* At most about 1000px across, centred, so the cards stay a comfortable size */}
+          <div className="mx-auto mt-10 grid max-w-[62rem] gap-6 [perspective:1400px] lg:grid-cols-2">
             {KIDOOS.map((kidoo, i) => (
               <KidooCard key={kidoo.id} kidoo={kidoo} index={i} />
             ))}
