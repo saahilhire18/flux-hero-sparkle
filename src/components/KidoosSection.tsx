@@ -231,8 +231,8 @@ export function KidoosSection({ topColor = "#DDE4F2" }: { topColor?: string }) {
             </p>
           </motion.div>
 
-          {/* At most about 1000px across, centred, so the cards stay a comfortable size */}
-          <div className="mx-auto mt-10 grid max-w-[62rem] gap-6 [perspective:1400px] lg:grid-cols-2">
+          {/* At most about 1220px across, centred, the two cards close together */}
+          <div className="mx-auto mt-10 grid max-w-[76rem] gap-4 [perspective:1400px] lg:grid-cols-2">
             {KIDOOS.map((kidoo, i) => (
               <KidooCard key={kidoo.id} kidoo={kidoo} index={i} />
             ))}
