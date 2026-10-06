@@ -1,5 +1,5 @@
 // components/home/HomeHero.tsx
-import { type CSSProperties, type PointerEvent } from "react";
+import { type PointerEvent } from "react";
 import { Link } from "@tanstack/react-router";
 import {
   motion,
@@ -8,14 +8,14 @@ import {
   useReducedMotion,
   useSpring,
   useTransform,
-  type MotionStyle,
-  type MotionValue,
   type Variants,
 } from "motion/react";
-import { ArrowDown, Check, ShoppingBag } from "lucide-react";
+import { ArrowDown, ShieldCheck, ShoppingBag } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
-import { BRUSH, KIDOOS_ADVANCE, mouthwash, toothpaste, type HomeProduct } from "@/data/home";
+import { mouthwash, type HomeProduct } from "@/data/home";
 import { AMAZON_STORE, EXTERNAL } from "@/data/links";
+import { ORALBRUSH } from "@/data/oralbrush";
+import { cn } from "@/lib/utils";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 const NAVY = "#24467A";
@@ -24,172 +24,114 @@ const TEAL = "#178AA0";
 /** Where the hero ends: the next section starts from this. */
 export const HOME_HERO_END = "#E8F1FA";
 
-const TICKS = ["SLS free", "Clinically tested", "100% vegetarian"];
-
-/** A spot for a floating product: its centre (% across, % down), height and lean (degrees). */
-type Spot = { x: number; y: number; h: number; rotate: number };
+const GLASS =
+  "border border-white/80 bg-white/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_12px_30px_-16px_rgba(20,60,120,0.4)] backdrop-blur-md";
 
 /**
- * The products floating round the headline. wide: on desktop, over the whole hero, clear of the
- * words in the middle (height in svh). narrow: on phones and tablets, in a band under the words
- * (height in % of that band); left out, it shows on desktop only. depth: how far it drifts with
- * the mouse (nearer ones drift more). bob: seconds for its gentle float up and down.
+ * The toothpaste range's studio photo with its backdrop cut away (public/toothpaste-boxes.webp,
+ * made from the "All View" snapshot; the boxes' soft shadows are kept, see-through).
  */
-const COLLAGE: { product: HomeProduct; wide: Spot; narrow?: Spot; depth: number; bob: number }[] = [
+const BOXES: HomeProduct = {
+  name: "The toothpaste range",
+  kind: "Toothpaste",
+  image: { src: "/toothpaste-boxes.webp", width: 1400, height: 980 },
+  ink: "#1F5E48",
+  to: "/toothpaste",
+};
+
+/**
+ * The photo's bottom 11% is only the boxes' soft shadow: they stand that far up from its
+ * edge. It's lowered by as much, so the boxes stand on the platform like the rest.
+ */
+const BOXES_SINK = "translate-y-[11%]";
+
+/** The Oralbrush opened up, its handle swung round on the hinge so the tongue scraper shows. */
+const BRUSH_OPEN: HomeProduct = {
+  name: "Oralbrush",
+  kind: "Oralbrush",
+  image: ORALBRUSH.images.open,
+  ink: ORALBRUSH.colors.ink,
+  to: "/oralbrush",
+};
+
+/** The mouthwash bottles' height: all three the same (in the stage's container units). */
+const BOTTLE_H = "h-[26cqw] lg:h-[min(78cqh,17cqw)]";
+
+/**
+ * The range standing together on the platform, left to right, each in its own space: what it
+ * is, its height (in the stage's container units; phones size by the width, so the row fits
+ * across), how wide its shadow is, and whether phones leave it out (there's room for one bottle
+ * there). The toothpaste boxes are the centrepiece.
+ */
+const LINEUP: {
+  product: HomeProduct;
+  height: string;
+  shadow: string;
+  alt: string;
+  wideOnly?: boolean;
+}[] = [
+  {
+    product: mouthwash("kidoos"),
+    height: BOTTLE_H,
+    shadow: "w-[125%]",
+    alt: "Totalflux Kidoos mouthwash",
+    wideOnly: true,
+  },
   {
     product: mouthwash("mintfresh"),
-    wide: { x: 12, y: 36, h: 32, rotate: -8 },
-    narrow: { x: 14, y: 46, h: 78, rotate: -6 },
-    depth: 1,
-    bob: 6,
+    height: BOTTLE_H,
+    shadow: "w-[125%]",
+    alt: "Totalflux Mintfresh mouthwash",
   },
   {
-    product: toothpaste("advance"),
-    wide: { x: 21, y: 74, h: 30, rotate: 14 },
-    narrow: { x: 37, y: 54, h: 70, rotate: 10 },
-    depth: 0.85,
-    bob: 7,
-  },
-  { product: KIDOOS_ADVANCE, wide: { x: 5, y: 76, h: 21, rotate: -14 }, depth: 0.55, bob: 5.5 },
-  { product: mouthwash("neem"), wide: { x: 24, y: 26, h: 19, rotate: 10 }, depth: 0.45, bob: 8 },
-  {
-    product: BRUSH,
-    wide: { x: 89, y: 42, h: 48, rotate: 18 },
-    narrow: { x: 87, y: 46, h: 92, rotate: 16 },
-    depth: 1,
-    bob: 6.5,
+    product: BOXES,
+    height: "h-[42cqw] lg:h-[min(100cqh,38cqw)]",
+    shadow: "w-[96%]",
+    alt: "The Totalflux toothpaste range: Essential, Sensitive, Kidoos and Advance, with their boxes",
   },
   {
-    product: toothpaste("sensitive"),
-    wide: { x: 77, y: 75, h: 29, rotate: -14 },
-    narrow: { x: 63, y: 54, h: 70, rotate: -10 },
-    depth: 0.85,
-    bob: 7.5,
+    product: BRUSH_OPEN,
+    height: "h-[29cqw] lg:h-[min(86cqh,26cqw)]",
+    shadow: "w-[85%]",
+    alt: "The Totalflux Oralbrush, opened up to show its tongue scraper",
   },
-  { product: mouthwash("turmeric"), wide: { x: 77, y: 26, h: 20, rotate: 8 }, depth: 0.5, bob: 5 },
-  { product: mouthwash("kidoos"), wide: { x: 95, y: 83, h: 21, rotate: -8 }, depth: 0.6, bob: 6 },
+  {
+    product: mouthwash("neem"),
+    height: BOTTLE_H,
+    shadow: "w-[125%]",
+    alt: "Totalflux Neem mouthwash",
+    wideOnly: true,
+  },
 ];
-
-/** Products arrive one after another, from a little smaller and lower, after the headline. */
-const arrive: Variants = {
-  hidden: { opacity: 0, scale: 0.7, y: 30 },
-  show: (i: number) => ({
-    opacity: 1,
-    scale: 1,
-    y: 0,
-    transition: { duration: 0.9, delay: 0.35 + i * 0.08, ease: EASE },
-  }),
-};
 
 const words: Variants = {
   hidden: {},
-  show: { transition: { staggerChildren: 0.08, delayChildren: 0.1 } },
+  show: { transition: { staggerChildren: 0.1, delayChildren: 0.15 } },
 };
 const word: Variants = {
-  hidden: { opacity: 0, y: 18 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.7, ease: EASE } },
+  hidden: { opacity: 0, y: 22 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.75, ease: EASE } },
 };
 
 /**
- * One floating product: placed at its spot, drifting with the mouse by its depth and bobbing
- * gently; it grows a little and shows its name on hover, and opens its page.
- */
-function FloatingProduct({
-  item,
-  index,
-  pointerX,
-  pointerY,
-}: {
-  item: (typeof COLLAGE)[number];
-  index: number;
-  pointerX: MotionValue<number>;
-  pointerY: MotionValue<number>;
-}) {
-  const { product, wide, narrow, depth, bob } = item;
-  const x = useTransform(pointerX, (v) => v * depth * -26);
-  const y = useTransform(pointerY, (v) => v * depth * -18);
-  const name = `Totalflux ${product.name}`;
-  const label = `${name}${product.kind === "Oralbrush" ? "" : ` ${product.kind.toLowerCase()}`}`;
-
-  return (
-    <motion.div
-      custom={index}
-      variants={arrive}
-      className={`absolute left-[var(--nx)] top-[var(--ny)] h-[var(--nh)] -translate-x-1/2 -translate-y-1/2 lg:left-[var(--wx)] lg:top-[var(--wy)] lg:h-[var(--wh)] ${narrow ? "" : "hidden lg:block"}`}
-      style={
-        {
-          "--wx": `${wide.x}%`,
-          "--wy": `${wide.y}%`,
-          "--wh": `${wide.h}svh`,
-          "--nx": `${narrow?.x ?? 50}%`,
-          "--ny": `${narrow?.y ?? 50}%`,
-          "--nh": `${narrow?.h ?? 0}%`,
-          // Nearer products in front
-          zIndex: Math.round(depth * 10),
-        } as MotionStyle
-      }
-    >
-      {/* Drifting with the mouse */}
-      <motion.div style={{ x, y }} className="h-full">
-        <Link
-          to={product.to}
-          {...(product.hash ? { hash: product.hash } : {})}
-          aria-label={label}
-          className="float-bob group relative block h-full rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          style={
-            {
-              aspectRatio: `${product.image.width} / ${product.image.height}`,
-              "--bob-duration": `${bob}s`,
-              "--bob-delay": `-${(index * 1.7) % bob}s`,
-            } as CSSProperties
-          }
-        >
-          <img
-            src={product.image.src}
-            width={product.image.width}
-            height={product.image.height}
-            alt=""
-            draggable={false}
-            className="size-full select-none object-contain drop-shadow-[0_26px_24px_rgba(20,50,90,0.28)] transition-[scale] duration-300 ease-out group-hover:scale-105"
-            style={{ rotate: `${(narrow ?? wide).rotate}deg` }}
-          />
-          {/* Its name, on hover */}
-          <span
-            className="pointer-events-none absolute left-1/2 top-full mt-2 -translate-x-1/2 whitespace-nowrap rounded-full bg-white/90 px-3 py-1 text-xs font-bold opacity-0 shadow-[0_8px_20px_-10px_rgba(15,40,80,0.5)] transition-opacity duration-200 group-hover:opacity-100 group-focus-visible:opacity-100"
-            style={{ color: product.ink }}
-          >
-            {name}
-          </span>
-        </Link>
-      </motion.div>
-    </motion.div>
-  );
-}
-
-/**
- * The home page's hero: the headline centred, with the range floating round it (toothpastes,
- * mouthwashes and the Oralbrush, at different sizes and depths), each drifting with the mouse
- * by its depth (parallax) and bobbing gently, and opening its page when clicked. On phones the
- * products gather in a band under the words.
+ * The home page's hero, in the same calm style as the mouthwash and toothpaste pages': the
+ * promise centred at the top, and the whole range standing together on a glass platform below
+ * (mouthwashes, the toothpaste range in its boxes, the Oralbrush), each going to its page. The
+ * range drifts gently with the mouse.
  */
 export function HomeHero() {
   const reduceMotion = useReducedMotion();
   // The mouse across the hero, -1..1, eased
   const rawX = useMotionValue(0);
-  const rawY = useMotionValue(0);
-  const pointerX = useSpring(rawX, { stiffness: 50, damping: 16, mass: 0.6 });
-  const pointerY = useSpring(rawY, { stiffness: 50, damping: 16, mass: 0.6 });
+  const pointerX = useSpring(rawX, { stiffness: 60, damping: 18, mass: 0.6 });
+  const stageX = useTransform(pointerX, (v) => v * -12);
 
   const onPointerMove = (event: PointerEvent<HTMLElement>) => {
     if (reduceMotion || event.pointerType !== "mouse") return;
     const box = event.currentTarget.getBoundingClientRect();
     rawX.set(((event.clientX - box.left) / box.width) * 2 - 1);
-    rawY.set(((event.clientY - box.top) / box.height) * 2 - 1);
   };
-  const onPointerLeave = () => {
-    rawX.set(0);
-    rawY.set(0);
-  };
+  const onPointerLeave = () => rawX.set(0);
 
   return (
     <MotionConfig reducedMotion="user">
@@ -198,60 +140,49 @@ export function HomeHero() {
         aria-labelledby="home-title"
         onPointerMove={onPointerMove}
         onPointerLeave={onPointerLeave}
-        className="relative isolate flex min-h-svh flex-col overflow-hidden lg:h-svh lg:min-h-[44rem]"
+        className="relative isolate flex min-h-svh flex-col overflow-hidden lg:h-svh lg:min-h-[40rem]"
         style={{
-          background: `linear-gradient(180deg, #F7FAFE 0%, #EEF4FB 55%, ${HOME_HERO_END} 100%)`,
+          background: `radial-gradient(ellipse 70% 55% at 50% -8%, #ffffff 0%, rgba(255,255,255,0) 70%), linear-gradient(180deg, #E8F2FA 0%, #F4F8FD 42%, ${HOME_HERO_END} 100%)`,
         }}
       >
         <Navbar />
 
-        {/* Soft colour in the corners, from the ranges */}
+        {/* Soft colour in the top corners, from the ranges */}
         <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10">
-          <div className="absolute -left-[10%] -top-[15%] size-[36rem] rounded-full bg-[radial-gradient(circle,rgba(103,182,195,0.28)_0%,transparent_65%)]" />
-          <div className="absolute -right-[8%] -top-[10%] size-[34rem] rounded-full bg-[radial-gradient(circle,rgba(240,175,202,0.24)_0%,transparent_65%)]" />
-          <div className="absolute -bottom-[20%] left-1/2 size-[44rem] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgba(169,207,234,0.35)_0%,transparent_65%)]" />
+          <div className="absolute -left-[12%] -top-[18%] size-[42rem] rounded-full bg-[radial-gradient(circle,rgba(103,182,195,0.3)_0%,transparent_65%)]" />
+          <div className="absolute -right-[10%] -top-[14%] size-[38rem] rounded-full bg-[radial-gradient(circle,rgba(169,201,234,0.4)_0%,transparent_65%)]" />
         </div>
 
-        {/* The floating range: over the whole hero on desktop */}
-        <motion.ul
-          aria-label="The Totalflux range"
-          initial="hidden"
-          animate="show"
-          className="pointer-events-none absolute inset-0 hidden lg:block [&_a]:pointer-events-auto"
-        >
-          {COLLAGE.map((item, i) => (
-            <li key={item.product.name + item.product.kind}>
-              <FloatingProduct item={item} index={i} pointerX={pointerX} pointerY={pointerY} />
-            </li>
-          ))}
-        </motion.ul>
-
-        {/* The words, centred */}
-        <div className="relative z-20 mx-auto flex w-full max-w-3xl flex-1 flex-col items-center justify-center px-5 pb-6 pt-28 text-center sm:px-8 lg:pb-10 lg:pt-20">
+        <div className="relative mx-auto flex w-full max-w-[90rem] flex-1 flex-col justify-center px-5 pb-6 pt-[5.25rem] lg:justify-start sm:px-8 lg:min-h-0 lg:px-12 lg:pb-4">
+          {/* The words */}
           <motion.div
             variants={words}
             initial="hidden"
             animate="show"
-            className="flex flex-col items-center"
+            className="relative z-20 mx-auto flex max-w-4xl flex-col items-center text-center"
           >
             <motion.p
               variants={word}
-              className="text-xs font-bold uppercase tracking-[0.28em] sm:text-sm"
-              style={{ color: TEAL }}
+              className={cn(
+                GLASS,
+                "inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-primary",
+              )}
             >
-              Complete Oral Care
+              <ShieldCheck className="size-4 text-accent" strokeWidth={2} aria-hidden="true" />
+              SLS Free | Clinically Tested
             </motion.p>
             <motion.h1
               variants={word}
               id="home-title"
-              className="mt-4 text-[clamp(2.4rem,min(5.4vw,9.5vh),5.4rem)] font-black leading-[1.02] tracking-tight text-balance"
+              className="mt-3 text-[clamp(2rem,min(3.4vw,6vh),3.25rem)] font-black leading-[1.03] tracking-tight"
               style={{ color: NAVY }}
             >
               Your journey to a
               <span
-                className="block bg-clip-text pb-[0.06em] text-transparent"
+                className="block bg-clip-text pb-[0.08em] text-transparent"
                 style={{
-                  backgroundImage: `linear-gradient(100deg, ${TEAL} 0%, #2B6CB0 60%, ${NAVY} 100%)`,
+                  backgroundImage: `linear-gradient(90deg, ${TEAL} 0%, #2B6CB0 55%, ${NAVY} 100%)`,
+                  filter: "drop-shadow(0 6px 10px rgba(23,110,140,0.22))",
                 }}
               >
                 better smile.
@@ -259,18 +190,18 @@ export function HomeHero() {
             </motion.h1>
             <motion.p
               variants={word}
-              className="mt-4 max-w-md text-base leading-7 text-slate-600 sm:text-lg"
+              className="mt-2 max-w-4xl text-base text-slate-600 sm:text-lg"
             >
               Toothpaste, mouthwash and the Oralbrush: everything for a healthy mouth, for every
               age.
             </motion.p>
             <motion.div
               variants={word}
-              className="mt-7 flex flex-wrap items-center justify-center gap-3"
+              className="mt-4 flex flex-wrap items-center justify-center gap-3"
             >
               <a
                 href="#ranges"
-                className="inline-flex items-center gap-2.5 rounded-full px-6 py-3.5 text-base font-semibold text-white shadow-[0_14px_28px_-14px_rgba(15,40,80,0.6)] transition-transform duration-200 hover:scale-[1.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                className="inline-flex items-center gap-2.5 rounded-full px-6 py-3 text-base font-semibold text-white shadow-[0_14px_28px_-14px_rgba(15,40,80,0.6)] transition-transform duration-200 hover:scale-[1.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                 style={{ backgroundColor: NAVY }}
               >
                 Explore the range
@@ -279,7 +210,10 @@ export function HomeHero() {
               <a
                 href={AMAZON_STORE}
                 {...EXTERNAL}
-                className="inline-flex items-center gap-2 rounded-full border border-slate-300 bg-white/80 px-5 py-3 text-base font-semibold transition-colors hover:border-slate-400 hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className={cn(
+                  GLASS,
+                  "inline-flex items-center gap-2 rounded-full px-5 py-3 text-base font-semibold transition-colors hover:bg-white/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                )}
                 style={{ color: NAVY }}
               >
                 <ShoppingBag className="size-4" aria-hidden="true" />
@@ -287,38 +221,73 @@ export function HomeHero() {
                 <span className="sr-only"> (Amazon, opens in a new tab)</span>
               </a>
             </motion.div>
-            <motion.ul
-              variants={word}
-              className="mt-7 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm font-semibold text-slate-600"
-            >
-              {TICKS.map((tick) => (
-                <li key={tick} className="inline-flex items-center gap-2">
-                  <span
-                    className="grid size-5 place-items-center rounded-full text-white"
-                    style={{ backgroundColor: TEAL }}
-                  >
-                    <Check className="size-3" strokeWidth={3} aria-hidden="true" />
-                  </span>
-                  {tick}
-                </li>
-              ))}
-            </motion.ul>
           </motion.div>
-        </div>
 
-        {/* The floating range: in a band under the words on phones and tablets */}
-        <motion.ul
-          aria-label="The Totalflux range"
-          initial="hidden"
-          animate="show"
-          className="relative mx-auto h-[19rem] w-full max-w-xl sm:h-[22rem] lg:hidden"
-        >
-          {COLLAGE.filter((item) => item.narrow).map((item, i) => (
-            <li key={item.product.name + item.product.kind}>
-              <FloatingProduct item={item} index={i} pointerX={pointerX} pointerY={pointerY} />
-            </li>
-          ))}
-        </motion.ul>
+          {/* The range on its platform. A size container: the products size themselves from it */}
+          <div className="relative mt-6 h-[15rem] [container-type:size] sm:h-[24rem] lg:mt-1 lg:h-auto lg:min-h-0 lg:flex-1">
+            {/* Glass platform under their bases */}
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-x-[10%] bottom-[2%] h-[16%] lg:inset-x-[22%]"
+            >
+              <div className="absolute inset-x-[0.6%] bottom-0 top-[26%] rounded-[50%] border border-white/60 bg-linear-to-b from-white/45 to-[#a9cdf0]/25 shadow-[0_28px_48px_-26px_rgba(30,80,150,0.5)]" />
+              <div className="absolute inset-x-0 bottom-[26%] top-0 rounded-[50%] border border-white/90 bg-linear-to-br from-white/80 via-white/50 to-white/25 shadow-[inset_0_2px_8px_rgba(255,255,255,0.95),inset_0_-10px_24px_rgba(130,180,235,0.25)] backdrop-blur-md" />
+            </div>
+
+            {/* The range, standing together on the platform */}
+            <motion.ul
+              aria-label="The Totalflux range"
+              style={{ x: stageX }}
+              className="absolute inset-x-0 bottom-[6%] flex items-end justify-center gap-[2.5cqw] lg:gap-[2.2cqw]"
+            >
+              {LINEUP.map((item, i) => {
+                const fromCentre = Math.abs(i - (LINEUP.length - 1) / 2);
+                const { image } = item.product;
+                return (
+                  <motion.li
+                    key={image.src}
+                    initial={{ opacity: 0, y: 70 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 1, delay: 0.45 + fromCentre * 0.14, ease: EASE }}
+                    className={cn("relative", item.wideOnly && "hidden lg:block")}
+                  >
+                    {/* A soft shadow where it stands (first, so the product stands over it) */}
+                    <span
+                      aria-hidden="true"
+                      className={cn(
+                        "pointer-events-none absolute -bottom-2 left-1/2 h-4 -translate-x-1/2 rounded-[50%] bg-[radial-gradient(ellipse,rgba(20,40,80,0.4)_0%,rgba(20,40,80,0.16)_45%,transparent_72%)] lg:h-5",
+                        item.shadow,
+                      )}
+                    />
+                    <Link
+                      to={item.product.to}
+                      aria-label={item.alt}
+                      className={cn(
+                        "group relative block rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                        item.product === BOXES && BOXES_SINK,
+                      )}
+                    >
+                      <img
+                        src={image.src}
+                        width={image.width}
+                        height={image.height}
+                        alt=""
+                        draggable={false}
+                        className={cn(
+                          item.height,
+                          "w-auto max-w-none select-none object-contain transition-[translate] duration-500 ease-out group-hover:-translate-y-2",
+                          // The boxes carry their own soft shadows
+                          item.product !== BOXES && "drop-shadow-[0_22px_22px_rgba(20,50,90,0.22)]",
+                        )}
+                        style={{ aspectRatio: `${image.width} / ${image.height}` }}
+                      />
+                    </Link>
+                  </motion.li>
+                );
+              })}
+            </motion.ul>
+          </div>
+        </div>
       </section>
     </MotionConfig>
   );

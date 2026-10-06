@@ -1,15 +1,22 @@
 // components/Hero.tsx
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+} from "react";
 import { motion, MotionConfig, type Variants } from "motion/react";
 import { ArrowRight } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
-import { HeroArt } from "@/components/HeroArt";
-import { Navbar } from "@/components/Navbar";
 import { BrandName } from "@/components/BrandName";
+import { Navbar } from "@/components/Navbar";
 import { RollText, WaveText } from "@/components/TextEffects";
+import { Button } from "@/components/ui/button";
 import { HERO_PRODUCTS, HERO_STEPS, type HeroStep } from "@/data/hero-range";
 import { useStepGestures } from "@/hooks/use-step-gestures";
+import { cn } from "@/lib/utils";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -31,30 +38,65 @@ function useAtTop() {
   return atTop;
 }
 
-// The chips and the button come in while the heading's letters are still landing.
+/** Scrolls the page to a product's section. */
+function openSection(id: string) {
+  const smooth = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  document
+    .getElementById(id)
+    ?.scrollIntoView({ behavior: smooth ? "smooth" : "auto", block: "start" });
+}
+
+/** The tubes left to right: the Kidoos at the ends, Essential in the middle, so the row rises and falls evenly. */
+const ROW_ORDER = ["kidoos-advance", "advance", "essential", "sensitive", "kidoos-plus"];
+const ROW = ROW_ORDER.flatMap((id) => HERO_PRODUCTS.filter((product) => product.id === id));
+type RowProduct = (typeof HERO_PRODUCTS)[number];
+
+/** Big soft patches of colour drifting slowly behind the hero (transform only, so it's cheap). */
+const AURORA = [
+  {
+    left: "-14%",
+    top: "-22%",
+    size: "46rem",
+    color: "rgba(126,205,190,0.3)",
+    duration: 28,
+    delay: 0,
+  },
+  {
+    left: "62%",
+    top: "-26%",
+    size: "44rem",
+    color: "rgba(240,175,202,0.24)",
+    duration: 32,
+    delay: 10,
+  },
+  {
+    left: "24%",
+    top: "8%",
+    size: "52rem",
+    color: "rgba(130,185,235,0.22)",
+    duration: 36,
+    delay: 18,
+  },
+];
+
+const GLASS =
+  "border border-white/80 bg-white/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_12px_30px_-16px_rgba(20,60,120,0.4)] backdrop-blur-md";
+
+/** The intro's second line: a soft teal-to-blue gradient. */
+const HEADLINE_GRADIENT: CSSProperties = {
+  backgroundImage: "linear-gradient(90deg, #2A9D8F 0%, #2B7BB9 55%, #2B4270 100%)",
+  filter: "drop-shadow(0 6px 10px rgba(23,110,140,0.2))",
+};
+
+// The pills and the button come in while the heading is still rising.
 const container = {
   hidden: {},
-  show: {
-    transition: {
-      staggerChildren: 0.12,
-      delayChildren: 0.8,
-    },
-  },
+  show: { transition: { staggerChildren: 0.12, delayChildren: 0.8 } },
 };
 
 const item = {
-  hidden: {
-    opacity: 0,
-    y: 20,
-  },
-  show: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.6,
-      ease: EASE,
-    },
-  },
+  hidden: { opacity: 0, y: 20 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: EASE } },
 };
 
 /**
@@ -62,18 +104,9 @@ const item = {
  * and description play their entrances one after another.
  */
 const stepText: Variants = {
-  hidden: {
-    opacity: 0,
-    transition: { duration: 0.3, ease: "easeOut" },
-  },
-  show: {
-    opacity: 1,
-    transition: { duration: 0.2, delayChildren: 0.2, staggerChildren: 0.18 },
-  },
+  hidden: { opacity: 0, transition: { duration: 0.3, ease: "easeOut" } },
+  show: { opacity: 1, transition: { duration: 0.2, delayChildren: 0.2, staggerChildren: 0.18 } },
 };
-
-/** The brand's name: in a heading, lettered like the logo (font-brand). */
-const BRAND = "Totalflux";
 
 /**
  * A piece of a step's text rising into place, a whole line at a time. When its step is left,
@@ -88,11 +121,10 @@ const rise: Variants = {
 const lines: Variants = { hidden: {}, show: { transition: { staggerChildren: 0.1 } } };
 
 /**
- * Eyebrow, heading and description for every step, stacked in one grid cell: the
- * block is always as tall as its longest step, so switching steps changes the text in
- * place and nothing around it moves. Each time a step comes up its text rises in, line by
- * line, as the text does across the site. On a product step the eyebrow and the product's
- * name are in its colour, and "Totalflux" is lettered like the logo.
+ * Eyebrow, heading and description for every step, stacked in one grid cell: the block is
+ * always as tall as its longest step, so switching steps changes the text in place and
+ * nothing around it moves. On a product step the eyebrow's dot and the product's name are in
+ * its colour, and "Totalflux" is lettered like the logo; the intro's second line is a gradient.
  */
 function HeroText({ activeIndex }: { activeIndex: number }) {
   return (
@@ -107,39 +139,58 @@ function HeroText({ activeIndex }: { activeIndex: number }) {
             variants={stepText}
             initial="hidden"
             animate={active ? "show" : "hidden"}
-            className="flex flex-col items-center [grid-area:1/1] lg:items-start"
+            // Centred in the block: the intro, with no eyebrow, is shorter than the product steps
+            className="flex flex-col items-center justify-center [grid-area:1/1]"
             aria-hidden={!active}
           >
-            {/* Eyebrow */}
-            <motion.p
-              variants={rise}
-              className="mb-2 text-[0.7rem] font-bold uppercase tracking-[0.25em] text-accent sm:text-xs lg:mb-5 lg:text-sm"
-              style={{ color: ink }}
-            >
-              {step.eyebrow}
-            </motion.p>
+            {/* Eyebrow: a product step's (the intro has none) */}
+            {step.product && (
+              <motion.p
+                variants={rise}
+                className={cn(
+                  GLASS,
+                  "mb-3 inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-[0.7rem] font-semibold uppercase tracking-[0.14em] text-primary sm:text-xs",
+                )}
+              >
+                <span
+                  aria-hidden="true"
+                  className="size-1.5 rounded-full"
+                  style={{ backgroundColor: ink }}
+                />
+                {step.eyebrow}
+              </motion.p>
+            )}
 
             {/* Heading */}
             <Heading
               variants={lines}
-              className="max-w-2xl text-[clamp(2.5rem,5vw,4.5rem)] font-extrabold leading-[1.02] tracking-[0] text-primary"
+              id={index === 0 ? "hero-title" : undefined}
+              className="text-[clamp(2rem,min(3.4vw,6vh),3.25rem)] font-black leading-[1.03] tracking-tight text-primary"
             >
-              {step.title.map((line, i) => (
-                <motion.span
-                  key={line}
-                  variants={rise}
-                  className="block pb-[0.12em]"
-                  style={i === 1 && ink ? { color: ink } : {}}
-                >
-                  {i === 0 && line === BRAND ? <BrandName className="font-bold" /> : line}
-                </motion.span>
-              ))}
+              <motion.span variants={rise} className="block pb-[0.06em]">
+                {!step.product ? (
+                  `${step.title[0]},`
+                ) : step.title[0] === "Totalflux" ? (
+                  <BrandName className="font-bold" />
+                ) : (
+                  step.title[0]
+                )}
+              </motion.span>
+              <motion.span variants={rise} className="block pb-[0.08em]">
+                {step.product ? (
+                  <span style={{ color: ink }}>{step.title[1]}</span>
+                ) : (
+                  <span className="bg-clip-text text-transparent" style={HEADLINE_GRADIENT}>
+                    {step.title[1]}.
+                  </span>
+                )}
+              </motion.span>
             </Heading>
 
             {/* Description */}
             <motion.p
               variants={rise}
-              className="mt-2 max-w-[28rem] text-base leading-7 text-muted-foreground sm:text-lg lg:mt-4"
+              className="mt-1 max-w-2xl text-base text-slate-600 sm:text-lg"
             >
               {step.description}
             </motion.p>
@@ -221,9 +272,9 @@ function DetailPills({ product }: { product: NonNullable<HeroStep["product"]> })
 
 /**
  * The pills under the text: on the intro, the products (each goes to its step); on a product
- * step, its details. Separate frosted-glass pills that wrap freely, no panel around them.
- * Every step's set is stacked in one grid cell, like HeroText, so the block keeps the height
- * of the tallest set and nothing below it moves; only the current set shows (and can be used).
+ * step, its details. Every step's set is stacked in one grid cell, like HeroText, so the block
+ * keeps the height of the tallest set and nothing below it moves; only the current set shows
+ * (and can be used).
  */
 function StepPills({
   activeIndex,
@@ -245,7 +296,7 @@ function StepPills({
             aria-label={step.product ? `${step.product.name} highlights` : "Our toothpastes"}
             aria-hidden={!active}
             inert={!active}
-            className="flex max-w-[36rem] flex-wrap content-start justify-center gap-2 justify-self-center [grid-area:1/1] sm:gap-2.5 lg:justify-start lg:justify-self-start"
+            className="mx-auto flex max-w-6xl flex-wrap content-start justify-center gap-2 [grid-area:1/1] sm:gap-2.5"
           >
             {step.product ? (
               <DetailPills product={step.product} />
@@ -259,12 +310,202 @@ function StepPills({
   );
 }
 
+/** The move when a product is shown or left: easeInOutCubic, as the old hero's (seconds). */
+const MOVE = { duration: 0.9, ease: [0.65, 0, 0.35, 1] as const };
+
 /**
- * The top of the home page. While it fills the screen, each scroll gesture moves one step
- * through HERO_STEPS: first the whole range, then one product at a time (its tube zooms in
- * and leans, the others fade back, and the text names it with its details). Scrolling on
- * past the last step moves the page down to what follows the hero (the product sections),
- * and once back at the top, scrolling up steps back through the products.
+ * How a shown tube comes out: an adult tube lies on its side, as long as `lie` times its
+ * standing height; a Kidoos tube stays standing and grows `kids` times. Both come forward
+ * (down) `forward` of the stage's height. The others shrink to `dim.scale` and fade.
+ */
+const FOCUS = { lie: 1.45, kids: 1.4, forward: 0.03, dim: { scale: 0.86, opacity: 0.38 } };
+
+/** Where a tube stands in the row, measured: how far its base is from the row's middle, and its size (px). */
+type Spot = { toCentre: number; height: number; width: number };
+
+/**
+ * One tube in the row. On the intro every tube stands alike, a soft glow of its colour behind
+ * it. When its product is shown it glides to the front of the row, in the middle, and lies
+ * down on its side, cap to the left so its label reads left to right, growing as it goes (a
+ * Kidoos tube, whose pack is printed upright, comes forward standing and just grows); the
+ * others shrink and fade where they stand. Light falls across it and now and then a shine
+ * sweeps over it (both masked by its photo, so only the tube catches them). Clicking it shows
+ * its product, or, when it's already shown, goes down to its section.
+ * spot: where it stands (null until measured); forward: how far the shown tube comes forward (px).
+ */
+function Tube({
+  product,
+  order,
+  focus,
+  spot,
+  forward,
+  onSelect,
+}: {
+  product: RowProduct;
+  order: number;
+  focus: string | undefined;
+  spot: Spot | null;
+  forward: number;
+  onSelect: (stepIndex: number) => void;
+}) {
+  const shown = focus === product.id;
+  const dimmed = !!focus && !shown;
+  const fromCentre = Math.abs(order - (ROW.length - 1) / 2);
+  const { image, colors } = product;
+  const mask = `url(${image.src})`;
+
+  // Its pose (turned about its base) and its shadow's
+  let pose = { x: 0, y: 0, rotate: 0, scale: 1, opacity: 1 };
+  let shadow = { x: 0, y: 0, scaleX: 1, opacity: 1 };
+  if (dimmed) {
+    pose = { ...pose, scale: FOCUS.dim.scale, opacity: FOCUS.dim.opacity };
+    shadow = { ...shadow, scaleX: FOCUS.dim.scale, opacity: 0.4 };
+  } else if (shown && spot) {
+    if (product.upright) {
+      pose = { ...pose, x: spot.toCentre, y: forward, scale: FOCUS.kids };
+      shadow = { ...shadow, x: spot.toCentre, y: forward, scaleX: FOCUS.kids * 1.1 };
+    } else {
+      // Turned a quarter clockwise about its base it lies to the right of it, centred on the
+      // base line: so it moves left by half its length to sit in the middle, and up by half its
+      // thickness to rest on the line
+      const length = spot.height * FOCUS.lie;
+      const thickness = spot.width * FOCUS.lie;
+      pose = {
+        x: spot.toCentre - length / 2,
+        y: forward - thickness / 2,
+        rotate: 90,
+        scale: FOCUS.lie,
+        opacity: 1,
+      };
+      shadow = {
+        x: spot.toCentre,
+        y: forward,
+        scaleX: (length * 0.92) / (spot.width * 0.9),
+        opacity: 1,
+      };
+    }
+  }
+
+  return (
+    <li
+      className="relative flex flex-col items-center"
+      style={{ zIndex: shown ? 20 : Math.round(10 - fromCentre * 2) }}
+    >
+      {/* Rises into place when the page opens, from the middle out */}
+      <motion.div
+        initial={{ opacity: 0, y: 80 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 1.1, delay: 0.45 + fromCentre * 0.14, ease: EASE }}
+        className="relative"
+      >
+        <motion.button
+          type="button"
+          onClick={() => (shown ? openSection(product.id) : onSelect(product.stepIndex))}
+          aria-label={
+            shown ? `Totalflux ${product.name}: see its section` : `Show Totalflux ${product.name}`
+          }
+          aria-current={shown ? "true" : undefined}
+          animate={pose}
+          whileHover={shown ? {} : { y: -8 }}
+          transition={MOVE}
+          style={{ transformOrigin: "50% 100%" }}
+          className="relative block cursor-pointer rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          {/* Its glow: goes with it (round, so turning it doesn't show) */}
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute left-1/2 top-[45%] -z-10 aspect-square w-[280%] -translate-x-1/2 -translate-y-1/2 rounded-full transition-opacity duration-700"
+            style={{
+              opacity: shown ? 1 : dimmed ? 0 : 0.45,
+              background: `radial-gradient(circle, ${colors.brand}59 0%, ${colors.brand}1f 40%, transparent 68%)`,
+            }}
+          />
+          <span className="relative block">
+            <img
+              src={image.src}
+              width={image.width}
+              height={image.height}
+              alt=""
+              draggable={false}
+              className="block w-auto max-w-none select-none"
+              style={{
+                height: `calc(var(--tube-h) * ${product.height})`,
+                aspectRatio: `${image.width} / ${image.height}`,
+              }}
+            />
+            <span
+              aria-hidden="true"
+              className="tube-light"
+              style={{ "--tube": mask } as CSSProperties}
+            />
+            {/* Shown, it shines as it steps forward; in the row, now and then, each in turn */}
+            <span
+              key={shown ? "shown" : "row"}
+              aria-hidden="true"
+              className="tube-shine"
+              style={
+                {
+                  "--tube": mask,
+                  "--shine-delay": shown ? "0.5s" : `${2.5 + order * 1.3}s`,
+                } as CSSProperties
+              }
+            />
+          </span>
+        </motion.button>
+
+        {/* Its shadow, under it wherever it is */}
+        <motion.span
+          aria-hidden="true"
+          className="pointer-events-none absolute -bottom-1.5 left-1/2 h-3.5 w-[90%] -translate-x-1/2 rounded-[50%] bg-[radial-gradient(ellipse,rgba(28,58,102,0.42)_0%,rgba(28,58,102,0.16)_45%,transparent_72%)]"
+          animate={shadow}
+          transition={MOVE}
+        />
+      </motion.div>
+    </li>
+  );
+}
+
+/**
+ * Where each tube stands in the row (in ROW's order), measured from the layout (so the tubes'
+ * own moves don't change it) and again whenever the row resizes, and how far a shown tube
+ * comes forward. Null until measured (on the server, and before the page has loaded).
+ */
+function useSpots() {
+  const rowRef = useRef<HTMLUListElement>(null);
+  const [measured, setMeasured] = useState<{ spots: Spot[]; forward: number } | null>(null);
+  useLayoutEffect(() => {
+    const row = rowRef.current;
+    const stage = row?.parentElement;
+    if (!row || !stage) return;
+    const measure = () => {
+      const middle = row.clientWidth / 2;
+      const spots = [...row.children].map((child) => {
+        const item = child as HTMLElement;
+        const img = item.querySelector("img");
+        return {
+          toCentre: middle - (item.offsetLeft + item.offsetWidth / 2),
+          height: img?.offsetHeight ?? 0,
+          width: img?.offsetWidth ?? 0,
+        };
+      });
+      setMeasured({ spots, forward: stage.clientHeight * FOCUS.forward });
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(stage);
+    return () => observer.disconnect();
+  }, []);
+  return { rowRef, measured };
+}
+
+/**
+ * The top of the toothpaste page: the headline centred over the whole range standing in a
+ * row, a giant word behind and soft colour drifting slowly behind that. While it fills the screen, each
+ * scroll gesture moves one step through HERO_STEPS: first the whole range, then one product
+ * at a time (its tube comes to the front and lies down, or for the Kidoos grows standing; the
+ * others fade back; and the text above names it with its details).
+ * Scrolling on past the last step moves the page down to what follows the hero (the product
+ * sections), and once back at the top, scrolling up steps back through the products.
  * transitionColor: the next section's background, which the hero's bottom edge fades into.
  */
 export function Hero({ transitionColor }: { transitionColor?: string }) {
@@ -293,13 +534,15 @@ export function Hero({ transitionColor }: { transitionColor?: string }) {
     onExit: leave,
   });
 
-  const step = HERO_STEPS[activeIndex];
+  const focus = HERO_STEPS[activeIndex]?.product?.id;
+  const { rowRef, measured } = useSpots();
 
   return (
     <MotionConfig reducedMotion="user">
       <section
         ref={sectionRef}
         id="top"
+        aria-labelledby="hero-title"
         className="relative"
         style={{
           // While the hero fills the screen, swipes step through it (useStepGestures), so the
@@ -312,82 +555,95 @@ export function Hero({ transitionColor }: { transitionColor?: string }) {
         {/* Transparent over the hero; frosted glass once the page scrolls */}
         <Navbar />
 
-        <div className="relative h-svh overflow-hidden bg-[linear-gradient(115deg,#f8fbff_0%,#edf4fc_42%,#dde9f7_100%)]">
-          {/* bg.png: sunlit room, soft light rays behind the text and a fluted panel at the right edge.
-              Desktop keeps the right edge (the panel) in frame; phones show the plain middle of the wall. */}
-          <img
-            src="/bg.webp"
-            alt=""
-            aria-hidden="true"
-            width={1855}
-            height={848}
-            draggable={false}
-            className="pointer-events-none absolute inset-0 h-full w-full select-none object-cover object-[70%_center] lg:object-right"
-          />
-
-          {/* Frosted veil behind the text: blurs the room's details there (such as the floor
-              edge between the chips and the button) so the text, chips and button sit on one
-              smooth surface. It fades out before the products (downwards on phones). */}
+        <div className="relative isolate flex h-svh flex-col overflow-hidden bg-[linear-gradient(180deg,#EDF5FB_0%,#F6FAFD_45%,#EAF4F9_100%)]">
+          {/* Soft colour drifting behind */}
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute inset-0 bg-white/10 backdrop-blur-2xl [mask-image:linear-gradient(to_bottom,#000_45%,transparent_70%)] lg:right-auto lg:w-[62%] lg:[mask-image:linear-gradient(to_right,#000_55%,transparent),linear-gradient(to_bottom,#000_70%,transparent)] lg:[mask-composite:intersect]"
-          />
+            className="pointer-events-none absolute inset-0 -z-10 overflow-hidden"
+          >
+            {AURORA.map((blob) => (
+              <div
+                key={blob.left}
+                className="aurora-drift absolute rounded-full"
+                style={
+                  {
+                    left: blob.left,
+                    top: blob.top,
+                    width: blob.size,
+                    height: blob.size,
+                    background: `radial-gradient(circle, ${blob.color} 0%, transparent 65%)`,
+                    "--drift-duration": `${blob.duration}s`,
+                    "--drift-delay": `-${blob.delay}s`,
+                  } as CSSProperties
+                }
+              />
+            ))}
+          </div>
 
           {/* The bottom edge fades into the next section's background (behind the content) */}
           {transitionColor && (
             <div
               aria-hidden="true"
-              className="pointer-events-none absolute inset-x-0 bottom-0 h-[24vh]"
+              className="pointer-events-none absolute inset-x-0 bottom-0 h-[18vh]"
               style={{ background: `linear-gradient(to bottom, transparent, ${transitionColor})` }}
             />
           )}
 
-          <div className="relative mx-auto flex h-full w-full max-w-[90rem] flex-col px-5 pb-5 pt-20 sm:px-8 lg:flex-row lg:items-center lg:gap-6 lg:px-12 lg:pb-6 lg:pt-24">
-            {/* Text column */}
-            <div className="relative isolate w-full shrink-0 lg:w-[41%]">
-              {/* Soft glows in the logo's blue (#38598C) behind the chips and button, so the
-                  glass has colour to frost over; kept below the heading so the text stays clear */}
-              <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10">
-                {/* Kept well above the hero's bottom edge, or the edge cuts it off in a visible line */}
-                <div className="absolute bottom-[14%] left-[-12%] size-[min(24rem,80vw)] rounded-full bg-[radial-gradient(circle,rgba(56,89,140,0.72)_0%,rgba(56,89,140,0.28)_45%,transparent_70%)] blur-2xl" />
-                <div className="absolute bottom-[12%] left-[38%] size-[min(20rem,60vw)] rounded-full bg-[radial-gradient(circle,rgba(86,132,196,0.62)_0%,rgba(86,132,196,0.22)_45%,transparent_70%)] blur-2xl" />
+          <div className="relative mx-auto flex min-h-0 w-full max-w-[90rem] flex-1 flex-col px-5 pb-3 pt-[5.25rem] sm:px-8 lg:px-12">
+            {/* The text, the pills and the button */}
+            <motion.div
+              variants={container}
+              initial="hidden"
+              animate="show"
+              className="relative z-30 flex flex-col items-center text-center"
+            >
+              <HeroText activeIndex={activeIndex} />
+
+              <div className="mt-3 w-full">
+                <StepPills activeIndex={activeIndex} onSelect={setActiveIndex} />
               </div>
 
-              <motion.div
-                variants={container}
-                initial="hidden"
-                animate="show"
-                className="flex w-full flex-col items-center text-center lg:items-start lg:text-left"
-              >
-                <HeroText activeIndex={activeIndex} />
-
-                {/* The products (intro) or the product's details */}
-                <div className="mt-5 w-full lg:mt-9">
-                  <StepPills activeIndex={activeIndex} onSelect={setActiveIndex} />
-                </div>
-
-                {/* CTA */}
-                <motion.div variants={item} className="mt-5 lg:mt-10">
-                  <motion.div
-                    whileHover={{ scale: 1.04 }}
-                    whileTap={{ scale: 0.97 }}
-                    transition={{ type: "spring", stiffness: 350, damping: 20 }}
-                  >
-                    <Button asChild variant="glass" size="hero" className="btn-shine letter-fx">
-                      <a href="#toothpaste">
-                        <RollText text="Explore Our Range" />
-                        <ArrowRight className="transition-transform duration-200 group-hover:translate-x-1" />
-                      </a>
-                    </Button>
-                  </motion.div>
+              <motion.div variants={item} className="mt-4">
+                <motion.div
+                  whileHover={{ scale: 1.04 }}
+                  whileTap={{ scale: 0.97 }}
+                  transition={{ type: "spring", stiffness: 350, damping: 20 }}
+                >
+                  <Button asChild variant="glass" size="hero" className="btn-shine letter-fx">
+                    <a href="#toothpaste">
+                      <RollText text="Explore Our Range" />
+                      <ArrowRight className="transition-transform duration-200 group-hover:translate-x-1" />
+                    </a>
+                  </Button>
                 </motion.div>
               </motion.div>
-            </div>
+            </motion.div>
 
-            {/* Artwork: fills the rest (below the text on phones, to its right on desktop, where it
-                may grow out into the right margin) */}
-            <div className="flex min-h-0 w-full flex-1 items-center justify-center [container-type:size] lg:h-full lg:justify-start">
-              <HeroArt focus={step?.product?.id} />
+            {/* The range. A size container: --tube-h, the adult tubes' height, follows the space
+                the text leaves (and, on narrow screens, the width, so the row fits across) */}
+            <div className="relative mt-1 min-h-0 flex-1 [--tube-h:min(84cqh,58cqw)] [container-type:size] lg:[--tube-h:min(94cqh,34cqw)]">
+              {/* A soft pool of light where they stand */}
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-x-[12%] bottom-0 h-[22cqh] rounded-[50%] bg-[radial-gradient(ellipse,rgba(255,255,255,0.85)_0%,rgba(255,255,255,0)_70%)]"
+              />
+              <ul
+                ref={rowRef}
+                aria-label="The Totalflux toothpaste range"
+                className="absolute inset-x-0 bottom-[3cqh] flex items-end justify-center gap-[3.5cqw] lg:gap-[2.4cqw]"
+              >
+                {ROW.map((product, order) => (
+                  <Tube
+                    key={product.id}
+                    product={product}
+                    order={order}
+                    focus={focus}
+                    spot={measured?.spots[order] ?? null}
+                    forward={measured?.forward ?? 0}
+                    onSelect={setActiveIndex}
+                  />
+                ))}
+              </ul>
             </div>
           </div>
         </div>

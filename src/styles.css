@@ -160,14 +160,27 @@
   }
 }
 
-html { scroll-behavior: smooth; }
+html {
+  scroll-behavior: smooth;
+}
 
 @utility hero-surface {
-  background: linear-gradient(118deg, var(--background) 16%, var(--background) 44%, var(--soft-blue) 100%);
+  background: linear-gradient(
+    118deg,
+    var(--background) 16%,
+    var(--background) 44%,
+    var(--soft-blue) 100%
+  );
 }
 
 @utility hero-ray {
-  background: linear-gradient(128deg, color-mix(in oklab, var(--background) 82%, transparent) 0 18%, transparent 18% 34%, color-mix(in oklab, var(--background) 45%, transparent) 34% 42%, transparent 42%);
+  background: linear-gradient(
+    128deg,
+    color-mix(in oklab, var(--background) 82%, transparent) 0 18%,
+    transparent 18% 34%,
+    color-mix(in oklab, var(--background) 45%, transparent) 34% 42%,
+    transparent 42%
+  );
   opacity: 0.9;
 }
 
@@ -178,10 +191,26 @@ html { scroll-behavior: smooth; }
 
 @utility foliage-shadow {
   background:
-    radial-gradient(ellipse at 70% 16%, color-mix(in oklab, var(--accent) 30%, transparent) 0 7%, transparent 8%),
-    radial-gradient(ellipse at 48% 36%, color-mix(in oklab, var(--accent) 28%, transparent) 0 10%, transparent 11%),
-    radial-gradient(ellipse at 78% 54%, color-mix(in oklab, var(--accent) 24%, transparent) 0 12%, transparent 13%),
-    radial-gradient(ellipse at 38% 68%, color-mix(in oklab, var(--accent) 22%, transparent) 0 9%, transparent 10%);
+    radial-gradient(
+      ellipse at 70% 16%,
+      color-mix(in oklab, var(--accent) 30%, transparent) 0 7%,
+      transparent 8%
+    ),
+    radial-gradient(
+      ellipse at 48% 36%,
+      color-mix(in oklab, var(--accent) 28%, transparent) 0 10%,
+      transparent 11%
+    ),
+    radial-gradient(
+      ellipse at 78% 54%,
+      color-mix(in oklab, var(--accent) 24%, transparent) 0 12%,
+      transparent 13%
+    ),
+    radial-gradient(
+      ellipse at 38% 68%,
+      color-mix(in oklab, var(--accent) 22%, transparent) 0 9%,
+      transparent 10%
+    );
   filter: blur(18px);
   transform: rotate(-22deg);
   opacity: 0.48;
@@ -202,12 +231,23 @@ html { scroll-behavior: smooth; }
     transform-origin: right;
     transition: transform 220ms ease;
   }
-  &:hover::after { transform: scaleX(1); transform-origin: left; }
+  &:hover::after {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
-  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 /* Button shine sweep */
 .btn-shine {
@@ -218,7 +258,12 @@ html { scroll-behavior: smooth; }
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(110deg, transparent 30%, rgba(255, 255, 255, 0.35) 50%, transparent 70%);
+  background: linear-gradient(
+    110deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.35) 50%,
+    transparent 70%
+  );
   transform: translateX(-120%);
   animation: btn-shine 3.5s ease-in-out 2s infinite;
   pointer-events: none;
@@ -253,7 +298,7 @@ html {
 }
 
 /*
- * Toothpaste hero tubes (ProductRow.tsx): light falling across each tube, and a shine that
+ * Toothpaste hero tubes (Hero.tsx): light falling across each tube, and a shine that
  * sweeps over it now and then. Both are masked by the tube's own photo (--tube: its url), so
  * they only ever touch the tube. The light: brighter down the left and near the top, a touch
  * of shade down the right, as if lit from the upper left. The shine: a soft band crossing
@@ -280,12 +325,12 @@ html {
     radial-gradient(ellipse 70% 22% at 32% 10%, rgba(255, 255, 255, 0.35), transparent 70%),
     /* Lit from the left, shaded towards the right: it reads as round */
     linear-gradient(
-      90deg,
-      rgba(255, 255, 255, 0.28) 0%,
-      rgba(255, 255, 255, 0) 34%,
-      rgba(10, 30, 70, 0) 58%,
-      rgba(10, 30, 70, 0.26) 100%
-    );
+        90deg,
+        rgba(255, 255, 255, 0.28) 0%,
+        rgba(255, 255, 255, 0) 34%,
+        rgba(10, 30, 70, 0) 58%,
+        rgba(10, 30, 70, 0.26) 100%
+      );
 }
 .tube-shine {
   overflow: hidden;
@@ -332,24 +377,6 @@ html {
   .tube-shine::after {
     animation: none;
     opacity: 0;
-  }
-}
-
-/* Home hero (HomeHero.tsx): each floating product bobs gently, at its own pace */
-.float-bob {
-  animation: float-bob var(--bob-duration, 6s) ease-in-out var(--bob-delay, 0s) infinite alternate;
-}
-@keyframes float-bob {
-  from {
-    transform: translateY(-8px);
-  }
-  to {
-    transform: translateY(8px);
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .float-bob {
-    animation: none;
   }
 }
 
@@ -501,5 +528,24 @@ html {
   }
   .letter-fx:hover .letter-wave > span {
     animation: letter-wave 600ms cubic-bezier(0.3, 0.7, 0.4, 1) calc(var(--i) * 30ms);
+  }
+}
+
+/* Toothpaste hero (Hero.tsx): soft colour drifting slowly behind it */
+.aurora-drift {
+  animation: aurora-drift var(--drift-duration, 24s) ease-in-out var(--drift-delay, 0s) infinite
+    alternate;
+}
+@keyframes aurora-drift {
+  from {
+    transform: translate(-7%, -5%);
+  }
+  to {
+    transform: translate(7%, 6%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .aurora-drift {
+    animation: none;
   }
 }

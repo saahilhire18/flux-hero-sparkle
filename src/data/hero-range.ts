@@ -1,10 +1,10 @@
 // data/hero-range.ts
 //
 // Hero steps, in order. Each scroll gesture on the hero moves one step through these
-// entries. The first is the intro: the whole range on the platform, every tube as normal,
-// and a pill per product that goes to its step. Every other step shows one product: its
-// tube zooms in and leans while the others shrink and fade back, and the text beside them
-// names it, with its details as pills underneath.
+// entries. The first is the intro: the whole range standing in a row, every tube alike, and a
+// pill per product that goes to its step. Every other step shows one product: its tube comes
+// to the front and lies down (the Kidoos stand and grow) while the others shrink and fade
+// back, and the text above names it, with its details as pills underneath.
 //
 // Details follow the Totalflux product sheets and packs (the same as product-pages.ts and
 // KidoosSection). Keep descriptions to about two lines (~75 characters) so every step fits
@@ -45,6 +45,12 @@ export type HeroStep = {
      * for the name and the pill icons (readable on the hero's pale background).
      */
     colors: { brand: string; ink: string };
+    /** A cut-out photo of the tube: a transparent WebP in public/, cropped to the tube, and its size in pixels. */
+    image: { src: string; width: number; height: number };
+    /** Its height beside the others: 1 for the adult tubes; the Kidoos packs are smaller. */
+    height: number;
+    /** The Kidoos packs print their names upright, so their tubes stay standing when shown. */
+    upright?: boolean;
   };
 };
 
@@ -71,6 +77,8 @@ export const HERO_STEPS: HeroStep[] = [
         { label: "SLS Free", icon: FlaskConicalOff },
       ],
       colors: { brand: "#2F7C61", ink: "#1F5E48" },
+      image: { src: "/advance.webp", width: 226, height: 738 },
+      height: 1,
     },
   },
   {
@@ -88,6 +96,8 @@ export const HERO_STEPS: HeroStep[] = [
         { label: "With Clove Oil", icon: Leaf },
       ],
       colors: { brand: "#2398CA", ink: "#15648A" },
+      image: { src: "/sensitive.webp", width: 276, height: 897 },
+      height: 1,
     },
   },
   {
@@ -105,6 +115,8 @@ export const HERO_STEPS: HeroStep[] = [
         { label: "SLS Free", icon: FlaskConicalOff },
       ],
       colors: { brand: "#304977", ink: "#2B4270" },
+      image: { src: "/essential.webp", width: 292, height: 952 },
+      height: 1,
     },
   },
   {
@@ -122,6 +134,9 @@ export const HERO_STEPS: HeroStep[] = [
         { label: "SLS Free", icon: FlaskConicalOff },
       ],
       colors: { brand: "#E0506A", ink: "#8E2442" },
+      image: { src: "/kidoos-advance.webp", width: 232, height: 729 },
+      height: 0.72,
+      upright: true,
     },
   },
   {
@@ -139,6 +154,9 @@ export const HERO_STEPS: HeroStep[] = [
         { label: "SLS Free", icon: FlaskConicalOff },
       ],
       colors: { brand: "#5AA7E0", ink: "#23498A" },
+      image: { src: "/kidoos-plus.webp", width: 213, height: 697 },
+      height: 0.69,
+      upright: true,
     },
   },
 ];

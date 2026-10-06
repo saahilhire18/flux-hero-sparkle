@@ -35,3 +35,9 @@ dist-ssr
 public/Mouthwash/
 public/Oralbrush/
 public/Totalflux *.png
+
+# Vercel CLI: project link and local builds
+.vercel
+
+.vercel
+.env*

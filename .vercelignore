@@ -1,0 +1,14 @@
+# Files the Vercel CLI must not upload: build output and dependencies (Vercel builds and
+# installs on its own servers), and the original high-res product photos, which are kept
+# locally only (the site uses the small WebP copies in public/; see .gitignore).
+node_modules
+.output
+.vercel
+dist
+.wrangler
+public/Mouthwash/
+public/Oralbrush/
+public/Totalflux *.png
+
+# Local secrets (e.g. the Vercel CLI's token in .env.local)
+.env*

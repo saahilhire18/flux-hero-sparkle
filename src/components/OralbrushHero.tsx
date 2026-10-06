@@ -59,9 +59,9 @@ const word: Variants = {
 };
 
 /**
- * The Oralbrush page's hero: "Introducing Oralbrush" and its promise beside the brush, which
- * floats at a slant inside the glass orbit with its features in glass circles around it. The
- * brush turns a little as the page scrolls and the layers drift with the mouse (parallax);
+ * The Oralbrush page's hero: "Introducing Oralbrush" and its promise beside the brush, closed
+ * and opened up side by side inside the glass orbit, with its features in glass circles around
+ * it. The brushes turn a little as the page scrolls and the layers drift with the mouse (parallax);
  * bubbles rise behind, and a giant 3D "Oralbrush" sits along the bottom.
  */
 export function OralbrushHero() {
@@ -79,7 +79,7 @@ export function OralbrushHero() {
   // Scroll: the brush turns and rises, the words leave faster than the orbit
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
   const depth = reduceMotion ? 0 : 1;
-  const brushRotate = useTransform(scrollYProgress, [0, 1], [34, 34 - 16 * depth]);
+  const brushRotate = useTransform(scrollYProgress, [0, 1], [8, 8 - 8 * depth]);
   const brushY = useTransform(scrollYProgress, [0, 1], [0, -40 * depth]);
   const textY = useTransform(scrollYProgress, [0, 1], [0, -90 * depth]);
   const orbitY = useTransform(
@@ -232,22 +232,46 @@ export function OralbrushHero() {
             className="relative mx-auto aspect-square w-full max-w-[26rem] sm:max-w-[32rem] lg:w-[min(100%,70svh,42rem)] lg:max-w-none"
           >
             <OrbitFrame glow={colors.sky} ink={colors.ink} podium={false} discTop="50%" />
-            <motion.div
-              initial={{ opacity: 0, y: 90, rotate: 18 }}
-              animate={{ opacity: 1, y: 0, rotate: 0 }}
-              transition={{ duration: 1.1, delay: 0.25, ease: EASE }}
-              className="absolute inset-[4%] flex items-center justify-center"
-            >
-              <motion.img
-                src={images.front.src}
-                width={images.front.width}
-                height={images.front.height}
-                alt="The Totalflux Oralbrush in sky blue"
-                draggable={false}
-                className="h-[92%] w-auto select-none object-contain drop-shadow-[0_30px_28px_rgba(20,50,90,0.3)]"
-                style={{ rotate: brushRotate, y: brushY }}
-              />
-            </motion.div>
+            {/* The brush closed, and beside it opened up (the handle swung round on its
+                hinge, so the tongue scraper shows) */}
+            <div className="absolute inset-[4%] flex items-center justify-center">
+              <motion.div
+                initial={{ opacity: 0, y: 90, rotate: 18 }}
+                animate={{ opacity: 1, y: 0, rotate: 0 }}
+                transition={{ duration: 1.1, delay: 0.25, ease: EASE }}
+                className="relative z-10 flex h-full items-center"
+              >
+                <motion.img
+                  src={images.front.src}
+                  width={images.front.width}
+                  height={images.front.height}
+                  alt="The Totalflux Oralbrush in sky blue, closed"
+                  draggable={false}
+                  className="h-[86%] w-auto select-none object-contain drop-shadow-[0_30px_28px_rgba(20,50,90,0.3)]"
+                  style={{
+                    aspectRatio: `${images.front.width} / ${images.front.height}`,
+                    rotate: brushRotate,
+                    y: brushY,
+                  }}
+                />
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, x: 40, y: 60 }}
+                animate={{ opacity: 1, x: 0, y: 0 }}
+                transition={{ duration: 1.1, delay: 0.55, ease: EASE }}
+                className="relative ml-[5%] flex h-full items-center"
+              >
+                <motion.img
+                  src={images.open.src}
+                  width={images.open.width}
+                  height={images.open.height}
+                  alt="The Totalflux Oralbrush opened up, showing its tongue scraper"
+                  draggable={false}
+                  className="h-[60%] w-auto -rotate-[6deg] select-none object-contain drop-shadow-[0_26px_24px_rgba(20,50,90,0.28)]"
+                  style={{ aspectRatio: `${images.open.width} / ${images.open.height}`, y: brushY }}
+                />
+              </motion.div>
+            </div>
             <OrbitCircles items={BRUSH_HIGHLIGHTS} ink={colors.ink} label="Oralbrush highlights" />
           </motion.div>
         </div>
