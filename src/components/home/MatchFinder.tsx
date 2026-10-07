@@ -283,7 +283,7 @@ export function MatchFinder({ topColor }: { topColor: string }) {
                     {need.note && (
                       <span className="mr-1 font-semibold text-primary">{need.note}</span>
                     )}
-                    Suggestions only: for lasting problems, see your dentist.
+                    Suggestions only: For lasting problems, see your dentist.
                   </motion.p>
                 </motion.div>
               </AnimatePresence>
