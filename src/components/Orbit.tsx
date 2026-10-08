@@ -11,6 +11,15 @@ import type { LucideIcon } from "lucide-react";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
+/** The turning ring's radius, in % of the box (its centre is the box's). */
+const RING = 44;
+
+/** A point on the ring, `angle` degrees clockwise from its right-hand side, in % of the box. */
+function onRing(angle: number) {
+  const radians = (angle * Math.PI) / 180;
+  return { x: 50 + RING * Math.cos(radians), y: 50 + RING * Math.sin(radians) };
+}
+
 /**
  * The frame: glow, disc, turning ring and (if `podium`) the podium. glow and ink: its colours
  * (they fade when they change). discTop: where the disc's centre sits, from the box's top.
@@ -44,23 +53,19 @@ export function OrbitFrame({
         <circle
           cx="50"
           cy="50"
-          r="44"
+          r={RING}
           fill="none"
           stroke="currentColor"
           strokeWidth="0.3"
           strokeDasharray="1.1 1.7"
           opacity="0.5"
         />
-        {[0, 60, 120, 180, 240, 300].map((angle) => (
-          <circle
-            key={angle}
-            cx={50 + 44 * Math.cos((angle * Math.PI) / 180)}
-            cy={50 + 44 * Math.sin((angle * Math.PI) / 180)}
-            r="0.9"
-            fill="currentColor"
-            opacity="0.7"
-          />
-        ))}
+        {[0, 60, 120, 180, 240, 300].map((angle) => {
+          const dot = onRing(angle);
+          return (
+            <circle key={angle} cx={dot.x} cy={dot.y} r="0.9" fill="currentColor" opacity="0.7" />
+          );
+        })}
       </svg>
       {podium && (
         <div className="absolute bottom-[5%] left-1/2 h-[9%] w-[54%] -translate-x-1/2">
@@ -73,25 +78,13 @@ export function OrbitFrame({
 }
 
 /**
- * Where the glass circles sit around the ring (% of the box), by how many there are: clear of
- * the middle, near the ring.
+ * Where the glass circles sit, by how many there are: centred on the ring's line (it runs
+ * through the middle of each), clear of the product. In degrees, as for onRing.
  */
-const CIRCLE_SPOTS: Record<number, { left: string; top: string }[]> = {
-  2: [
-    { left: "13%", top: "32%" },
-    { left: "87%", top: "60%" },
-  ],
-  3: [
-    { left: "13%", top: "30%" },
-    { left: "87%", top: "34%" },
-    { left: "84%", top: "72%" },
-  ],
-  4: [
-    { left: "13%", top: "28%" },
-    { left: "87%", top: "28%" },
-    { left: "87%", top: "70%" },
-    { left: "13%", top: "70%" },
-  ],
+const CIRCLE_ANGLES: Record<number, number[]> = {
+  2: [205, 15],
+  3: [208, 336, 34],
+  4: [210, 330, 30, 150],
 };
 
 /** Each circle pops in after the one before; its parent sets "hidden" / "show" / "exit". */
@@ -127,18 +120,19 @@ export function OrbitCircles({
   ink: string;
   label: string;
 }) {
-  const spots = CIRCLE_SPOTS[Math.min(items.length, 4)] ?? CIRCLE_SPOTS[4] ?? [];
+  const angles = CIRCLE_ANGLES[Math.min(items.length, 4)] ?? CIRCLE_ANGLES[4] ?? [];
   return (
     <ul aria-label={label} className="absolute inset-0">
       {items.slice(0, 4).map(({ label: text, icon: Icon, color, stat }, i) => {
-        const spot = spots[i] ?? { left: "50%", top: "50%" };
+        const angle = angles[i];
+        const spot = angle === undefined ? { x: 50, y: 50 } : onRing(angle);
         return (
           <motion.li
             key={text}
             custom={i}
             variants={circleVariants}
             className="absolute flex size-[21%] max-h-[8.5rem] max-w-[8.5rem] -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center gap-1 rounded-full border border-white/85 bg-white/55 px-2 text-center shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_18px_36px_-20px_rgba(15,40,80,0.45)] backdrop-blur-md"
-            style={{ left: spot.left, top: spot.top }}
+            style={{ left: `${spot.x}%`, top: `${spot.y}%` }}
           >
             <span
               className="grid size-7 shrink-0 place-items-center rounded-full text-white transition-colors duration-500 sm:size-8"

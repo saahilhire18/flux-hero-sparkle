@@ -13,7 +13,13 @@ import {
 } from "motion/react";
 import { ShieldCheck } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
-import { fullName, MOUTHWASHES, MOUTHWASH_GROUPS, type Mouthwash, type MouthwashGroup } from "@/data/mouthwash";
+import {
+  fullName,
+  MOUTHWASHES,
+  MOUTHWASH_GROUPS,
+  type Mouthwash,
+  type MouthwashGroup,
+} from "@/data/mouthwash";
 import { cn } from "@/lib/utils";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -42,7 +48,9 @@ const BOTTLE_ASPECT = (MOUTHWASHES[0]?.image.width ?? 408) / (MOUTHWASHES[0]?.im
  * height, with a little to spare. (The arc's scale doesn't change the space a bottle takes.)
  */
 const BOTTLE_MAX = `min(28rem, calc((100vw - 6rem - ${MOUTHWASHES.length - 1} * clamp(1.25rem, 2.4vw, 3rem)) / ${(
-  MOUTHWASHES.length * BOTTLE_ASPECT * 1.04
+  MOUTHWASHES.length *
+  BOTTLE_ASPECT *
+  1.04
 ).toFixed(3)}))`;
 
 /**
@@ -68,10 +76,6 @@ const BUBBLE_STYLE: CSSProperties = {
     "radial-gradient(circle at 32% 28%, rgba(255,255,255,0.95) 0 10%, rgba(255,255,255,0.4) 26%, rgba(150,200,235,0.35) 60%, rgba(90,150,210,0.5) 100%)",
   border: "1px solid rgba(110,165,215,0.45)",
 };
-
-/** A solid 3D extrusion for text: `depth` stacked 1px shadows in `color`, down and to the right. */
-const extrude = (depth: number, color: string) =>
-  Array.from({ length: depth }, (_, i) => `${i + 1}px ${i + 1}px 0 ${color}`).join(", ");
 
 type Filter = "all" | MouthwashGroup;
 
@@ -117,7 +121,12 @@ function FilterBar({ value, onChange }: { value: Filter; onChange: (filter: Filt
                 />
               )}
               {option.label}
-              <span className={cn("ml-1.5 text-xs tabular-nums", selected ? "text-primary-foreground/70" : "text-slate-500")}>
+              <span
+                className={cn(
+                  "ml-1.5 text-xs tabular-nums",
+                  selected ? "text-primary-foreground/70" : "text-slate-500",
+                )}
+              >
                 {option.count}
               </span>
             </button>
@@ -182,7 +191,10 @@ function Bottle({
           style={{ aspectRatio: `${image.width} / ${image.height}` }}
         >
           {/* Centred a little below the bottle's middle; wider than the bottle, it overflows both sides */}
-          <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 top-[16%] flex items-center justify-center">
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-x-0 bottom-0 top-[16%] flex items-center justify-center"
+          >
             <motion.span
               className="aspect-square w-[210%] shrink-0 rounded-full transition-opacity duration-500"
               style={{
@@ -243,7 +255,9 @@ function Bottle({
         >
           {mouthwash.name}
         </span>
-        <span className="text-[0.68rem] font-medium leading-tight text-slate-600 sm:text-xs">{mouthwash.benefit}</span>
+        <span className="text-[0.68rem] font-medium leading-tight text-slate-600 sm:text-xs">
+          {mouthwash.benefit}
+        </span>
       </motion.div>
     </li>
   );
@@ -268,16 +282,17 @@ export function MouthwashHero() {
   const easedY = useSpring(pointerY, { stiffness: 60, damping: 18, mass: 0.6 });
   const stageX = useTransform(easedX, (v) => v * -14);
   const glowX = useTransform(easedX, (v) => v * 20);
-  const wordX = useTransform(easedX, (v) => v * -34);
 
-  // Scroll parallax: the text leaves faster than the bottles, the giant word slowest. The
-  // bottles scroll with the page: they stand at the hero's bottom edge, which clips anything
-  // pushed down past it (their name tags would be cut off on the way out).
-  const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start start", "end start"] });
+  // Scroll parallax: the text leaves faster than the bottles. The bottles scroll with the
+  // page: they stand at the hero's bottom edge, which clips anything pushed down past it
+  // (their name tags would be cut off on the way out).
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start start", "end start"],
+  });
   const depth = reduceMotion ? 0 : 1;
   const textY = useTransform(scrollYProgress, [0, 1], [0, -100 * depth]);
   const stageY = useTransform(easedY, (v) => v * -8);
-  const wordY = useTransform(scrollYProgress, [0, 1], [0, 140 * depth]);
 
   const onPointerMove = (event: PointerEvent<HTMLElement>) => {
     if (reduceMotion || event.pointerType !== "mouse") return;
@@ -292,6 +307,9 @@ export function MouthwashHero() {
 
   return (
     <MotionConfig reducedMotion="user">
+      {/* Outside the hero, so it stays above every section as the page scrolls (inside, the
+          hero's own layering would let the sections below paint over it) */}
+      <Navbar />
       <section
         ref={sectionRef}
         id="top"
@@ -305,8 +323,6 @@ export function MouthwashHero() {
             "radial-gradient(ellipse 70% 55% at 50% -8%, #ffffff 0%, rgba(255,255,255,0) 70%), linear-gradient(180deg, #E6F1FA 0%, #F3F8FD 42%, #DCEAF6 100%)",
         }}
       >
-        <Navbar />
-
         {/* Soft colour in the top corners, from the range's liquids */}
         <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10">
           <div className="absolute -left-[12%] -top-[18%] size-[42rem] rounded-full bg-[radial-gradient(circle,rgba(103,182,195,0.32)_0%,transparent_65%)]" />
@@ -319,20 +335,39 @@ export function MouthwashHero() {
             style={{ y: textY }}
             initial="hidden"
             animate="show"
-            variants={{ hidden: {}, show: { transition: { staggerChildren: 0.1, delayChildren: 0.15 } } }}
+            variants={{
+              hidden: {},
+              show: { transition: { staggerChildren: 0.1, delayChildren: 0.15 } },
+            }}
             className="relative z-20 mx-auto flex max-w-3xl flex-col items-center text-center"
           >
+            {/* The promise, highlighted like the home hero's: a shine sweeping across it every few
+                seconds and a blinking blue ring (styles.css) */}
             <motion.p
-              variants={{ hidden: { opacity: 0, y: 14 }, show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: EASE } } }}
-              className={cn(GLASS, "inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-primary")}
+              variants={{
+                hidden: { opacity: 0, y: 14 },
+                show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: EASE } },
+              }}
+              className={cn(
+                GLASS,
+                // A soft teal-to-blue tint, so the white light shows as it passes
+                "pill-shine inline-flex items-center gap-2 rounded-full bg-[linear-gradient(100deg,rgba(214,240,242,0.92)_0%,rgba(226,236,250,0.92)_100%)] px-3.5 py-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-primary",
+              )}
             >
-              <ShieldCheck className="size-4 text-accent" strokeWidth={2} aria-hidden="true" />
+              <ShieldCheck
+                className="pill-shine-icon size-4 text-accent"
+                strokeWidth={2}
+                aria-hidden="true"
+              />
               100% Secure | Clinically Tested
             </motion.p>
 
             <motion.h1
               id="mouthwash-title"
-              variants={{ hidden: { opacity: 0, y: 26 }, show: { opacity: 1, y: 0, transition: { duration: 0.8, ease: EASE } } }}
+              variants={{
+                hidden: { opacity: 0, y: 26 },
+                show: { opacity: 1, y: 0, transition: { duration: 0.8, ease: EASE } },
+              }}
               // Scales with the screen's width and, on short screens, its height
               className="mt-4 text-[clamp(2.2rem,min(3.9vw,7vh),3.75rem)] font-black leading-[1.03] tracking-tight text-primary"
             >
@@ -349,14 +384,21 @@ export function MouthwashHero() {
             </motion.h1>
 
             <motion.p
-              variants={{ hidden: { opacity: 0, y: 14 }, show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: EASE } } }}
+              variants={{
+                hidden: { opacity: 0, y: 14 },
+                show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: EASE } },
+              }}
               className="mt-2 max-w-xl text-base text-slate-600 sm:text-lg"
             >
-              Kills <strong className="font-bold text-primary">99.9%</strong> of oral germs for a healthier mouth.
+              Kills <strong className="font-bold text-primary">99.9%</strong> of oral germs for a
+              healthier mouth.
             </motion.p>
 
             <motion.div
-              variants={{ hidden: { opacity: 0, y: 14 }, show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: EASE } } }}
+              variants={{
+                hidden: { opacity: 0, y: 14 },
+                show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: EASE } },
+              }}
               className="mt-5"
             >
               <FilterBar value={filter} onChange={setFilter} />
@@ -365,18 +407,11 @@ export function MouthwashHero() {
 
           {/* The range, on its platform */}
           <div className="relative mt-10 flex flex-1 flex-col justify-end lg:mt-4 lg:min-h-0">
-            {/* Giant 3D word behind the bottles */}
-            <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-[4%] flex justify-center">
-              <motion.p
-                style={{ x: wordX, y: wordY, color: "rgba(255,255,255,0.75)", textShadow: extrude(9, "rgba(40,90,140,0.07)") }}
-                className="select-none whitespace-nowrap text-[min(12.5vw,13rem)] font-black uppercase leading-none tracking-[0.12em]"
-              >
-                Mouthwash
-              </motion.p>
-            </div>
-
             {/* Bubbles rising behind the bottles */}
-            <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-[10%] top-[18%] overflow-hidden">
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-x-0 bottom-[10%] top-[18%] overflow-hidden"
+            >
               {BUBBLES.map(([left, size, duration, delay]) => (
                 <span
                   key={left}

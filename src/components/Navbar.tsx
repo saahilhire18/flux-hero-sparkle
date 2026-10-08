@@ -170,7 +170,7 @@ export function Navbar({
         >
           <Button asChild variant="glass" size="default" className="letter-fx px-5">
             <a href={AMAZON_STORE} {...EXTERNAL}>
-              <RollText text="Where to Buy" />
+              <RollText text="Buy Now" />
               <span className="sr-only"> (Amazon, opens in a new tab)</span>
             </a>
           </Button>
@@ -214,7 +214,7 @@ export function Navbar({
           })}
           <Button asChild variant="glass" size="hero" className="mt-3 self-start">
             <a href={AMAZON_STORE} {...EXTERNAL} onClick={() => setOpen(false)}>
-              Where to Buy
+              Buy Now
               <span className="sr-only"> (Amazon, opens in a new tab)</span>
             </a>
           </Button>

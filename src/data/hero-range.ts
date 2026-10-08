@@ -1,10 +1,10 @@
 // data/hero-range.ts
 //
-// Hero steps, in order. Each scroll gesture on the hero moves one step through these
-// entries. The first is the intro: the whole range standing in a row, every tube alike, and a
-// pill per product that goes to its step. Every other step shows one product: its tube comes
-// to the front and lies down (the Kidoos stand and grow) while the others shrink and fade
-// back, and the text above names it, with its details as pills underneath.
+// Hero steps. The first is the intro: the whole range standing in a row, every tube alike,
+// and a pill per product that goes to its step. Every other step shows one product (picked by
+// resting the mouse on its tube, or clicking the tube or its pill): its tube floats to the
+// middle and lies down (the Kidoos stand and grow) while the others shrink and fade back, and
+// the text above names it, with its details as pills underneath.
 //
 // Details follow the Totalflux product sheets and packs (the same as product-pages.ts and
 // KidoosSection). Keep descriptions to about two lines (~75 characters) so every step fits

@@ -278,6 +278,97 @@ html {
     animation: none;
   }
 }
+/*
+ * The heroes' promise pills (HomeHero.tsx, MouthwashHero.tsx): every few seconds a soft band of light glides
+ * across its tinted glass, behind the words so they stay crisp (the ::after, below the text
+ * in the pill's own stacking context), and its shield pops as the light passes; both run on
+ * one cycle (--pill-cycle), after --pill-delay, resting between sweeps. All the while a blue
+ * ring round the pill blinks softly, bright then faint, on its own quicker beat.
+ */
+.pill-shine {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  animation: pill-blink 1.2s ease-in-out infinite;
+}
+.pill-shine::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: -40% auto -40% 0;
+  width: 34%;
+  background: linear-gradient(
+    100deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.55) 30%,
+    rgba(255, 255, 255, 1) 50%,
+    rgba(255, 255, 255, 0.55) 70%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: translateX(-170%) skewX(-20deg);
+  animation: pill-sweep var(--pill-cycle, 4.6s) cubic-bezier(0.4, 0, 0.6, 1) var(--pill-delay, 1.4s)
+    infinite;
+  pointer-events: none;
+}
+.pill-shine-icon {
+  animation: pill-pop var(--pill-cycle, 4.6s) ease-out var(--pill-delay, 1.4s) infinite;
+}
+@keyframes pill-sweep {
+  0% {
+    transform: translateX(-170%) skewX(-20deg);
+  }
+  34%,
+  100% {
+    transform: translateX(460%) skewX(-20deg);
+  }
+}
+/* The blue ring: bright, with a soft halo, then faint, and back */
+@keyframes pill-blink {
+  0%,
+  100% {
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.95),
+      0 12px 30px -16px rgba(20, 60, 120, 0.4),
+      0 0 0 2px rgba(43, 108, 176, 0.95),
+      0 0 16px 2px rgba(43, 108, 176, 0.45);
+  }
+  50% {
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.95),
+      0 12px 30px -16px rgba(20, 60, 120, 0.4),
+      0 0 0 2px rgba(43, 108, 176, 0.15),
+      0 0 16px 2px rgba(43, 108, 176, 0);
+  }
+}
+/* The shield pops as the light reaches it, near the start of the sweep */
+@keyframes pill-pop {
+  0%,
+  20%,
+  100% {
+    transform: scale(1) rotate(0deg);
+  }
+  8% {
+    transform: scale(1.28) rotate(-8deg);
+  }
+  14% {
+    transform: scale(0.96) rotate(3deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pill-shine,
+  .pill-shine-icon,
+  .pill-shine::after {
+    animation: none;
+  }
+  /* The ring stays, steady */
+  .pill-shine {
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.95),
+      0 12px 30px -16px rgba(20, 60, 120, 0.4),
+      0 0 0 2px rgba(43, 108, 176, 0.7);
+  }
+}
+
 /* src/styles/globals.css (or src/index.css — wherever your global CSS entry is) */
 html {
   scroll-snap-type: y proximity;

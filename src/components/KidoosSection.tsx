@@ -3,7 +3,6 @@ import { useRef } from "react";
 import { Check } from "lucide-react";
 import { motion, MotionConfig, useScroll, useTransform } from "motion/react";
 import { BrandName } from "@/components/BrandName";
-import { useHoverTilt } from "@/hooks/use-hover-tilt";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -21,24 +20,8 @@ type Kidoo = {
   ink: string;
 };
 
-/** From the Totalflux product sheets and the Kidoos packs. */
+/** From the Totalflux product sheets and the Kidoos packs. Plus (3+) first, then Advance (6+). */
 const KIDOOS: Kidoo[] = [
-  {
-    id: "kidoos-advance",
-    name: "Kidoos Advance",
-    age: "6+",
-    tag: "Reduced-dose fluoride",
-    summary:
-      "A pediatric-calibrated step between fluoride-free and adult-strength paste, for reduced-dose fluoride protection as teeth grow.",
-    actives: [
-      ["Sodium Fluoride", "498 ppm"],
-      ["Xylitol", "3%"],
-    ],
-    perks: ["SLS free · Non-cariogenic", "Cavity protection with fluoride", "Fresh breath all day"],
-    image: { src: "/kidoos-advance.webp", width: 232, height: 729 },
-    gradient: "linear-gradient(135deg, #FFD1DC 0%, #FFE3EC 45%, #FFE9D6 100%)",
-    ink: "#8E2442",
-  },
   {
     id: "kidoos-plus",
     name: "Kidoos Plus",
@@ -54,6 +37,22 @@ const KIDOOS: Kidoo[] = [
     image: { src: "/kidoos-plus.webp", width: 213, height: 697 },
     gradient: "linear-gradient(135deg, #CDEBFF 0%, #DCE4FF 50%, #EBDDFF 100%)",
     ink: "#23498A",
+  },
+  {
+    id: "kidoos-advance",
+    name: "Kidoos Advance",
+    age: "6+",
+    tag: "Reduced-dose fluoride",
+    summary:
+      "A pediatric-calibrated step between fluoride-free and adult-strength paste, for reduced-dose fluoride protection as teeth grow.",
+    actives: [
+      ["Sodium Fluoride", "498 ppm"],
+      ["Xylitol", "3%"],
+    ],
+    perks: ["SLS free · Non-cariogenic", "Cavity protection with fluoride", "Fresh breath all day"],
+    image: { src: "/kidoos-advance.webp", width: 232, height: 729 },
+    gradient: "linear-gradient(135deg, #FFD1DC 0%, #FFE3EC 45%, #FFE9D6 100%)",
+    ink: "#8E2442",
   },
 ];
 
@@ -73,15 +72,8 @@ function Dots() {
 }
 
 /**
- * On hover the card tilts towards the mouse (useHoverTilt) and its layers come apart in depth:
- * the badge nearest, then the tube, then the words (px towards you), so they shift against
- * each other as it turns. A soft glare follows the mouse.
- */
-const DEPTH = { badge: 85, tube: 60, words: 30 };
-
-/**
  * One Kidoos card: a gradient panel with the age badge, the tube (rising and swaying as the
- * page scrolls) and the product's key points. In 3D on hover.
+ * page scrolls) and the product's key points.
  */
 function KidooCard({ kidoo, index }: { kidoo: Kidoo; index: number }) {
   const ref = useRef<HTMLElement>(null);
@@ -89,12 +81,6 @@ function KidooCard({ kidoo, index }: { kidoo: Kidoo; index: number }) {
   const tubeY = useTransform(scrollYProgress, [0, 1], [50, -50]);
   const tubeRotate = useTransform(scrollYProgress, [0, 1], index % 2 ? [-14, 6] : [14, -6]);
   const badgeRotate = useTransform(scrollYProgress, [0, 1], [-20, 20]);
-
-  const { handlers, style: tiltStyle, hover, glare } = useHoverTilt();
-  const badgeZ = useTransform(hover, [0, 1], [0, DEPTH.badge]);
-  const tubeZ = useTransform(hover, [0, 1], [0, DEPTH.tube]);
-  const wordsZ = useTransform(hover, [0, 1], [0, DEPTH.words]);
-  const { rotateX, rotateY, scale } = tiltStyle;
 
   return (
     <motion.article
@@ -105,23 +91,14 @@ function KidooCard({ kidoo, index }: { kidoo: Kidoo; index: number }) {
       whileInView={{ opacity: 1, y: 0, rotate: 0 }}
       viewport={{ once: true, amount: 0.3 }}
       transition={{ duration: 0.8, delay: index * 0.12, ease: EASE }}
-      {...handlers}
-      // preserve-3d (and no overflow clipping here) lets the layers inside sit at their depths
-      className="relative rounded-[2rem] border border-white/70 p-6 shadow-[0_30px_70px_-35px_rgba(60,40,90,0.45)] transition-shadow duration-300 [transform-style:preserve-3d] hover:shadow-[0_50px_90px_-35px_rgba(60,40,90,0.55)] sm:p-7"
-      style={{
-        background: kidoo.gradient,
-        color: kidoo.ink,
-        scrollMarginTop: "6rem",
-        rotateX,
-        rotateY,
-        scale,
-      }}
+      className="relative rounded-[2rem] border border-white/70 p-6 shadow-[0_30px_70px_-35px_rgba(60,40,90,0.45)] sm:p-7"
+      style={{ background: kidoo.gradient, color: kidoo.ink, scrollMarginTop: "6rem" }}
     >
       <Dots />
 
-      <div className="relative grid items-center gap-5 [transform-style:preserve-3d] sm:grid-cols-[auto_1fr] sm:gap-x-10">
+      <div className="relative grid items-center gap-5 sm:grid-cols-[auto_1fr] sm:gap-x-10">
         {/* Tube with its age badge */}
-        <div className="relative mx-auto h-60 w-28 [transform-style:preserve-3d] sm:h-72 sm:w-32">
+        <div className="relative mx-auto h-60 w-28 sm:h-72 sm:w-32">
           <motion.img
             src={kidoo.image.src}
             width={kidoo.image.width}
@@ -129,10 +106,10 @@ function KidooCard({ kidoo, index }: { kidoo: Kidoo; index: number }) {
             alt={`Totalflux ${kidoo.name} toothpaste`}
             draggable={false}
             className="h-full w-auto select-none object-contain drop-shadow-[0_24px_30px_rgba(60,40,90,0.3)]"
-            style={{ y: tubeY, rotate: tubeRotate, z: tubeZ }}
+            style={{ y: tubeY, rotate: tubeRotate }}
           />
           <motion.span
-            style={{ rotate: badgeRotate, z: badgeZ, backgroundColor: kidoo.ink }}
+            style={{ rotate: badgeRotate, backgroundColor: kidoo.ink }}
             className="absolute -right-5 top-1 grid size-16 place-items-center rounded-full text-center text-white shadow-lg ring-4 ring-white/70"
           >
             <span className="leading-none">
@@ -142,7 +119,7 @@ function KidooCard({ kidoo, index }: { kidoo: Kidoo; index: number }) {
           </motion.span>
         </div>
 
-        <motion.div style={{ z: wordsZ }}>
+        <div>
           <p className="inline-flex rounded-full bg-white/60 px-3 py-1 text-[0.68rem] font-bold uppercase tracking-[0.16em] backdrop-blur">
             {kidoo.tag}
           </p>
@@ -176,15 +153,8 @@ function KidooCard({ kidoo, index }: { kidoo: Kidoo; index: number }) {
               </li>
             ))}
           </ul>
-        </motion.div>
+        </div>
       </div>
-
-      {/* Glare following the mouse, only while hovered */}
-      <motion.div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 rounded-[2rem]"
-        style={{ background: glare, opacity: hover }}
-      />
     </motion.article>
   );
 }
@@ -232,7 +202,7 @@ export function KidoosSection({ topColor = "#DDE4F2" }: { topColor?: string }) {
           </motion.div>
 
           {/* At most about 1220px across, centred, the two cards close together */}
-          <div className="mx-auto mt-10 grid max-w-[76rem] gap-4 [perspective:1400px] lg:grid-cols-2">
+          <div className="mx-auto mt-10 grid max-w-[76rem] gap-4 lg:grid-cols-2">
             {KIDOOS.map((kidoo, i) => (
               <KidooCard key={kidoo.id} kidoo={kidoo} index={i} />
             ))}

@@ -100,6 +100,9 @@ export function OralbrushHero() {
 
   return (
     <MotionConfig reducedMotion="user">
+      {/* Outside the hero, so it stays above every section as the page scrolls (inside, the
+          hero's own layering would let the sections below paint over it) */}
+      <Navbar />
       <section
         ref={ref}
         id="top"
@@ -112,8 +115,6 @@ export function OralbrushHero() {
             "radial-gradient(ellipse 60% 60% at 70% 45%, rgba(255,255,255,0.75), transparent 70%), linear-gradient(180deg, #E8F2FB 0%, #F3F8FD 45%, #DCEAF6 100%)",
         }}
       >
-        <Navbar />
-
         {/* Soft colour from the brush, far behind everything */}
         <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10">
           <div className="absolute -left-[12%] -top-[16%] size-[40rem] rounded-full bg-[radial-gradient(circle,rgba(169,201,234,0.42)_0%,transparent_65%)]" />

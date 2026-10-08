@@ -2,10 +2,10 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { AnimatePresence, motion, MotionConfig, type Variants } from "motion/react";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Check } from "lucide-react";
 import { BrandName } from "@/components/BrandName";
 import { OrbitFrame } from "@/components/Orbit";
-import { NEEDS, type HomeProduct, type Need } from "@/data/home";
+import { NEEDS, type Need, type Pick } from "@/data/home";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 const NAVY = "#24467A";
@@ -47,14 +47,18 @@ const line: Variants = {
   show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: EASE } },
 };
 
-/** One product of the pair, in the words: a small photo, what it is and why it suits, and a link to it. */
-function PickRow({ product, why }: { product: HomeProduct; why: string }) {
+/**
+ * One product of the pair, in the words: a photo, what it is and why it suits, what works in it
+ * (its actives; those both products share ticked, in the need's colour) and a link to it.
+ */
+function PickRow({ pick, shared, ink }: { pick: Pick; shared: string[]; ink: string }) {
+  const { product, why, actives } = pick;
   return (
     <motion.li
       variants={line}
       className="group flex items-center gap-4 rounded-[1.75rem] border border-white/85 bg-white/55 p-3 pr-5 text-left shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_16px_36px_-26px_rgba(20,60,120,0.5)] backdrop-blur-md"
     >
-      <span className="relative h-24 w-16 shrink-0 rounded-2xl bg-white/70">
+      <span className="relative h-36 w-[5.5rem] shrink-0 rounded-2xl bg-white/70">
         <img
           src={product.image.src}
           width={product.image.width}
@@ -62,7 +66,8 @@ function PickRow({ product, why }: { product: HomeProduct; why: string }) {
           alt=""
           loading="lazy"
           draggable={false}
-          className="absolute inset-0 m-auto h-[86%] w-auto select-none object-contain drop-shadow-[0_8px_8px_rgba(20,50,90,0.25)]"
+          className="absolute inset-0 m-auto h-[90%] w-auto select-none object-contain drop-shadow-[0_10px_10px_rgba(20,50,90,0.25)]"
+          style={{ aspectRatio: `${product.image.width} / ${product.image.height}` }}
         />
       </span>
       <span className="min-w-0 flex-1">
@@ -76,6 +81,29 @@ function PickRow({ product, why }: { product: HomeProduct; why: string }) {
           <BrandName className="text-[0.8em] font-bold text-slate-600" /> {product.name}
         </span>
         <span className="mt-0.5 block text-sm leading-snug text-slate-600">{why}</span>
+        <span className="mt-2 flex flex-wrap gap-1">
+          {actives.map(({ name, amount }) => {
+            const both = shared.includes(name);
+            return (
+              <span
+                key={name}
+                className="inline-flex items-center gap-1 rounded-full border bg-white/80 px-2 py-0.5 text-[0.68rem] text-slate-700"
+                style={{ borderColor: both ? ink : "rgba(148,163,184,0.35)" }}
+              >
+                {both && (
+                  <Check
+                    className="size-3"
+                    strokeWidth={3}
+                    style={{ color: ink }}
+                    aria-label="in both"
+                  />
+                )}
+                {name}
+                {amount && <b className="font-bold">{amount}</b>}
+              </span>
+            );
+          })}
+        </span>
         <Link
           to={product.to}
           {...(product.hash ? { hash: product.hash } : {})}
@@ -110,14 +138,14 @@ function Pair({ need }: { need: Need }) {
         exit="exit"
         className="absolute inset-0 flex items-center justify-center"
       >
-        {/* Nudged right: the leaning tube reaches further left than its box, so this centres what you see */}
-        <div className="relative flex h-[56cqw] translate-x-[3.3cqw] items-end">
+        {/* The pair, centred in the circle (both ways) */}
+        <div className="relative flex h-[56cqw] items-end gap-[3cqw]">
           {/* Their shadow */}
           <span
             aria-hidden="true"
             className="absolute -bottom-[2cqw] left-1/2 h-[5cqw] w-[120%] -translate-x-1/2 rounded-[50%] bg-[radial-gradient(ellipse,rgba(20,50,90,0.28),transparent_70%)]"
           />
-          {/* In front of the bottle, overlapping its lower left */}
+          {/* The toothpaste, the taller of the two, standing straight beside the bottle, a little apart */}
           <motion.img
             custom={0}
             variants={productVariants}
@@ -126,7 +154,7 @@ function Pair({ need }: { need: Need }) {
             height={tube.image.height}
             alt={`Totalflux ${tube.name} toothpaste`}
             draggable={false}
-            className="relative z-10 -mr-[5cqw] h-[76%] w-auto shrink-0 origin-bottom -rotate-[9deg] select-none object-contain drop-shadow-[0_22px_22px_rgba(20,50,90,0.35)]"
+            className="relative z-10 h-full w-auto shrink-0 select-none object-contain drop-shadow-[0_22px_22px_rgba(20,50,90,0.35)]"
             style={{ aspectRatio: `${tube.image.width} / ${tube.image.height}` }}
           />
           <motion.img
@@ -137,7 +165,7 @@ function Pair({ need }: { need: Need }) {
             height={bottle.image.height}
             alt={`Totalflux ${bottle.name} mouthwash`}
             draggable={false}
-            className="relative h-full w-auto shrink-0 select-none object-contain drop-shadow-[0_24px_24px_rgba(20,50,90,0.28)]"
+            className="relative h-[76%] w-auto shrink-0 select-none object-contain drop-shadow-[0_24px_24px_rgba(20,50,90,0.28)]"
             style={{ aspectRatio: `${bottle.image.width} / ${bottle.image.height}` }}
           />
         </div>
@@ -187,7 +215,9 @@ export function MatchFinder({ topColor }: { topColor: string }) {
             <Pair need={need} />
 
             <div role="group" aria-label="Your need" className="absolute inset-0">
-              {NEEDS.map(({ id, label, icon: Icon }, i) => {
+              {/* Each need in its own colour (from its products' packs): its icon and name in
+                  it, its glass washed with it, and filled with it when chosen */}
+              {NEEDS.map(({ id, label, icon: Icon, colors }, i) => {
                 const current = id === need.id;
                 const spot = SPOTS[i] ?? { left: "50%", top: "50%" };
                 return (
@@ -201,18 +231,23 @@ export function MatchFinder({ topColor }: { topColor: string }) {
                     transition={{ type: "spring", stiffness: 320, damping: 22 }}
                     className={`absolute flex size-[22cqw] max-h-[8.5rem] max-w-[8.5rem] -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center gap-1 rounded-full border px-2 text-center transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
                       current
-                        ? "z-10 border-transparent text-white shadow-[0_18px_36px_-14px_rgba(15,40,80,0.75)]"
-                        : "border-white/85 bg-white/60 text-primary shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_18px_36px_-20px_rgba(15,40,80,0.45)] backdrop-blur-md hover:bg-white/85"
+                        ? "z-10 border-transparent text-white"
+                        : "border-white/85 shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_18px_36px_-20px_rgba(15,40,80,0.45)] backdrop-blur-md hover:brightness-[1.03]"
                     }`}
                     style={{
                       left: spot.left,
                       top: spot.top,
-                      ...(current ? { backgroundColor: NAVY } : {}),
+                      ...(current
+                        ? {
+                            backgroundColor: colors.ink,
+                            boxShadow: `0 18px 36px -14px ${colors.ink}cc`,
+                          }
+                        : { backgroundColor: `${colors.soft}d9`, color: colors.ink }),
                     }}
                   >
                     <span
                       className={`grid size-[34%] place-items-center rounded-full transition-colors duration-300 ${current ? "bg-white/20" : "text-white"}`}
-                      style={current ? {} : { backgroundColor: NAVY }}
+                      style={current ? {} : { backgroundColor: colors.ink }}
                     >
                       <Icon className="size-[55%]" strokeWidth={1.9} aria-hidden="true" />
                     </span>
@@ -263,8 +298,11 @@ export function MatchFinder({ topColor }: { topColor: string }) {
                     className="flex items-center justify-center gap-3 lg:justify-start"
                   >
                     <span
-                      className="grid size-11 place-items-center rounded-2xl text-white shadow-[0_12px_24px_-12px_rgba(15,40,80,0.7)]"
-                      style={{ backgroundColor: NAVY }}
+                      className="grid size-11 place-items-center rounded-2xl text-white"
+                      style={{
+                        backgroundColor: need.colors.ink,
+                        boxShadow: `0 12px 24px -12px ${need.colors.ink}`,
+                      }}
                     >
                       <NeedIcon className="size-5" strokeWidth={1.9} aria-hidden="true" />
                     </span>
@@ -273,9 +311,30 @@ export function MatchFinder({ topColor }: { topColor: string }) {
                     </span>
                   </motion.h3>
                   <ul className="mx-auto mt-5 flex max-w-lg flex-col gap-3 lg:mx-0">
-                    <PickRow product={need.toothpaste.product} why={need.toothpaste.why} />
-                    <PickRow product={need.mouthwash.product} why={need.mouthwash.why} />
+                    <PickRow pick={need.toothpaste} shared={need.shared} ink={need.colors.ink} />
+                    <PickRow pick={need.mouthwash} shared={need.shared} ink={need.colors.ink} />
                   </ul>
+                  {/* What the two have in common, in one line */}
+                  <motion.p
+                    variants={line}
+                    className="mx-auto mt-3 flex max-w-lg flex-wrap items-center justify-center gap-x-3 gap-y-1 rounded-full px-4 py-2 text-sm font-semibold text-slate-700 lg:mx-0 lg:justify-start"
+                    style={{ backgroundColor: `${need.colors.soft}cc` }}
+                  >
+                    <span className="font-extrabold" style={{ color: need.colors.ink }}>
+                      Both have:
+                    </span>
+                    {need.shared.map((item) => (
+                      <span key={item} className="inline-flex items-center gap-1">
+                        <Check
+                          className="size-3.5"
+                          strokeWidth={3}
+                          style={{ color: need.colors.ink }}
+                          aria-hidden="true"
+                        />
+                        {item}
+                      </span>
+                    ))}
+                  </motion.p>
                   <motion.p
                     variants={line}
                     className="mx-auto mt-4 max-w-lg text-sm text-slate-600 lg:mx-0"

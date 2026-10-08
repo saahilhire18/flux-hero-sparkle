@@ -6,36 +6,76 @@ import {
   useRef,
   useState,
   type CSSProperties,
+  type PointerEvent as ReactPointerEvent,
 } from "react";
-import { motion, MotionConfig, type Variants } from "motion/react";
-import { ArrowRight } from "lucide-react";
+import {
+  AnimatePresence,
+  motion,
+  MotionConfig,
+  useMotionValue,
+  type MotionValue,
+  type Variants,
+} from "motion/react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 
 import { BrandName } from "@/components/BrandName";
 import { Navbar } from "@/components/Navbar";
 import { RollText, WaveText } from "@/components/TextEffects";
 import { Button } from "@/components/ui/button";
 import { HERO_PRODUCTS, HERO_STEPS, type HeroStep } from "@/data/hero-range";
-import { useStepGestures } from "@/hooks/use-step-gestures";
 import { cn } from "@/lib/utils";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
-/** How close to the top of the page still counts as "the hero fills the screen", in pixels. */
-const TOP_SLOP = 4;
+/**
+ * Hovering a tube shows its product once the mouse has rested on it for `dwell` ms, so
+ * sweeping across the row doesn't flick through the range; once the mouse has been off every
+ * tube for `linger` ms (time to cross the gap between two), it goes back. Hovers within
+ * `afterScroll` ms of the page scrolling are ignored: that's the row sliding under a still
+ * mouse, not the mouse moving.
+ */
+const HOVER = { dwell: 150, linger: 250, afterScroll: 300 };
 
-/** The hero is the top of the page, so it fills the screen while the page is at its top. */
-const heroFillsScreen = () => window.scrollY <= TOP_SLOP;
-
-/** Whether the page is at its top (the hero fills the screen), kept up to date as it scrolls. */
-function useAtTop() {
-  const [atTop, setAtTop] = useState(true);
+/**
+ * The mouse over the row (mice only: touch and keys pick by clicking). over: the tube it's on
+ * (its step index), for the "Click to know more" hint; previewed: the step shown for it, back
+ * to null once the mouse has left the tubes. enter(stepIndex, event) and leave(event) are each
+ * tube's pointer handlers.
+ */
+function useHoverPreview() {
+  const [over, setOver] = useState<number | null>(null);
+  const [previewed, setPreviewed] = useState<number | null>(null);
+  const showTimer = useRef<number | undefined>(undefined);
+  const backTimer = useRef<number | undefined>(undefined);
+  const lastScroll = useRef(-Infinity);
   useEffect(() => {
-    const update = () => setAtTop(heroFillsScreen());
-    update();
-    window.addEventListener("scroll", update, { passive: true });
-    return () => window.removeEventListener("scroll", update);
+    const onScroll = () => {
+      lastScroll.current = performance.now();
+      window.clearTimeout(showTimer.current);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.clearTimeout(showTimer.current);
+      window.clearTimeout(backTimer.current);
+    };
   }, []);
-  return atTop;
+
+  const enter = useCallback((stepIndex: number, event: ReactPointerEvent) => {
+    if (event.pointerType !== "mouse") return;
+    if (performance.now() - lastScroll.current < HOVER.afterScroll) return;
+    window.clearTimeout(backTimer.current);
+    window.clearTimeout(showTimer.current);
+    setOver(stepIndex);
+    showTimer.current = window.setTimeout(() => setPreviewed(stepIndex), HOVER.dwell);
+  }, []);
+  const leave = useCallback((event: ReactPointerEvent) => {
+    if (event.pointerType !== "mouse") return;
+    window.clearTimeout(showTimer.current);
+    setOver(null);
+    backTimer.current = window.setTimeout(() => setPreviewed(null), HOVER.linger);
+  }, []);
+  return { over, previewed, enter, leave };
 }
 
 /** Scrolls the page to a product's section. */
@@ -165,7 +205,7 @@ function HeroText({ activeIndex }: { activeIndex: number }) {
             <Heading
               variants={lines}
               id={index === 0 ? "hero-title" : undefined}
-              className="text-[clamp(2rem,min(3.4vw,6vh),3.25rem)] font-black leading-[1.03] tracking-tight text-primary"
+              className="text-[clamp(2.2rem,min(3.7vw,6.4vh),3.5rem)] font-black leading-[1.03] tracking-tight text-primary"
             >
               <motion.span variants={rise} className="block pb-[0.06em]">
                 {!step.product ? (
@@ -246,6 +286,24 @@ function ProductPills({ onSelect }: { onSelect: (stepIndex: number) => void }) {
   ));
 }
 
+/** On a product step, the way back to the whole range. */
+function BackPill({ onBack }: { onBack: () => void }) {
+  return (
+    <motion.li variants={pill}>
+      <button
+        type="button"
+        onClick={onBack}
+        className={`${GLASS_PILL} transition-colors duration-300 hover:bg-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring`}
+      >
+        <span className={GLASS_DISC}>
+          <ArrowLeft className="size-4" strokeWidth={1.8} />
+        </span>
+        All toothpastes
+      </button>
+    </motion.li>
+  );
+}
+
 /** A product's pills: what's in it and what it does, each icon on a disc in the product's colour. */
 function DetailPills({ product }: { product: NonNullable<HeroStep["product"]> }) {
   const { ink } = product.colors;
@@ -272,9 +330,9 @@ function DetailPills({ product }: { product: NonNullable<HeroStep["product"]> })
 
 /**
  * The pills under the text: on the intro, the products (each goes to its step); on a product
- * step, its details. Every step's set is stacked in one grid cell, like HeroText, so the block
- * keeps the height of the tallest set and nothing below it moves; only the current set shows
- * (and can be used).
+ * step, a way back to the whole range, then its details. Every step's set is stacked in one
+ * grid cell, like HeroText, so the block keeps the height of the tallest set and nothing below
+ * it moves; only the current set shows (and can be used).
  */
 function StepPills({
   activeIndex,
@@ -299,7 +357,10 @@ function StepPills({
             className="mx-auto flex max-w-6xl flex-wrap content-start justify-center gap-2 [grid-area:1/1] sm:gap-2.5"
           >
             {step.product ? (
-              <DetailPills product={step.product} />
+              <>
+                <BackPill onBack={() => onSelect(0)} />
+                <DetailPills product={step.product} />
+              </>
             ) : (
               <ProductPills onSelect={onSelect} />
             )}
@@ -315,23 +376,33 @@ const MOVE = { duration: 0.9, ease: [0.65, 0, 0.35, 1] as const };
 
 /**
  * How a shown tube comes out: an adult tube lies on its side, as long as `lie` times its
- * standing height; a Kidoos tube stays standing and grows `kids` times. Both come forward
- * (down) `forward` of the stage's height. The others shrink to `dim.scale` and fade.
+ * standing height, floating in the middle of the stage; a Kidoos tube stays standing, comes
+ * forward (down) `forward` of the stage's height and grows `kids` times. The others shrink to
+ * `dim.scale` and fade. A tap on the shown tube within `settleMs` of the tap that showed it is
+ * a double tap, so it doesn't yet go down to its section.
  */
-const FOCUS = { lie: 1.45, kids: 1.4, forward: 0.03, dim: { scale: 0.86, opacity: 0.38 } };
+const FOCUS = {
+  lie: 1.45,
+  kids: 1.4,
+  forward: 0.03,
+  dim: { scale: 0.86, opacity: 0.38 },
+  settleMs: 600,
+};
 
 /** Where a tube stands in the row, measured: how far its base is from the row's middle, and its size (px). */
 type Spot = { toCentre: number; height: number; width: number };
 
 /**
  * One tube in the row. On the intro every tube stands alike, a soft glow of its colour behind
- * it. When its product is shown it glides to the front of the row, in the middle, and lies
- * down on its side, cap to the left so its label reads left to right, growing as it goes (a
- * Kidoos tube, whose pack is printed upright, comes forward standing and just grows); the
- * others shrink and fade where they stand. Light falls across it and now and then a shine
- * sweeps over it (both masked by its photo, so only the tube catches them). Clicking it shows
- * its product, or, when it's already shown, goes down to its section.
- * spot: where it stands (null until measured); forward: how far the shown tube comes forward (px).
+ * it. When its product is shown it glides to the middle of the stage and lies down on its
+ * side, cap to the left so its label reads left to right, growing as it goes (a Kidoos tube,
+ * whose pack is printed upright, comes forward standing and just grows); the others shrink
+ * and fade where they stand. Light falls across it and now and then a shine sweeps over it
+ * (both masked by its photo, so only the tube catches them). The mouse resting on it shows its
+ * product (onHoverStart / onHoverEnd); a click or tap on it calls onPress, saying whether it
+ * came from the mouse.
+ * spot: where it stands (null until measured); forward: how far a shown Kidoos tube comes
+ * forward, and lift: how far up the row's base line the stage's middle is (px, negative).
  */
 function Tube({
   product,
@@ -339,15 +410,23 @@ function Tube({
   focus,
   spot,
   forward,
-  onSelect,
+  lift,
+  onPress,
+  onHoverStart,
+  onHoverEnd,
 }: {
   product: RowProduct;
   order: number;
   focus: string | undefined;
   spot: Spot | null;
   forward: number;
-  onSelect: (stepIndex: number) => void;
+  lift: number;
+  onPress: (product: RowProduct, viaMouse: boolean) => void;
+  onHoverStart: (stepIndex: number, event: ReactPointerEvent) => void;
+  onHoverEnd: (event: ReactPointerEvent) => void;
 }) {
+  // What pressed it last (a click from a key has no pointer, and detail 0)
+  const pointerType = useRef("");
   const shown = focus === product.id;
   const dimmed = !!focus && !shown;
   const fromCentre = Math.abs(order - (ROW.length - 1) / 2);
@@ -366,13 +445,12 @@ function Tube({
       shadow = { ...shadow, x: spot.toCentre, y: forward, scaleX: FOCUS.kids * 1.1 };
     } else {
       // Turned a quarter clockwise about its base it lies to the right of it, centred on the
-      // base line: so it moves left by half its length to sit in the middle, and up by half its
-      // thickness to rest on the line
+      // base line: so it moves left by half its length to sit in the middle, and up by `lift`
+      // to float in the middle of the stage. Its shadow stays on the floor, fainter
       const length = spot.height * FOCUS.lie;
-      const thickness = spot.width * FOCUS.lie;
       pose = {
         x: spot.toCentre - length / 2,
-        y: forward - thickness / 2,
+        y: lift,
         rotate: 90,
         scale: FOCUS.lie,
         opacity: 1,
@@ -380,16 +458,26 @@ function Tube({
       shadow = {
         x: spot.toCentre,
         y: forward,
-        scaleX: (length * 0.92) / (spot.width * 0.9),
-        opacity: 1,
+        scaleX: (length * 0.7) / (spot.width * 0.9),
+        opacity: 0.45,
       };
     }
   }
 
   return (
+    // Hover and clicks are taken on the tube's place in the row, which doesn't move, as well as
+    // on the tube: it gliding out from under the mouse doesn't count as leaving it, and a click
+    // where it stood still counts. The button inside is for keys and screen readers; its
+    // clicks come up to here.
     <li
-      className="relative flex flex-col items-center"
+      className="relative flex cursor-pointer flex-col items-center"
       style={{ zIndex: shown ? 20 : Math.round(10 - fromCentre * 2) }}
+      onPointerEnter={(event) => onHoverStart(product.stepIndex, event)}
+      onPointerLeave={onHoverEnd}
+      onPointerDown={(event) => {
+        pointerType.current = event.pointerType;
+      }}
+      onClick={(event) => onPress(product, event.detail > 0 && pointerType.current === "mouse")}
     >
       {/* Rises into place when the page opens, from the middle out */}
       <motion.div
@@ -400,7 +488,6 @@ function Tube({
       >
         <motion.button
           type="button"
-          onClick={() => (shown ? openSection(product.id) : onSelect(product.stepIndex))}
           aria-label={
             shown ? `Totalflux ${product.name}: see its section` : `Show Totalflux ${product.name}`
           }
@@ -467,12 +554,17 @@ function Tube({
 
 /**
  * Where each tube stands in the row (in ROW's order), measured from the layout (so the tubes'
- * own moves don't change it) and again whenever the row resizes, and how far a shown tube
- * comes forward. Null until measured (on the server, and before the page has loaded).
+ * own moves don't change it) and again whenever the row resizes; how far a shown Kidoos tube
+ * comes forward; and how far a lying tube rises from the row's base line to the middle of the
+ * stage. Null until measured (on the server, and before the page has loaded).
  */
 function useSpots() {
   const rowRef = useRef<HTMLUListElement>(null);
-  const [measured, setMeasured] = useState<{ spots: Spot[]; forward: number } | null>(null);
+  const [measured, setMeasured] = useState<{
+    spots: Spot[];
+    forward: number;
+    lift: number;
+  } | null>(null);
   useLayoutEffect(() => {
     const row = rowRef.current;
     const stage = row?.parentElement;
@@ -488,7 +580,12 @@ function useSpots() {
           width: img?.offsetWidth ?? 0,
         };
       });
-      setMeasured({ spots, forward: stage.clientHeight * FOCUS.forward });
+      setMeasured({
+        spots,
+        forward: stage.clientHeight * FOCUS.forward,
+        // The row sits at the stage's bottom (the stage is its offset parent)
+        lift: stage.clientHeight / 2 - (row.offsetTop + row.offsetHeight),
+      });
     };
     measure();
     const observer = new ResizeObserver(measure);
@@ -499,62 +596,106 @@ function useSpots() {
 }
 
 /**
+ * "Click to know more", following the mouse (at x, y in the stage) while it's on a tube, with
+ * an arrow on a disc in the tube's colour. product: the tube it's on, if any.
+ */
+function ClickHint({
+  product,
+  x,
+  y,
+}: {
+  product: HeroStep["product"];
+  x: MotionValue<number>;
+  y: MotionValue<number>;
+}) {
+  return (
+    <AnimatePresence>
+      {product && (
+        <motion.div
+          aria-hidden="true"
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.8 }}
+          transition={{ duration: 0.2, ease: "easeOut" }}
+          style={{ x, y }}
+          className="pointer-events-none absolute left-0 top-0 z-40"
+        >
+          {/* Down and to the right of the pointer, clear of it */}
+          <span className={cn(GLASS_PILL, "ml-4 mt-5 whitespace-nowrap bg-white/60")}>
+            <span
+              className="flex size-7 shrink-0 items-center justify-center rounded-full text-white transition-colors duration-300"
+              style={{ backgroundColor: product.colors.ink }}
+            >
+              <ArrowRight className="size-4" strokeWidth={1.8} />
+            </span>
+            Click to know more
+          </span>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
+
+/**
  * The top of the toothpaste page: the headline centred over the whole range standing in a
- * row, a giant word behind and soft colour drifting slowly behind that. While it fills the screen, each
- * scroll gesture moves one step through HERO_STEPS: first the whole range, then one product
- * at a time (its tube comes to the front and lies down, or for the Kidoos grows standing; the
- * others fade back; and the text above names it with its details).
- * Scrolling on past the last step moves the page down to what follows the hero (the product
- * sections), and once back at the top, scrolling up steps back through the products.
+ * row, a giant word behind and soft colour drifting slowly behind that. Showing a product
+ * floats its tube to the middle, lying down (the Kidoos grow standing), fades the others back
+ * and names it above with its details. With a mouse, resting on a tube shows it until the
+ * mouse moves off the tubes, and a click goes down to its section ("Click to know more"
+ * follows the mouse); a tap (or a key) shows it and a second goes down. A product's pill
+ * shows it too, until "All toothpastes". The page itself scrolls as usual: nothing here holds it.
  * transitionColor: the next section's background, which the hero's bottom edge fades into.
  */
 export function Hero({ transitionColor }: { transitionColor?: string }) {
-  const sectionRef = useRef<HTMLElement>(null);
-  const [activeIndex, setActiveIndex] = useState(0);
-  const atTop = useAtTop();
+  // The step picked by a tap, key or pill (0, the intro, until then), and when
+  const [pickedIndex, setPickedIndex] = useState(0);
+  const picked = useRef({ index: 0, at: 0 });
+  const pick = useCallback((stepIndex: number) => {
+    if (stepIndex === picked.current.index) return;
+    picked.current = { index: stepIndex, at: performance.now() };
+    setPickedIndex(stepIndex);
+  }, []);
 
-  const move = useCallback((direction: 1 | -1) => {
-    setActiveIndex((index) => Math.min(Math.max(index + direction, 0), HERO_STEPS.length - 1));
-  }, []);
-  // Past the last step: glide down to whatever follows the hero
-  const leave = useCallback(() => {
-    const hero = sectionRef.current;
-    if (!hero) return;
-    const smooth = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    window.scrollTo({
-      top: hero.getBoundingClientRect().bottom + window.scrollY,
-      behavior: smooth ? "smooth" : "auto",
-    });
-  }, []);
-  useStepGestures({
-    index: activeIndex,
-    count: HERO_STEPS.length,
-    active: heroFillsScreen,
-    onStep: move,
-    onExit: leave,
-  });
+  // A hovered tube's product shows over the picked one, until the mouse moves off
+  const hover = useHoverPreview();
+  const activeIndex = hover.previewed ?? pickedIndex;
+
+  const press = useCallback(
+    (product: RowProduct, viaMouse: boolean) => {
+      // With a mouse, hovering has shown it: a click is to know more
+      if (viaMouse) return openSection(product.id);
+      // A tap or a key: the first shows it, the next goes down (unless it's a double tap)
+      const { index, at } = picked.current;
+      if (index === product.stepIndex && performance.now() - at > FOCUS.settleMs)
+        openSection(product.id);
+      else pick(product.stepIndex);
+    },
+    [pick],
+  );
+
+  // Where the mouse is in the stage, for the hint
+  const pointerX = useMotionValue(0);
+  const pointerY = useMotionValue(0);
+  const trackPointer = (event: ReactPointerEvent<HTMLElement>) => {
+    const stage = event.currentTarget.getBoundingClientRect();
+    pointerX.set(event.clientX - stage.left);
+    pointerY.set(event.clientY - stage.top);
+  };
 
   const focus = HERO_STEPS[activeIndex]?.product?.id;
   const { rowRef, measured } = useSpots();
 
   return (
     <MotionConfig reducedMotion="user">
+      {/* Outside the hero, so it stays above every section as the page scrolls (inside, the
+          hero's own layering would let the sections below paint over it) */}
+      <Navbar />
       <section
-        ref={sectionRef}
         id="top"
         aria-labelledby="hero-title"
         className="relative"
-        style={{
-          // While the hero fills the screen, swipes step through it (useStepGestures), so the
-          // browser gets no panning here, only pinch-zoom: a swipe down never pulls the page
-          // to refresh. Once the page has moved on, it pans as usual.
-          touchAction: atTop ? "pinch-zoom" : "pan-y pinch-zoom",
-          scrollSnapAlign: "start",
-        }}
+        style={{ scrollSnapAlign: "start" }}
       >
-        {/* Transparent over the hero; frosted glass once the page scrolls */}
-        <Navbar />
-
         <div className="relative isolate flex h-svh flex-col overflow-hidden bg-[linear-gradient(180deg,#EDF5FB_0%,#F6FAFD_45%,#EAF4F9_100%)]">
           {/* Soft colour drifting behind */}
           <div
@@ -589,7 +730,7 @@ export function Hero({ transitionColor }: { transitionColor?: string }) {
             />
           )}
 
-          <div className="relative mx-auto flex min-h-0 w-full max-w-[90rem] flex-1 flex-col px-5 pb-3 pt-[5.25rem] sm:px-8 lg:px-12">
+          <div className="relative mx-auto flex min-h-0 w-full max-w-[90rem] flex-1 flex-col px-5 pb-3 pt-[5.5rem] sm:px-8 lg:px-12">
             {/* The text, the pills and the button */}
             <motion.div
               variants={container}
@@ -599,11 +740,11 @@ export function Hero({ transitionColor }: { transitionColor?: string }) {
             >
               <HeroText activeIndex={activeIndex} />
 
-              <div className="mt-3 w-full">
-                <StepPills activeIndex={activeIndex} onSelect={setActiveIndex} />
+              <div className="mt-4 w-full">
+                <StepPills activeIndex={activeIndex} onSelect={pick} />
               </div>
 
-              <motion.div variants={item} className="mt-4">
+              <motion.div variants={item} className="mt-5">
                 <motion.div
                   whileHover={{ scale: 1.04 }}
                   whileTap={{ scale: 0.97 }}
@@ -621,7 +762,12 @@ export function Hero({ transitionColor }: { transitionColor?: string }) {
 
             {/* The range. A size container: --tube-h, the adult tubes' height, follows the space
                 the text leaves (and, on narrow screens, the width, so the row fits across) */}
-            <div className="relative mt-1 min-h-0 flex-1 [--tube-h:min(84cqh,58cqw)] [container-type:size] lg:[--tube-h:min(94cqh,34cqw)]">
+            <div
+              // Over: as it comes onto a tube, so the hint starts where the mouse is
+              onPointerOver={trackPointer}
+              onPointerMove={trackPointer}
+              className="relative mt-2 min-h-0 flex-1 [--tube-h:min(84cqh,58cqw)] [container-type:size] lg:[--tube-h:min(88cqh,32cqw)]"
+            >
               {/* A soft pool of light where they stand */}
               <div
                 aria-hidden="true"
@@ -630,7 +776,7 @@ export function Hero({ transitionColor }: { transitionColor?: string }) {
               <ul
                 ref={rowRef}
                 aria-label="The Totalflux toothpaste range"
-                className="absolute inset-x-0 bottom-[3cqh] flex items-end justify-center gap-[3.5cqw] lg:gap-[2.4cqw]"
+                className="absolute inset-x-0 bottom-[4cqh] flex items-end justify-center gap-[3.5cqw] lg:gap-[2.4cqw]"
               >
                 {ROW.map((product, order) => (
                   <Tube
@@ -640,10 +786,18 @@ export function Hero({ transitionColor }: { transitionColor?: string }) {
                     focus={focus}
                     spot={measured?.spots[order] ?? null}
                     forward={measured?.forward ?? 0}
-                    onSelect={setActiveIndex}
+                    lift={measured?.lift ?? 0}
+                    onPress={press}
+                    onHoverStart={hover.enter}
+                    onHoverEnd={hover.leave}
                   />
                 ))}
               </ul>
+              <ClickHint
+                product={HERO_STEPS[hover.over ?? -1]?.product}
+                x={pointerX}
+                y={pointerY}
+              />
             </div>
           </div>
         </div>

@@ -1,5 +1,5 @@
 // components/ProductShowcase.tsx
-import { useCallback, useEffect, useId, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useRef, useState, type CSSProperties } from "react";
 import {
   AnimatePresence,
   motion,
@@ -8,7 +8,6 @@ import {
   useMotionValueEvent,
   useScroll,
   useTransform,
-  type MotionStyle,
   type Variants,
 } from "motion/react";
 import { ChevronDown, X } from "lucide-react";
@@ -20,8 +19,8 @@ import { useWideScreen } from "@/hooks/use-wide-screen";
 /*
  * A product range, one product at a time, shared by the mouthwash and toothpaste pages: its
  * photo in a slowly turning glass orbit (a bottle stands on a podium, a tube floats at a lean),
- * its key points in glass circles around it and its name huge behind it, while the words
- * beside it give its family, benefit and description. The background blends between each
+ * its key points in glass circles around it, while the words beside it give its family,
+ * name, benefit and description. The background blends between each
  * product's own soft colour. On desktop the stage is pinned and each scroll gesture brings in
  * the next product, with a rail to jump between them; on smaller screens they follow one
  * another down the page.
@@ -30,7 +29,7 @@ import { useWideScreen } from "@/hooks/use-wide-screen";
 export type ShowcaseItem = {
   /** Also the id of its place on the page, which links (e.g. the hero's products) scroll to. */
   id: string;
-  /** The big name (and the giant word behind). */
+  /** The big name. */
   name: string;
   /** Printed beside the name where two share it, e.g. "No Alcohol". */
   variant?: string | undefined;
@@ -64,12 +63,6 @@ const EASE = [0.22, 1, 0.36, 1] as const;
  */
 const STEP_VH = 60;
 
-/**
- * The band along the pinned stage's bottom kept for the giant name (the largest it gets): the
- * words and the product stand above it, so the name neither covers them nor runs off the edge.
- */
-const NAME_BAND = "min(15rem, 14vw, 18svh)";
-
 /** How far a floating tube leans (degrees, top to the right). */
 const FLOAT_LEAN = 18;
 
@@ -80,10 +73,6 @@ export function tint(hex: string, amount: number) {
   const rgb = (mix((value >> 16) & 255) << 16) | (mix((value >> 8) & 255) << 8) | mix(value & 255);
   return `#${rgb.toString(16).padStart(6, "0")}`;
 }
-
-/** A solid 3D extrusion for text: `depth` stacked 1px shadows in `color`, down and to the right. */
-const extrude = (depth: number, color: string) =>
-  Array.from({ length: depth }, (_, i) => `${i + 1}px ${i + 1}px 0 ${color}`).join(", ");
 
 const twoDigits = (n: number) => String(n).padStart(2, "0");
 
@@ -351,16 +340,6 @@ const productVariants: Variants = {
   }),
 };
 
-const wordVariants: Variants = {
-  enter: (direction: number) => ({ opacity: 0, x: `${22 * direction}%` }),
-  show: { opacity: 1, x: "0%", transition: { duration: 1, ease: EASE } },
-  exit: (direction: number) => ({
-    opacity: 0,
-    x: `${-22 * direction}%`,
-    transition: { duration: 0.6, ease: "easeIn" },
-  }),
-};
-
 /** The products, by group, at the stage's side: where you are, and a way to jump. */
 function ProgressRail({
   items,
@@ -392,19 +371,16 @@ function ProgressRail({
                       onClick={() => goTo(item)}
                       aria-current={i === index ? "step" : undefined}
                       aria-label={item.fullName}
+                      // Its pack colour: the one shown is in it, and the others take it on
+                      // hover (or focus), their dash growing and their name nudging along
+                      style={{ "--ink": item.colors.ink } as CSSProperties}
                       className="group flex items-center gap-2.5 rounded-full py-1 pr-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                     >
                       <span
-                        className="h-0.5 rounded-full transition-all duration-500"
-                        style={{
-                          width: i === index ? 30 : 12,
-                          backgroundColor:
-                            i === index ? item.colors.ink : "rgba(71, 85, 105, 0.45)",
-                        }}
+                        className={`h-0.5 rounded-full transition-all duration-500 ${i === index ? "w-[30px] bg-(--ink)" : "w-3 bg-[rgba(71,85,105,0.45)] group-hover:w-5 group-hover:bg-(--ink) group-focus-visible:w-5 group-focus-visible:bg-(--ink)"}`}
                       />
                       <span
-                        className={`hidden text-sm transition-colors duration-300 xl:inline ${i === index ? "font-bold" : "font-medium text-slate-500 group-hover:text-slate-800"}`}
-                        style={i === index ? { color: item.colors.ink } : undefined}
+                        className={`hidden text-sm transition-[color,translate] duration-300 xl:inline-block ${i === index ? "font-bold text-(--ink)" : "font-medium text-slate-500 group-hover:translate-x-1 group-hover:text-(--ink) group-focus-visible:translate-x-1 group-focus-visible:text-(--ink)"}`}
                       >
                         {item.fullName}
                       </span>
@@ -499,7 +475,7 @@ function PinnedShowcase({ items, groups, pose, id, title, seamColor }: ShowcaseP
       <motion.div
         ref={stageRef}
         className="sticky top-0 h-svh overflow-hidden"
-        style={{ backgroundColor, "--name-band": NAME_BAND } as MotionStyle}
+        style={{ backgroundColor }}
       >
         <motion.div
           aria-hidden="true"
@@ -519,39 +495,7 @@ function PinnedShowcase({ items, groups, pose, id, title, seamColor }: ShowcaseP
           }}
         />
 
-        {/* Giant 3D name behind everything, sliding through with each change (the leaving and
-            the arriving name share one grid cell). In its own band along the bottom, below the
-            words and the product. */}
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-x-0 bottom-2 grid justify-items-center overflow-hidden"
-        >
-          <AnimatePresence initial={false} custom={direction}>
-            {seen && (
-              <motion.p
-                key={item.id}
-                custom={direction}
-                variants={wordVariants}
-                initial="enter"
-                animate="show"
-                exit="exit"
-                className="col-start-1 row-start-1 select-none whitespace-nowrap font-black uppercase leading-none tracking-[0.06em]"
-                style={{
-                  // As big as fits across the screen (a capital here is about 0.8em wide), at
-                  // most the band's height
-                  fontSize: `min(var(--name-band), ${Math.min(14, 92 / (item.name.length * 0.8)).toFixed(2)}vw)`,
-                  color: "rgba(255,255,255,0.6)",
-                  textShadow: extrude(10, `${item.colors.ink}10`),
-                }}
-              >
-                {item.name}
-              </motion.p>
-            )}
-          </AnimatePresence>
-        </div>
-
-        {/* Above the name's band (1rem clear of it) */}
-        <div className="relative mx-auto grid h-full w-full max-w-[90rem] grid-cols-[0.95fr_1.05fr] items-center gap-10 px-12 pb-[calc(var(--name-band)_+_1rem)] pt-24 pr-20 xl:pr-52">
+        <div className="relative mx-auto grid h-full w-full max-w-[90rem] grid-cols-[0.95fr_1.05fr] items-center gap-10 px-12 pb-8 pt-24 pr-20 xl:pr-52">
           {/* Words */}
           <div className="relative z-10 max-w-xl">
             <AnimatePresence mode="wait" initial={false}>
@@ -569,9 +513,8 @@ function PinnedShowcase({ items, groups, pose, id, title, seamColor }: ShowcaseP
             </AnimatePresence>
           </div>
 
-          {/* The product in its orbit: as tall as the space above the band (the screen less the
-              top padding, the band and the 1rem clear of it) */}
-          <div className="relative mx-auto aspect-square w-[min(100%,calc(100svh_-_7rem_-_var(--name-band)),44rem)]">
+          {/* The product in its orbit: as tall as the screen less the top and bottom padding */}
+          <div className="relative mx-auto aspect-square w-[min(100%,calc(100svh_-_8rem),44rem)]">
             <Orbit item={item} pose={pose} />
             <AnimatePresence initial={false} custom={direction}>
               {seen && (

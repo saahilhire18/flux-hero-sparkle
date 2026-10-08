@@ -71,10 +71,6 @@ const BUBBLE_STYLE: CSSProperties = {
   border: "1px solid rgba(110,165,215,0.45)",
 };
 
-/** A solid 3D extrusion for text: `depth` stacked 1px shadows in `color`, down and to the right. */
-const extrude = (depth: number, color: string) =>
-  Array.from({ length: depth }, (_, i) => `${i + 1}px ${i + 1}px 0 ${color}`).join(", ");
-
 /** Counts up from 0 to `to` once `start` is true (straight to it when motion is reduced). */
 function CountUp({ to, start }: { to: number; start: boolean }) {
   const reduceMotion = useReducedMotion();
@@ -146,7 +142,7 @@ function ProgressRing({
  * same turning orbit and glass disc, with the headline figure (90%) inside, its ring filling
  * and the number counting up as it comes into view, and the range's four promises in glass
  * circles around it. Beside it: why oral health matters, the second figure, "Let's change the
- * stats!" and a closing line. Bubbles rise behind, and a giant 3D word drifts along the bottom.
+ * stats!" and a closing line. Bubbles rise behind.
  * topColor: the colour above it, which it starts from. promises and closing: the range's own
  * (the mouthwash booklet's back cover by default). rangeHref: where "Explore the range" goes.
  */
@@ -169,11 +165,6 @@ export function OralHealthSection({
   const reduceMotion = useReducedMotion();
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
   const orbitY = useTransform(scrollYProgress, [0, 1], reduceMotion ? [0, 0] : [60, -60]);
-  const wordX = useTransform(
-    scrollYProgress,
-    [0, 1],
-    reduceMotion ? ["0%", "0%"] : ["10%", "-10%"],
-  );
 
   return (
     <MotionConfig reducedMotion="user">
@@ -181,9 +172,7 @@ export function OralHealthSection({
         ref={ref}
         id="oral-health"
         aria-labelledby="oral-health-title"
-        // The bottom padding keeps a band for the giant word (--word-size tall, 1rem up from
-        // the edge), so it covers nothing and runs off nothing
-        className="relative isolate overflow-hidden px-5 pb-[calc(var(--word-size)_+_2.5rem)] pt-20 [--word-size:min(11vw,12rem,18svh)] sm:px-8 lg:flex lg:min-h-svh lg:items-center lg:px-12"
+        className="relative isolate overflow-hidden px-5 py-20 sm:px-8 lg:flex lg:min-h-svh lg:items-center lg:px-12"
         style={{ background: `linear-gradient(180deg, ${topColor} 0%, #E6F1F9 45%, #DCEAF6 100%)` }}
       >
         {/* Soft light and colour, as on the stages above */}
@@ -220,23 +209,6 @@ export function OralHealthSection({
               }
             />
           ))}
-        </div>
-
-        {/* Giant 3D word in its band along the bottom, drifting with the scroll */}
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-x-0 bottom-4 -z-10 flex justify-center overflow-hidden"
-        >
-          <motion.p
-            style={{
-              x: wordX,
-              color: "rgba(255,255,255,0.6)",
-              textShadow: extrude(10, "rgba(43,66,112,0.07)"),
-            }}
-            className="select-none whitespace-nowrap text-(length:--word-size) font-black uppercase leading-none tracking-[0.06em]"
-          >
-            Oral Health
-          </motion.p>
         </div>
 
         <div className="mx-auto grid w-full max-w-[90rem] items-center gap-12 lg:grid-cols-[0.95fr_1.05fr] lg:gap-10">

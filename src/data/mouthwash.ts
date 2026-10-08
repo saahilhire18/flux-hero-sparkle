@@ -85,7 +85,9 @@ export const MOUTHWASHES: Mouthwash[] = [
     ingredients:
       "Aqua, Alcohol, Sorbitol, PEG-40 Hydrogenated Castor Oil, Poloxamer 407, Sodium Benzoate, Turmeric Oil, Benzoic Acid, Flavour, Sodium Saccharin, Clove Oil, Caramel.",
     image: { src: "/mouthwash-turmeric.webp", ...BOTTLE },
-    colors: { liquid: "#DFCA84", ink: "#7A5A0E" },
+    // ink: the green "Turmeric" band on its label, sampled from the photo (lighter than the
+    // others: white on it 3.4:1, it on the pale blue 3:1)
+    colors: { liquid: "#DFCA84", ink: "#00A048" },
   },
   {
     id: "sensitive",

@@ -135,6 +135,9 @@ export function HomeHero() {
 
   return (
     <MotionConfig reducedMotion="user">
+      {/* Outside the hero, so it stays above every section as the page scrolls (inside, the
+          hero's own layering would let the sections below paint over it) */}
+      <Navbar />
       <section
         id="top"
         aria-labelledby="home-title"
@@ -145,8 +148,6 @@ export function HomeHero() {
           background: `radial-gradient(ellipse 70% 55% at 50% -8%, #ffffff 0%, rgba(255,255,255,0) 70%), linear-gradient(180deg, #E8F2FA 0%, #F4F8FD 42%, ${HOME_HERO_END} 100%)`,
         }}
       >
-        <Navbar />
-
         {/* Soft colour in the top corners, from the ranges */}
         <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10">
           <div className="absolute -left-[12%] -top-[18%] size-[42rem] rounded-full bg-[radial-gradient(circle,rgba(103,182,195,0.3)_0%,transparent_65%)]" />
@@ -161,14 +162,20 @@ export function HomeHero() {
             animate="show"
             className="relative z-20 mx-auto flex max-w-4xl flex-col items-center text-center"
           >
+            {/* The promise, a shine sweeping across it every few seconds (styles.css) */}
             <motion.p
               variants={word}
               className={cn(
                 GLASS,
-                "inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-primary",
+                // A soft teal-to-blue tint, so the white light shows as it passes
+                "pill-shine inline-flex items-center gap-2 rounded-full bg-[linear-gradient(100deg,rgba(214,240,242,0.92)_0%,rgba(226,236,250,0.92)_100%)] px-3.5 py-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-primary",
               )}
             >
-              <ShieldCheck className="size-4 text-accent" strokeWidth={2} aria-hidden="true" />
+              <ShieldCheck
+                className="pill-shine-icon size-4 text-accent"
+                strokeWidth={2}
+                aria-hidden="true"
+              />
               SLS Free | Clinically Tested
             </motion.p>
             <motion.h1
@@ -192,7 +199,7 @@ export function HomeHero() {
               variants={word}
               className="mt-2 max-w-4xl text-base text-slate-600 sm:text-lg"
             >
-              Toothpaste, mouthwash and the Oralbrush: everything for a healthy mouth, for every
+              Toothpaste, Mouthwash and the Oralbrush: everything for a healthy mouth, for every
               age.
             </motion.p>
             <motion.div

@@ -115,93 +115,155 @@ export const ROUTINE: {
 ];
 
 /** A need, and the toothpaste and mouthwash pair for it, each with why. */
+/** One of a need's two picks: everything here is from its product sheet or the booklet. */
+export type Pick = {
+  product: HomeProduct;
+  /** One line on why it suits the need (beside its photo). */
+  why: string;
+  /** Its key actives, as on its pack or product sheet; one both picks share is ticked. */
+  actives: { name: string; amount?: string }[];
+};
+
 export type Need = {
   id: string;
   label: string;
   icon: LucideIcon;
-  toothpaste: { product: HomeProduct; why: string };
-  mouthwash: { product: HomeProduct; why: string };
+  toothpaste: Pick;
+  mouthwash: Pick;
+  /** What the two have in common, in a word or two each. */
+  shared: string[];
   note?: string;
+  /**
+   * The need's colour, from the packs of the products it suggests: ink, a deep shade for its
+   * circle (filled when chosen) and its marks; soft, a pale wash of it for its circle's glass.
+   */
+  colors: { ink: string; soft: string };
 };
 
 export const NEEDS: Need[] = [
   {
     id: "sensitivity",
+    colors: { ink: "#15648A", soft: "#D3EEF4" },
     label: "Sensitivity",
     icon: ThermometerSnowflake,
     toothpaste: {
       product: toothpaste("sensitive"),
-      why: "Potassium Nitrate (5%) calms teeth that react to hot, cold or sweet.",
+      why: "Our only paste made for sensitivity: Potassium Nitrate calms teeth that react to hot, cold or sweet.",
+      actives: [
+        { name: "Potassium Nitrate", amount: "5%" },
+        { name: "Sodium Fluoride", amount: "950 ppm" },
+        { name: "Clove Oil" },
+      ],
     },
     mouthwash: {
       product: mouthwash("sensitive"),
-      why: "Alcohol-free, with Potassium Nitrate, Sodium Fluoride and Clove Oil.",
+      why: "Our only rinse with Potassium Nitrate, alcohol-free to soothe without irritation.",
+      actives: [{ name: "Potassium Nitrate" }, { name: "Sodium Fluoride" }, { name: "Clove Oil" }],
     },
+    shared: ["Potassium Nitrate", "Sodium Fluoride", "Clove Oil"],
   },
   {
     id: "cavities",
+    colors: { ink: "#2B4270", soft: "#DCE3F1" },
     label: "Cavity protection",
     icon: ToothShield,
     toothpaste: {
       product: toothpaste("essential"),
-      why: "Sodium Fluoride (995 ppm) for reliable protection, every day.",
+      why: "Clinically balanced fluoride for reliable protection, every day, with nothing extra.",
+      actives: [{ name: "Sodium Fluoride", amount: "995 ppm" }],
     },
     mouthwash: {
       product: mouthwash("turmeric-no-alcohol"),
-      why: "Turmeric oil and fluoride, without alcohol, to protect against cavities.",
+      why: "The alcohol-free rinse designed to protect against cavities, with fluoride and turmeric.",
+      actives: [{ name: "Sodium Fluoride" }, { name: "Turmeric Oil" }, { name: "Clove Oil" }],
     },
+    shared: ["Sodium Fluoride", "No SLS or alcohol"],
   },
   {
     id: "plaque",
+    colors: { ink: "#8A6512", soft: "#F4EACB" },
     label: "Plaque & tartar",
     icon: ToothSparkle,
     toothpaste: {
       product: toothpaste("advance"),
-      why: "Anti-tartar and anti-plaque actives together in one paste.",
+      why: "Our only paste with tartar-control actives: anti-tartar and anti-plaque in one.",
+      actives: [
+        { name: "Arginine Bicarbonate", amount: "2%" },
+        { name: "Sodium Fluoride", amount: "995 ppm" },
+        { name: "Zinc Citrate", amount: "0.3%" },
+        { name: "TSPP", amount: "0.3%" },
+      ],
     },
     mouthwash: {
       product: mouthwash("turmeric"),
-      why: "Anti-plaque and anti-inflammatory, with Curcumin and Clove Oil.",
+      why: "Reduces harmful bacteria and calms gums, with natural Curcumin and Clove Oil.",
+      actives: [{ name: "Turmeric Oil" }, { name: "Clove Oil" }],
     },
+    shared: ["Multi-action", "Teeth and gums"],
   },
   {
     id: "gums",
+    colors: { ink: "#2E6B33", soft: "#DCEEDB" },
     label: "Gum care",
     icon: ShieldPlus,
     toothpaste: {
       product: toothpaste("advance"),
-      why: "Multi-action care for healthy gums, with Arginine and Zinc Citrate.",
+      why: "Keeps plaque and tartar, the build-up that irritates gums, in check.",
+      actives: [
+        { name: "Arginine Bicarbonate", amount: "2%" },
+        { name: "Sodium Fluoride", amount: "995 ppm" },
+        { name: "Zinc Citrate", amount: "0.3%" },
+        { name: "TSPP", amount: "0.3%" },
+      ],
     },
     mouthwash: {
       product: mouthwash("neem"),
-      why: "Natural anti-inflammatory Neem that soothes bleeding gums.",
+      why: "Our rinse made for gums: natural Neem soothes bleeding gums, alcohol-free.",
+      actives: [{ name: "Neem Oil" }, { name: "Clove Oil" }, { name: "Sodium Fluoride" }],
     },
+    shared: ["Sodium Fluoride", "Fight plaque"],
   },
   {
     id: "breath",
+    colors: { ink: "#1B6A7E", soft: "#D4ECF0" },
     label: "Fresh breath",
     icon: Wind,
     toothpaste: {
       product: toothpaste("essential"),
       why: "A Minty White formula that freshens breath and keeps teeth strong.",
+      actives: [{ name: "Sodium Fluoride", amount: "995 ppm" }],
     },
     mouthwash: {
       product: mouthwash("mintfresh"),
-      why: "Eucalyptus, Thyme, Peppermint and Wintergreen kill germs and refresh.",
+      why: "Four essential oils kill germs and leave a cool, fresh feel.",
+      actives: [
+        { name: "Eucalyptus" },
+        { name: "Thyme" },
+        { name: "Peppermint" },
+        { name: "Wintergreen" },
+      ],
     },
+    shared: ["Minty fresh", "Against tooth decay"],
   },
   {
     id: "kids",
+    colors: { ink: "#A62B61", soft: "#F9DEE9" },
     label: "For kids",
     icon: Baby,
     toothpaste: {
       product: KIDOOS_ADVANCE,
-      why: "Reduced-dose fluoride (498 ppm) for growing teeth, ages 6+.",
+      why: "Reduced-dose fluoride for growing teeth, ages 6+, SLS free.",
+      actives: [
+        { name: "Sodium Fluoride", amount: "498 ppm" },
+        { name: "Xylitol", amount: "3%" },
+      ],
     },
     mouthwash: {
       product: mouthwash("kidoos"),
-      why: "Strawberry-flavoured and alcohol-free, against cavities and bad breath.",
+      why: "Our only rinse made for children: alcohol-free, with a safe amount of fluoride.",
+      actives: [{ name: "Sodium Fluoride", amount: "kid-safe" }],
     },
+    shared: ["Sodium Fluoride", "Strawberry flavour", "Made for kids"],
     note: "Under 6? Kidoos Plus is fluoride free, made for ages 3+.",
   },
 ];

@@ -30,10 +30,10 @@ export const Route = createFileRoute("/toothpaste")({
   component: ToothpastePage,
 });
 
-// The toothpaste page: the hero steps through the range as you scroll (see Hero), then the
-// adult toothpastes' sections (Advance, Sensitive, Essential) on a background blending from
-// each one's colour into the next, then the Kidoos. Clicking a tube in the hero scrolls
-// straight to its section.
+// The toothpaste page: the hero shows the range, one product at a time on hover or click (see
+// Hero), then the adult toothpastes' sections (Advance, Sensitive, Essential) on a background
+// blending from each one's colour into the next, then the Kidoos. Clicking a tube in the hero
+// (on a touch screen, tapping it a second time) scrolls straight to its section.
 function ToothpastePage() {
   return (
     <main>
