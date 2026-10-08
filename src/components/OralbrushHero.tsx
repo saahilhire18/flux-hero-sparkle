@@ -22,10 +22,6 @@ const { colors, images } = ORALBRUSH;
 /** The hero's bottom colour, which "How it works" below starts from. */
 const SEAM_COLOR = "#DCEAF6";
 
-/** A solid 3D extrusion for text: `depth` stacked 1px shadows in `color`, down and to the right. */
-const extrude = (depth: number, color: string) =>
-  Array.from({ length: depth }, (_, i) => `${i + 1}px ${i + 1}px 0 ${color}`).join(", ");
-
 /**
  * Bubbles rising behind the brush: [left %, size px, seconds per rise, seconds already
  * risen]. Fixed values, so the server and the browser render the same.
@@ -62,7 +58,7 @@ const word: Variants = {
  * The Oralbrush page's hero: "Introducing Oralbrush" and its promise beside the brush, closed
  * and opened up side by side inside the glass orbit, with its features in glass circles around
  * it. The brushes turn a little as the page scrolls and the layers drift with the mouse (parallax);
- * bubbles rise behind, and a giant 3D "Oralbrush" sits along the bottom.
+ * bubbles rise behind.
  */
 export function OralbrushHero() {
   const ref = useRef<HTMLElement>(null);
@@ -74,7 +70,6 @@ export function OralbrushHero() {
   const easedX = useSpring(pointerX, { stiffness: 60, damping: 18, mass: 0.6 });
   const easedY = useSpring(pointerY, { stiffness: 60, damping: 18, mass: 0.6 });
   const orbitX = useTransform(easedX, (v) => v * -12);
-  const wordX = useTransform(easedX, (v) => v * -30);
 
   // Scroll: the brush turns and rises, the words leave faster than the orbit
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
@@ -151,23 +146,6 @@ export function OralbrushHero() {
           className="pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-[24vh]"
           style={{ background: `linear-gradient(to bottom, ${SEAM_COLOR}00, ${SEAM_COLOR})` }}
         />
-
-        {/* Giant 3D word along the bottom, whole (it ends just above the edge) */}
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-x-0 bottom-3 -z-10 flex justify-center overflow-hidden px-2 pb-3"
-        >
-          <motion.p
-            style={{
-              x: wordX,
-              color: "rgba(255,255,255,0.65)",
-              textShadow: extrude(10, "rgba(36,80,127,0.08)"),
-            }}
-            className="select-none whitespace-nowrap text-[min(10.5vw,11rem)] font-black uppercase leading-[0.8] tracking-[0.06em]"
-          >
-            Oralbrush
-          </motion.p>
-        </div>
 
         <div className="relative mx-auto grid w-full max-w-[90rem] flex-1 items-center gap-10 px-5 pb-14 pt-24 sm:px-8 lg:grid-cols-[0.95fr_1.05fr] lg:px-12 lg:pb-10">
           {/* Words */}
