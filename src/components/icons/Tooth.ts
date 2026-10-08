@@ -20,12 +20,18 @@ export const ToothShield = createLucideIcon("ToothShield", [
     },
   ],
   // 0.45 scale: 3.6 draws as ~1.6, a touch finer than the shield so the small tooth stays open
-  ["path", { d: TOOTH, transform: "translate(6.6 6.9) scale(0.45)", strokeWidth: "3.6", key: "tooth" }],
+  [
+    "path",
+    { d: TOOTH, transform: "translate(6.6 6.9) scale(0.45)", strokeWidth: "3.6", key: "tooth" },
+  ],
 ]);
 
 /** Plaque control: a clean tooth with shine rays off its top corner. */
 export const ToothSparkle = createLucideIcon("ToothSparkle", [
   // 0.78 scale: 2.3 draws as ~1.8
-  ["path", { d: TOOTH, transform: "translate(-0.73 5.12) scale(0.78)", strokeWidth: "2.3", key: "tooth" }],
+  [
+    "path",
+    { d: TOOTH, transform: "translate(-0.73 5.12) scale(0.78)", strokeWidth: "2.3", key: "tooth" },
+  ],
   ["path", { d: "M17 3.5v-2M19.5 5l1.5-1.5M20.5 8h2", key: "shine" }],
 ]);

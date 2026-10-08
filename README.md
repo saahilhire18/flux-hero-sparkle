@@ -3,6 +3,7 @@
 Build a full-width, responsive hero section for an oral care brand called "Totalflux". Match the layout, mood, and polish of a premium consumer-health website.
 
 ## OVERALL LAYOUT
+
 - Full-viewport hero (min-height 100vh on desktop), two-column layout:
   - LEFT (approx. 45%): text content
   - RIGHT (approx. 55%): 3D product showcase
@@ -10,11 +11,13 @@ Build a full-width, responsive hero section for an oral care brand called "Total
 - Blurred green tropical leaf shadows/foliage in the top-right corner for depth (decorative, low opacity, blurred).
 
 ## NAVBAR (sticky, transparent → white on scroll)
+
 - Left: "Totalflux" logo (bold, deep navy #0B2A5B, with a small ® mark)
 - Center links: Toothpaste, Mouthwash, Oralbrush, About Us (navy, medium weight, hover = underline slide-in animation)
 - Right: pill-shaped button "Where to Buy" (navy background, white text, hover = slightly lighter with soft shadow)
 
 ## LEFT CONTENT
+
 1. Small eyebrow text: "COMPLETE ORAL CARE" — uppercase, wide letter-spacing (0.25em), small size, teal/navy.
 2. Headline (H1): "Healthy Smile Happier You" — very bold, deep navy (#0B2A5B), large (clamp 44px–72px), tight line height, broken into 2 lines: "Healthy Smile" / "Happier You".
 3. Subtext: "A range of SLS free toothpastes for every mouth, every age." — gray-blue (#3B4B66), 18px, max-width 420px.
@@ -22,10 +25,11 @@ Build a full-width, responsive hero section for an oral care brand called "Total
    - Leaf/tooth icon → "SLS FREE"
    - Shield with tooth → "CAVITY PROTECTION"
    - Leaf icon → "FRESH BREATH"
-   (Use lucide-react icons, navy stroke, circle border 1.5px navy)
+     (Use lucide-react icons, navy stroke, circle border 1.5px navy)
 5. CTA button: "Explore Our Range →" — pill-shaped, navy fill, white text, arrow icon that nudges right on hover.
 
 ## RIGHT: 3D PRODUCT SHOWCASE
+
 - Use React Three Fiber (@react-three/fiber) + @react-three/drei + three.
 - Scene contains a **white matte circular podium/stand** (cylinder with slightly beveled edge, soft rounded corners, low height) centered at the bottom of the canvas, with a soft contact shadow beneath it (drei `ContactShadows`).
 - Place **5 toothpaste tube 3D models standing upright side by side on the podium**, slightly fanned in a gentle arc, with the center tubes taller/forward:
@@ -45,6 +49,7 @@ Build a full-width, responsive hero section for an oral care brand called "Total
 - Lazy-load the canvas with a skeleton placeholder while models load.
 
 ## STYLE & TECH
+
 - React + TypeScript + Tailwind CSS + shadcn/ui
 - Framer Motion for entrance animations: text fades/slides up with stagger; product canvas fades in and scales from 0.95 → 1.
 - Font: Poppins or Inter (headline weight 800).
@@ -56,6 +61,7 @@ Build a full-width, responsive hero section for an oral care brand called "Total
 - Accessibility: semantic HTML, alt text/aria-label on the canvas, focus-visible states on all buttons/links, respect `prefers-reduced-motion` (disable float/parallax).
 
 ## DELIVERABLE
+
 A single `Hero.tsx` component, plus `Navbar.tsx`, `ProductScene.tsx` (the 3D canvas), and `FeatureBadge.tsx`. Render it on the home page. Include placeholder assets and clear comments showing where to drop in my real GLB models and label textures.
 
 This project was built with [Lovable](https://lovable.dev).
