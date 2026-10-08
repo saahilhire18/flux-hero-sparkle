@@ -185,8 +185,18 @@ export const fullName = (mouthwash: Mouthwash) =>
  * The groups, as the booklet sets them out. accent: the colour of the booklet's band over the
  * group (for small marks, not text); note: printed with the group in the booklet.
  */
-export const MOUTHWASH_GROUPS: { id: MouthwashGroup; label: string; accent: string; note?: string }[] = [
+export const MOUTHWASH_GROUPS: {
+  id: MouthwashGroup;
+  label: string;
+  accent: string;
+  note?: string;
+}[] = [
   { id: "alcohol-based", label: "Alcohol-based", accent: "#375A8C" },
-  { id: "alcohol-free", label: "Alcohol-free", accent: "#4FA3CF", note: "250 ppm maximum available fluoride" },
+  {
+    id: "alcohol-free",
+    label: "Alcohol-free",
+    accent: "#4FA3CF",
+    note: "250 ppm maximum available fluoride",
+  },
   { id: "medicinal", label: "Medicinal", accent: "#D7263D" },
 ];
