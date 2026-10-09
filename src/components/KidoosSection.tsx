@@ -15,6 +15,8 @@ type Kidoo = {
   actives: [string, string][];
   perks: string[];
   image: { src: string; width: number; height: number };
+  /** The name as lettered on the pack (a transparent WebP), shown in place of the typed name. */
+  wordmark?: { src: string; width: number; height: number };
   /** The card's gradient, and a deep shade of it for text (readable on every part of it). */
   gradient: string;
   ink: string;
@@ -34,7 +36,8 @@ const KIDOOS: Kidoo[] = [
       ["Xylitol", "3%"],
     ],
     perks: ["No SLS · No fluoride", "Enamel protection", "Strawberry Bliss flavour"],
-    image: { src: "/kidoos-plus.webp", width: 213, height: 697 },
+    image: { src: "/kidoos-plus.webp", width: 266, height: 800 },
+    wordmark: { src: "/wordmark-kidoos-plus.webp", width: 1036, height: 360 },
     gradient: "linear-gradient(135deg, #CDEBFF 0%, #DCE4FF 50%, #EBDDFF 100%)",
     ink: "#23498A",
   },
@@ -50,7 +53,7 @@ const KIDOOS: Kidoo[] = [
       ["Xylitol", "3%"],
     ],
     perks: ["SLS free · Non-cariogenic", "Cavity protection with fluoride", "Fresh breath all day"],
-    image: { src: "/kidoos-advance.webp", width: 232, height: 729 },
+    image: { src: "/kidoos-advance.webp", width: 266, height: 800 },
     gradient: "linear-gradient(135deg, #FFD1DC 0%, #FFE3EC 45%, #FFE9D6 100%)",
     ink: "#8E2442",
   },
@@ -128,7 +131,19 @@ function KidooCard({ kidoo, index }: { kidoo: Kidoo; index: number }) {
             className="mt-2.5 text-2xl font-black leading-tight tracking-tight sm:text-3xl"
           >
             <BrandName className="block text-sm font-bold tracking-normal opacity-70" />
-            {kidoo.name}
+            {/* The name as lettered on the pack where we have it */}
+            {kidoo.wordmark ? (
+              <img
+                src={kidoo.wordmark.src}
+                width={kidoo.wordmark.width}
+                height={kidoo.wordmark.height}
+                alt={kidoo.name}
+                draggable={false}
+                className="mt-1.5 block h-14 w-auto max-w-full select-none sm:h-16"
+              />
+            ) : (
+              kidoo.name
+            )}
           </h3>
           <p className="mt-2 text-sm leading-6 opacity-90">{kidoo.summary}</p>
 
@@ -159,9 +174,13 @@ function KidooCard({ kidoo, index }: { kidoo: Kidoo; index: number }) {
   );
 }
 
+/** The Kidoos logo as lettered on the Kidoos mouthwash's label (a transparent WebP). */
+const KIDOOS_LOGO = { src: "/wordmark-kidoos-mouthwash.webp", width: 1006, height: 330 };
+
 /**
- * The Kidoos range: a playful gradient heading and a gradient card per product, below the
- * adult sections. `topColor`: the colour above it, which its background starts from.
+ * The Kidoos range: a playful heading ("Totalflux" in a gradient, then the Kidoos logo) and a
+ * gradient card per product, below the adult sections. `topColor`: the colour above it, which
+ * its background starts from.
  */
 export function KidoosSection({ topColor = "#DDE4F2" }: { topColor?: string }) {
   return (
@@ -193,7 +212,17 @@ export function KidoosSection({ topColor = "#DDE4F2" }: { topColor?: string }) {
                 backgroundImage: "linear-gradient(90deg, #E0506A 0%, #B35CC9 50%, #3F7BD9 100%)",
               }}
             >
-              <BrandName className="tracking-normal" /> Kidoos
+              <BrandName className="tracking-normal" />{" "}
+              {/* The logo, a little taller than the text and set just below its baseline, so
+                  its letters line up with "Totalflux" */}
+              <img
+                src={KIDOOS_LOGO.src}
+                width={KIDOOS_LOGO.width}
+                height={KIDOOS_LOGO.height}
+                alt="Kidoos"
+                draggable={false}
+                className="inline-block h-[1.15em] w-auto select-none align-[-0.14em] drop-shadow-[0_6px_10px_rgba(120,60,140,0.18)]"
+              />
             </h2>
             <p className="mx-auto mt-4 max-w-xl text-base text-slate-600 sm:text-lg">
               Gentle, SLS-free care made for children&apos;s teeth, with a Strawberry Bliss taste

@@ -61,7 +61,7 @@ const BOTTLE_H = "h-[26cqw] lg:h-[min(78cqh,17cqw)]";
  * The range standing together on the platform, left to right, each in its own space: what it
  * is, its height (in the stage's container units; phones size by the width, so the row fits
  * across), how wide its shadow is, and whether phones leave it out (there's room for one bottle
- * there). The toothpaste boxes are the centrepiece.
+ * there). The toothpaste boxes are the centrepiece, two bottles either side of them.
  */
 const LINEUP: {
   product: HomeProduct;
@@ -85,15 +85,22 @@ const LINEUP: {
   },
   {
     product: BOXES,
-    height: "h-[42cqw] lg:h-[min(100cqh,38cqw)]",
+    height: "h-[36cqw] lg:h-[min(80cqh,30cqw)]",
     shadow: "w-[96%]",
     alt: "The Totalflux toothpaste range: Essential, Sensitive, Kidoos and Advance, with their boxes",
   },
   {
     product: BRUSH_OPEN,
-    height: "h-[29cqw] lg:h-[min(86cqh,26cqw)]",
+    height: "h-[25cqw] lg:h-[min(70cqh,21cqw)]",
     shadow: "w-[85%]",
     alt: "The Totalflux Oralbrush, opened up to show its tongue scraper",
+  },
+  {
+    product: mouthwash("turmeric"),
+    height: BOTTLE_H,
+    shadow: "w-[125%]",
+    alt: "Totalflux Turmeric mouthwash",
+    wideOnly: true,
   },
   {
     product: mouthwash("neem"),

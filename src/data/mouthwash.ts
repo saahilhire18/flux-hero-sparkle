@@ -2,7 +2,8 @@
 //
 // The Totalflux mouthwash range, from the product booklet ("Booklet Updated Design"): each
 // mouthwash's one-line benefit, its group, description and ingredients, a cut-out photo of
-// the bottle (WebP copies of public/Mouthwash/*.png, trimmed to the bottle) and its colours.
+// the bottle (WebP copies of the supplied product renders, trimmed to the bottle) and its
+// colours, which are only ever the label's own (the "Hexa Codes" sheet: three per label).
 import type { LucideIcon } from "lucide-react";
 import {
   BugOff,
@@ -36,15 +37,17 @@ export type Mouthwash = {
   /** As printed in the booklet (none is given for Chlorhexidine). */
   ingredients?: string;
   image: { src: string; width: number; height: number };
+  /** The name as lettered on the pack (a transparent WebP), shown in place of the typed name. */
+  wordmark?: { src: string; width: number; height: number };
   /**
-   * liquid: the liquid's colour, sampled from the photo (for glows);
-   * ink: a deep shade of the pack colour, for its name tag (white text reads on it, and it
-   * reads as text on the page's pale blue: at least 4.9:1 either way).
+   * Both from the label's three colours on the "Hexa Codes" sheet. liquid: the one nearest
+   * the liquid's colour (for glows); ink: the most readable one, for its name tag (white text
+   * on it) and as text on the page.
    */
   colors: { liquid: string; ink: string };
 };
 
-const BOTTLE = { width: 408, height: 1000 };
+const BOTTLE = { width: 388, height: 1000 };
 
 /**
  * In the hero's order, left to right: the liquid colours alternate and mirror each other about
@@ -68,7 +71,8 @@ export const MOUTHWASHES: Mouthwash[] = [
     ingredients:
       "Aqua, Alcohol, Sorbitol, PEG-40 Hydrogenated Castor Oil, Flavour, Poloxamer 407, Sodium Benzoate, Eucalyptus Oil, Thyme Oil, Benzoic Acid, Sodium Saccharin, Peppermint Oil, Wintergreen Oil, CI 42053.",
     image: { src: "/mouthwash-mintfresh.webp", ...BOTTLE },
-    colors: { liquid: "#67B6C3", ink: "#1B6A7E" },
+    // Label: #006ea2, #1cb0ff, #5bcff1
+    colors: { liquid: "#5bcff1", ink: "#006ea2" },
   },
   {
     // The bottle with the "Detox" badge; the alcohol-free Turmeric ("No Alcohol") is further on
@@ -85,9 +89,8 @@ export const MOUTHWASHES: Mouthwash[] = [
     ingredients:
       "Aqua, Alcohol, Sorbitol, PEG-40 Hydrogenated Castor Oil, Poloxamer 407, Sodium Benzoate, Turmeric Oil, Benzoic Acid, Flavour, Sodium Saccharin, Clove Oil, Caramel.",
     image: { src: "/mouthwash-turmeric.webp", ...BOTTLE },
-    // ink: the green "Turmeric" band on its label, sampled from the photo (lighter than the
-    // others: white on it 3.4:1, it on the pale blue 3:1)
-    colors: { liquid: "#DFCA84", ink: "#00A048" },
+    // Label: #d08804, #00a049, #eee07f
+    colors: { liquid: "#eee07f", ink: "#00a049" },
   },
   {
     id: "sensitive",
@@ -104,7 +107,8 @@ export const MOUTHWASHES: Mouthwash[] = [
     ingredients:
       "Aqua, Sorbitol, Potassium Nitrate, PEG-40 Hydrogenated Castor Oil, Flavour, Poloxamer 407, Sodium Benzoate, Clove Oil, Sodium Fluoride, Sodium Saccharin, CI 42090.",
     image: { src: "/mouthwash-sensitive.webp", ...BOTTLE },
-    colors: { liquid: "#90DAE2", ink: "#C0392F" },
+    // Label: #06b4e2, #db434b, #59d2eb
+    colors: { liquid: "#59d2eb", ink: "#db434b" },
   },
   {
     id: "kidoos",
@@ -120,7 +124,9 @@ export const MOUTHWASHES: Mouthwash[] = [
     ingredients:
       "Aqua, Sorbitol, Poloxamer 407, Sodium Benzoate, Sodium Saccharin, Flavour, Peppermint Oil, PEG-40 Hydrogenated Castor Oil, Sodium Fluoride, CI 16255.",
     image: { src: "/mouthwash-kidoos.webp", ...BOTTLE },
-    colors: { liquid: "#F0AFCA", ink: "#A62B61" },
+    wordmark: { src: "/wordmark-kidoos-mouthwash.webp", width: 1006, height: 330 },
+    // Label: #3eb6f4, #f160af, #8ccbff (the pink is the liquid's colour and the most readable)
+    colors: { liquid: "#f160af", ink: "#f160af" },
   },
   {
     id: "neem",
@@ -137,10 +143,10 @@ export const MOUTHWASHES: Mouthwash[] = [
     ingredients:
       "Aqua, Sorbitol, PEG-40 Hydrogenated Castor Oil, Poloxamer 407, Sodium Benzoate, Potassium Sorbate, Azadirachta Indica Oil, Eugenia Caryophyllus Oil, Mentha Piperita Oil, Sodium Fluoride, Cetylpyridinium Chloride, Sodium Saccharin, CI 15985, CI 42090, Citric Acid.",
     image: { src: "/mouthwash-neem.webp", ...BOTTLE },
-    colors: { liquid: "#9DC99B", ink: "#2E6B33" },
+    // Label: #0b9131, #007843, #6eb343
+    colors: { liquid: "#6eb343", ink: "#007843" },
   },
   {
-    // No photo was supplied: cut out of the booklet's page, so a little softer than the others
     id: "turmeric-no-alcohol",
     name: "Turmeric",
     variant: "No Alcohol",
@@ -156,8 +162,8 @@ export const MOUTHWASHES: Mouthwash[] = [
     ingredients:
       "Aqua, Sorbitol, PEG-40 Hydrogenated Castor Oil, Flavour, Poloxamer 407, Sodium Benzoate, Potassium Sorbate, Curcuma Longa Oil, Eugenia Caryophyllus Oil, Sodium Fluoride, Cetylpyridinium Chloride, Sodium Saccharin, Caramel, Citric Acid.",
     image: { src: "/mouthwash-turmeric-no-alcohol.webp", ...BOTTLE },
-    // ink: the booklet's olive "Turmeric" band (white on it 8.1:1; on the pale blue 6.6:1)
-    colors: { liquid: "#EBD57E", ink: "#4A5424" },
+    // Label: #df9803, #4a5423, #e9d816
+    colors: { liquid: "#e9d816", ink: "#4a5423" },
   },
   {
     id: "chlorhexidine",
@@ -173,7 +179,8 @@ export const MOUTHWASHES: Mouthwash[] = [
       { label: "Antifungal", icon: ShieldCheck },
     ],
     image: { src: "/mouthwash-chlorhexidine.webp", ...BOTTLE },
-    colors: { liquid: "#78C4CC", ink: "#1F4E8C" },
+    // Label: #00a4ef, #ee0800, #59d2fd (ink: the bottle's blue, as asked, over the red)
+    colors: { liquid: "#59d2fd", ink: "#00a4ef" },
   },
 ];
 

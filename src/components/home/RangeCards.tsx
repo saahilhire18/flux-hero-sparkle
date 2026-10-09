@@ -127,7 +127,8 @@ const RANGES: Range[] = [
     text: "Kills 99.9% of oral germs, in alcohol-based, alcohol-free and medicinal formulas.",
     link: "Explore mouthwash",
     background: "linear-gradient(180deg, #D3EDF2 0%, #E4F3F6 50%, #EFF5F9 100%)",
-    ink: "#1B6A7E",
+    // Mintfresh's, from its label (mouthwash.ts)
+    ink: "#006ea2",
     visual: <MouthwashVisual />,
   },
   {

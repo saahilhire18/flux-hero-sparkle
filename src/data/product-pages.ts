@@ -23,6 +23,8 @@ export type ProductPage = {
   benefits: { icon: LucideIcon; title: string; text: string; stat?: string }[];
   /** A cut-out photo of the tube (transparent WebP in public/, cropped to the tube) and its size in pixels. */
   image: { src: string; width: number; height: number };
+  /** The name as lettered on the pack (a transparent WebP), shown in place of the typed name. */
+  wordmark?: { src: string; width: number; height: number };
   /**
    * Colours from the pack, checked for contrast (WCAG AA) against `tint`:
    * - brand: the pack's main colour, for glows, icon backgrounds and the platform, never
@@ -75,7 +77,8 @@ export const PRODUCT_PAGES: Record<ProductPageId, ProductPage> = {
         text: "TSPP rounds out the defense, helping keep tartar and plaque in check.",
       },
     ],
-    image: { src: "/advance.webp", width: 226, height: 738 },
+    image: { src: "/advance.webp", width: 304, height: 1000 },
+    wordmark: { src: "/wordmark-advance.webp", width: 1241, height: 240 },
     colors: {
       brand: "#2F7C61",
       ink: "#1F5E48",
@@ -119,7 +122,7 @@ export const PRODUCT_PAGES: Record<ProductPageId, ProductPage> = {
         text: "Formulated with clove oil for sensitivity to hot, cold or sweet.",
       },
     ],
-    image: { src: "/sensitive.webp", width: 276, height: 897 },
+    image: { src: "/sensitive.webp", width: 304, height: 1000 },
     colors: {
       brand: "#2398CA",
       ink: "#15648A",
@@ -159,7 +162,8 @@ export const PRODUCT_PAGES: Record<ProductPageId, ProductPage> = {
         text: "Gentle, everyday care with nothing extra added.",
       },
     ],
-    image: { src: "/essential.webp", width: 292, height: 952 },
+    image: { src: "/essential.webp", width: 299, height: 1000 },
+    wordmark: { src: "/wordmark-essential.webp", width: 1125, height: 260 },
     colors: {
       brand: "#304977",
       ink: "#2B4270",

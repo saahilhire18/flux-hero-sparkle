@@ -88,10 +88,23 @@ function ProductPanel({ product, flip }: { product: ProductPage; flip: boolean }
             className="mt-5 text-[clamp(3rem,6.5vw,6rem)] font-black leading-[0.95] tracking-tight"
           >
             <BrandName className="block text-[0.42em] font-bold tracking-normal text-slate-800" />
-            {/* Solid in the pack's colour, with a soft shadow for depth */}
-            <span style={{ color: colors.ink, filter: `drop-shadow(0 6px 10px ${colors.ink}40)` }}>
-              {product.name}
-            </span>
+            {/* The name as lettered on the pack where we have it; otherwise solid in the
+                pack's colour. Either way with a soft shadow for depth */}
+            {product.wordmark ? (
+              <img
+                src={product.wordmark.src}
+                width={product.wordmark.width}
+                height={product.wordmark.height}
+                alt={product.name}
+                draggable={false}
+                className="mx-auto mt-[0.12em] block h-[0.85em] w-auto max-w-full select-none lg:mx-0"
+                style={{ filter: `drop-shadow(0 6px 10px ${colors.ink}40)` }}
+              />
+            ) : (
+              <span style={{ color: colors.ink, filter: `drop-shadow(0 6px 10px ${colors.ink}40)` }}>
+                {product.name}
+              </span>
+            )}
           </motion.h2>
 
           <motion.p

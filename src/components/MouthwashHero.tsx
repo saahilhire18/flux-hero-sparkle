@@ -249,12 +249,24 @@ function Bottle({
         transition={{ duration: 0.6, delay: 0.9 + fromCentre * 0.14, ease: EASE }}
         className="flex h-[var(--tag-h)] flex-col items-center justify-end gap-1 whitespace-nowrap text-center lg:w-0 lg:min-w-full"
       >
-        <span
-          className="rounded-md px-2 py-1 text-[0.6rem] font-bold uppercase tracking-[0.18em] text-white shadow-[0_6px_14px_-8px_rgba(15,40,80,0.6)] sm:px-2.5 sm:text-[0.68rem] sm:tracking-[0.2em]"
-          style={{ backgroundColor: colors.ink }}
-        >
-          {mouthwash.name}
-        </span>
+        {/* Or the name as lettered on the pack, where we have it */}
+        {mouthwash.wordmark ? (
+          <img
+            src={mouthwash.wordmark.src}
+            width={mouthwash.wordmark.width}
+            height={mouthwash.wordmark.height}
+            alt={mouthwash.name}
+            draggable={false}
+            className="h-7 w-auto select-none drop-shadow-[0_6px_10px_rgba(15,40,80,0.25)]"
+          />
+        ) : (
+          <span
+            className="rounded-md px-2 py-1 text-[0.6rem] font-bold uppercase tracking-[0.18em] text-white shadow-[0_6px_14px_-8px_rgba(15,40,80,0.6)] sm:px-2.5 sm:text-[0.68rem] sm:tracking-[0.2em]"
+            style={{ backgroundColor: colors.ink }}
+          >
+            {mouthwash.name}
+          </span>
+        )}
         <span className="text-[0.68rem] font-medium leading-tight text-slate-600 sm:text-xs">
           {mouthwash.benefit}
         </span>

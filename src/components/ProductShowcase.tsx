@@ -44,6 +44,8 @@ export type ShowcaseItem = {
   /** A list behind a button, e.g. the ingredients. */
   details?: { label: string; text: string } | undefined;
   image: { src: string; width: number; height: number };
+  /** The name as lettered on the pack (a transparent image), shown in place of the big name. */
+  wordmark?: { src: string; width: number; height: number } | undefined;
   alt: string;
   /** glow: behind it in the orbit; ink: its name, icons, marks; backdrop: the stage's colour. */
   colors: { glow: string; ink: string; backdrop: string };
@@ -75,6 +77,9 @@ export function tint(hex: string, amount: number) {
 }
 
 const twoDigits = (n: number) => String(n).padStart(2, "0");
+
+/** How much smaller the big name is set: 1 up to 9 letters, less for longer ones. */
+const nameFit = (name: string) => Math.min(1, 9 / name.length);
 
 /** Glides the page to a product's place in the section (its element with its id). */
 function goTo(item: ShowcaseItem | undefined) {
@@ -278,13 +283,32 @@ function Words({
 
       <motion.h3 variants={textItem} id={`${item.id}-name`} className="mt-5 leading-[0.95] lg:mt-6">
         <BrandName className="block text-[clamp(1.2rem,1.8vw,1.75rem)] font-bold text-slate-800" />
-        {/* Solid in the pack's colour, with a soft glow under it */}
-        <span
-          className="inline-block pb-[0.06em] text-[clamp(2.8rem,6vw,6rem)] font-black tracking-tight"
-          style={{ color: ink, filter: `drop-shadow(0 8px 12px ${glow}99)` }}
-        >
-          {item.name}
-        </span>
+        {/* The name as lettered on the pack where we have it; otherwise solid in the pack's
+            colour. Either way with a soft glow under it */}
+        {item.wordmark ? (
+          <img
+            src={item.wordmark.src}
+            width={item.wordmark.width}
+            height={item.wordmark.height}
+            alt={item.name}
+            draggable={false}
+            className="mt-2 inline-block h-[clamp(4rem,8.5vw,8.25rem)] w-auto max-w-full select-none"
+            style={{ filter: `drop-shadow(0 8px 12px ${glow}99)` }}
+          />
+        ) : (
+          <span
+            className="inline-block pb-[0.06em] font-black tracking-tight"
+            style={{
+              // A long name (Chlorhexidine) is set smaller, so it's no wider than a 9-letter
+              // one and stays clear of the orbit beside it
+              fontSize: `clamp(2.4rem, ${6 * nameFit(item.name)}vw, ${6 * nameFit(item.name)}rem)`,
+              color: ink,
+              filter: `drop-shadow(0 8px 12px ${glow}99)`,
+            }}
+          >
+            {item.name}
+          </span>
+        )}
         {item.variant && (
           <span
             className="ml-3 inline-block -translate-y-[0.6em] rounded-full px-3 py-1 align-middle text-xs font-bold uppercase tracking-[0.16em] text-white"

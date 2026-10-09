@@ -26,6 +26,7 @@ const ITEMS: ShowcaseItem[] = MOUTHWASHES.map((mouthwash) => {
       ? { label: "Ingredients", text: mouthwash.ingredients }
       : undefined,
     image: mouthwash.image,
+    wordmark: mouthwash.wordmark,
     alt: `Totalflux ${fullName(mouthwash)} mouthwash`,
     colors: {
       glow: mouthwash.colors.liquid,

@@ -66,7 +66,7 @@ export const toothpaste = (id: "advance" | "sensitive" | "essential"): HomeProdu
 export const KIDOOS_ADVANCE: HomeProduct = {
   name: "Kidoos Advance",
   kind: "Toothpaste",
-  image: { src: "/kidoos-advance.webp", width: 232, height: 729 },
+  image: { src: "/kidoos-advance.webp", width: 266, height: 800 },
   ink: "#8E2442",
   to: "/toothpaste",
   hash: "kidoos-advance",
@@ -203,7 +203,7 @@ export const NEEDS: Need[] = [
   },
   {
     id: "gums",
-    colors: { ink: "#2E6B33", soft: "#DCEEDB" },
+    colors: { ink: "#007843", soft: "#DCEEDB" },
     label: "Gum care",
     icon: ShieldPlus,
     toothpaste: {
@@ -225,7 +225,7 @@ export const NEEDS: Need[] = [
   },
   {
     id: "breath",
-    colors: { ink: "#1B6A7E", soft: "#D4ECF0" },
+    colors: { ink: "#006ea2", soft: "#D4ECF0" },
     label: "Fresh breath",
     icon: Wind,
     toothpaste: {
@@ -247,7 +247,7 @@ export const NEEDS: Need[] = [
   },
   {
     id: "kids",
-    colors: { ink: "#A62B61", soft: "#F9DEE9" },
+    colors: { ink: "#f160af", soft: "#F9DEE9" },
     label: "For kids",
     icon: Baby,
     toothpaste: {
