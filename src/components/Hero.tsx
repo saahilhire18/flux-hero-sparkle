@@ -13,6 +13,7 @@ import {
   motion,
   MotionConfig,
   useMotionValue,
+  useSpring,
   type MotionValue,
   type Variants,
 } from "motion/react";
@@ -469,8 +470,10 @@ function Tube({
     // on the tube: it gliding out from under the mouse doesn't count as leaving it, and a click
     // where it stood still counts. The button inside is for keys and screen readers; its
     // clicks come up to here.
+    // The pointer: the stage hides it (--tube-cursor: none) while the "Click to know more"
+    // badge takes its place
     <li
-      className="relative flex cursor-pointer flex-col items-center"
+      className="relative flex cursor-[var(--tube-cursor,pointer)] flex-col items-center"
       style={{ zIndex: shown ? 20 : Math.round(10 - fromCentre * 2) }}
       onPointerEnter={(event) => onHoverStart(product.stepIndex, event)}
       onPointerLeave={onHoverEnd}
@@ -496,7 +499,7 @@ function Tube({
           whileHover={shown ? {} : { y: -8 }}
           transition={MOVE}
           style={{ transformOrigin: "50% 100%" }}
-          className="relative block cursor-pointer rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="relative block cursor-[var(--tube-cursor,pointer)] rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           {/* Its glow: goes with it (round, so turning it doesn't show) */}
           <span
@@ -596,8 +599,9 @@ function useSpots() {
 }
 
 /**
- * "Click to know more", following the mouse (at x, y in the stage) while it's on a tube, with
- * an arrow on a disc in the tube's colour. product: the tube it's on, if any.
+ * "Click to know more" in a round badge that takes the pointer's place while the mouse is on a
+ * tube (the pointer itself is hidden there): centred on the mouse (at x, y in the stage),
+ * trailing it a touch, in the tube's colour. product: the tube it's on, if any.
  */
 function ClickHint({
   product,
@@ -608,28 +612,34 @@ function ClickHint({
   x: MotionValue<number>;
   y: MotionValue<number>;
 }) {
+  const followX = useSpring(x, { stiffness: 600, damping: 40, mass: 0.4 });
+  const followY = useSpring(y, { stiffness: 600, damping: 40, mass: 0.4 });
   return (
     <AnimatePresence>
       {product && (
         <motion.div
           aria-hidden="true"
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.8 }}
-          transition={{ duration: 0.2, ease: "easeOut" }}
-          style={{ x, y }}
+          style={{ x: followX, y: followY }}
           className="pointer-events-none absolute left-0 top-0 z-40"
         >
-          {/* Down and to the right of the pointer, clear of it */}
-          <span className={cn(GLASS_PILL, "ml-4 mt-5 whitespace-nowrap bg-white/60")}>
-            <span
-              className="flex size-7 shrink-0 items-center justify-center rounded-full text-white transition-colors duration-300"
-              style={{ backgroundColor: product.colors.ink }}
-            >
-              <ArrowRight className="size-4" strokeWidth={1.8} />
+          <motion.span
+            initial={{ opacity: 0, scale: 0.4 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.4 }}
+            transition={{ duration: 0.25, ease: EASE }}
+            className="absolute left-0 top-0 grid size-24 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full text-center text-white ring-4 ring-white/70 transition-colors duration-300"
+            style={{
+              backgroundColor: product.colors.ink,
+              boxShadow: `0 16px 34px -12px ${product.colors.ink}`,
+            }}
+          >
+            <span className="flex flex-col items-center gap-1 text-[0.72rem] font-bold leading-tight">
+              <ArrowRight className="size-4" strokeWidth={2.2} />
+              Click to
+              <br />
+              know more
             </span>
-            Click to know more
-          </span>
+          </motion.span>
         </motion.div>
       )}
     </AnimatePresence>
@@ -767,6 +777,8 @@ export function Hero({ transitionColor }: { transitionColor?: string }) {
               onPointerOver={trackPointer}
               onPointerMove={trackPointer}
               className="relative mt-2 min-h-0 flex-1 [--tube-h:min(84cqh,58cqw)] [container-type:size] lg:[--tube-h:min(88cqh,32cqw)]"
+              // While the "Click to know more" badge is up, it stands in for the pointer
+              style={(hover.over !== null ? { "--tube-cursor": "none" } : {}) as CSSProperties}
             >
               {/* A soft pool of light where they stand */}
               <div
