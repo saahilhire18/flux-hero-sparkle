@@ -1,10 +1,9 @@
 // components/home/RangeCards.tsx
 import { type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
-import { motion, MotionConfig, useTransform } from "motion/react";
+import { motion, MotionConfig } from "motion/react";
 import { ArrowRight } from "lucide-react";
 import { BrandName } from "@/components/BrandName";
-import { useHoverTilt } from "@/hooks/use-hover-tilt";
 import { MOUTHWASHES } from "@/data/mouthwash";
 import { ORALBRUSH } from "@/data/oralbrush";
 
@@ -144,18 +143,11 @@ const RANGES: Range[] = [
   },
 ];
 
-/** How far the card's layers lift towards you while it's hovered (px). */
-const DEPTH = { visual: 55, words: 28 };
-
 /**
  * One range: its picture over its name, what it is and a link, the whole card leading to the
- * range's page. It tilts in 3D towards the mouse, its picture lifting off the card.
+ * range's page. Flat: on hover only its shadow deepens and its arrow nudges along.
  */
 function RangeCard({ range, index }: { range: Range; index: number }) {
-  const { handlers, style, hover, glare } = useHoverTilt({ tilt: { x: 7, y: 10 } });
-  const visualZ = useTransform(hover, [0, 1], [0, DEPTH.visual]);
-  const wordsZ = useTransform(hover, [0, 1], [0, DEPTH.words]);
-
   return (
     <motion.article
       aria-labelledby={`${range.id}-card-title`}
@@ -163,19 +155,13 @@ function RangeCard({ range, index }: { range: Range; index: number }) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.25 }}
       transition={{ duration: 0.8, delay: index * 0.12, ease: EASE }}
-      {...handlers}
-      className="group relative flex flex-col rounded-[2rem] border border-white/80 shadow-[0_30px_70px_-35px_rgba(20,50,100,0.45)] transition-shadow duration-300 [transform-style:preserve-3d] hover:shadow-[0_50px_90px_-35px_rgba(20,50,100,0.55)]"
-      style={{ background: range.background, ...style }}
+      className="group relative flex flex-col rounded-[2rem] border border-white/80 shadow-[0_30px_70px_-35px_rgba(20,50,100,0.45)] transition-shadow duration-300 hover:shadow-[0_40px_80px_-35px_rgba(20,50,100,0.55)]"
+      style={{ background: range.background }}
     >
       {/* The picture (clipped to the card's rounded top) */}
-      <motion.div
-        style={{ z: visualZ }}
-        className="relative aspect-[1.5] overflow-hidden rounded-t-[2rem]"
-      >
-        {range.visual}
-      </motion.div>
+      <div className="relative aspect-[1.5] overflow-hidden rounded-t-[2rem]">{range.visual}</div>
 
-      <motion.div style={{ z: wordsZ }} className="flex flex-1 flex-col px-6 pb-6 pt-1">
+      <div className="flex flex-1 flex-col px-6 pb-6 pt-1">
         <p
           className="w-fit rounded-full bg-white/70 px-3 py-1 text-[0.7rem] font-bold uppercase tracking-[0.16em]"
           style={{ color: range.ink }}
@@ -200,14 +186,7 @@ function RangeCard({ range, index }: { range: Range; index: number }) {
           {range.link}
           <ArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-1" />
         </span>
-      </motion.div>
-
-      {/* Glare following the mouse, only while hovered */}
-      <motion.div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 rounded-[2rem]"
-        style={{ background: glare, opacity: hover }}
-      />
+      </div>
 
       {/* The link: the whole card, so anywhere on it opens the range */}
       <Link
@@ -254,7 +233,7 @@ export function RangeCards({ topColor }: { topColor: string }) {
             </h2>
           </motion.div>
           {/* At most about 1100px across, centred, so the cards stay a comfortable size */}
-          <div className="mx-auto mt-10 grid max-w-[69rem] gap-6 [perspective:1400px] md:grid-cols-2 lg:grid-cols-3">
+          <div className="mx-auto mt-10 grid max-w-[69rem] gap-6 md:grid-cols-2 lg:grid-cols-3">
             {RANGES.map((range, i) => (
               <RangeCard key={range.id} range={range} index={i} />
             ))}
