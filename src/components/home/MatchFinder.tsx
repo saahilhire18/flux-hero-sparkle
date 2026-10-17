@@ -13,22 +13,30 @@ const NAVY = "#24467A";
 /** Where the section's background ends, for the next section to start from. */
 export const MATCH_END = "#EDF3FA";
 
+/** The needs on show (a need can be held back while its wording waits for approval). */
+const SHOWN = NEEDS.filter((need) => !need.hidden);
+
 /**
- * Where the needs sit on the ring (% of the orbit box): three down its left side, then three
+ * Where the needs sit on the ring (% of the orbit box): half down its left side, then half
  * down its right (degrees round from the right, clockwise), so the middle stays clear for the
  * products and their podium.
  */
 const RING = 43;
-const ANGLES = [220, 180, 140, -40, 0, 40];
-const SPOTS = ANGLES.map((degrees) => {
-  const angle = (degrees * Math.PI) / 180;
-  // Rounded, so the server's HTML and the browser's first render agree
-  const round = (value: number) => Math.round(value * 100) / 100;
-  return {
-    left: `${round(50 + RING * Math.cos(angle))}%`,
-    top: `${round(50 + RING * Math.sin(angle))}%`,
-  };
-});
+const ANGLES: Record<number, number[]> = {
+  6: [220, 180, 140, -40, 0, 40],
+  4: [205, 155, -25, 25],
+};
+const SPOTS = (ANGLES[SHOWN.length] ?? SHOWN.map((_, i) => (360 / SHOWN.length) * i - 90)).map(
+  (degrees) => {
+    const angle = (degrees * Math.PI) / 180;
+    // Rounded, so the server's HTML and the browser's first render agree
+    const round = (value: number) => Math.round(value * 100) / 100;
+    return {
+      left: `${round(50 + RING * Math.cos(angle))}%`,
+      top: `${round(50 + RING * Math.sin(angle))}%`,
+    };
+  },
+);
 
 /** The pair on the podium: the outgoing one sinks away as the new one rises into place. */
 const productVariants: Variants = {
@@ -51,7 +59,7 @@ const line: Variants = {
  * One product of the pair, in the words: a photo, what it is and why it suits, what works in it
  * (its actives; those both products share ticked, in the need's colour) and a link to it.
  */
-function PickRow({ pick, shared, ink }: { pick: Pick; shared: string[]; ink: string }) {
+function PickRow({ pick, inBoth, ink }: { pick: Pick; inBoth: string[]; ink: string }) {
   const { product, why, actives } = pick;
   return (
     <motion.li
@@ -83,7 +91,7 @@ function PickRow({ pick, shared, ink }: { pick: Pick; shared: string[]; ink: str
         <span className="mt-0.5 block text-sm leading-snug text-slate-600">{why}</span>
         <span className="mt-2 flex flex-wrap gap-1">
           {actives.map(({ name, amount }) => {
-            const both = shared.includes(name);
+            const both = inBoth.includes(name);
             return (
               <span
                 key={name}
@@ -182,10 +190,14 @@ function Pair({ need }: { need: Need }) {
  * topColor: the colour above it, which its background starts from.
  */
 export function MatchFinder({ topColor }: { topColor: string }) {
-  const [needId, setNeedId] = useState(NEEDS[0]?.id ?? "");
-  const need = NEEDS.find((each) => each.id === needId) ?? NEEDS[0];
+  const [needId, setNeedId] = useState(SHOWN[0]?.id ?? "");
+  const need = SHOWN.find((each) => each.id === needId) ?? SHOWN[0];
   if (!need) return null;
   const NeedIcon = need.icon;
+  // The chips both products list (ticked on each)
+  const inBoth = need.toothpaste.actives
+    .map(({ name }) => name)
+    .filter((name) => need.mouthwash.actives.some((active) => active.name === name));
 
   return (
     <MotionConfig reducedMotion="user">
@@ -217,7 +229,7 @@ export function MatchFinder({ topColor }: { topColor: string }) {
             <div role="group" aria-label="Your need" className="absolute inset-0">
               {/* Each need in its own colour (from its products' packs): its icon and name in
                   it, its glass washed with it, and filled with it when chosen */}
-              {NEEDS.map(({ id, label, icon: Icon, colors }, i) => {
+              {SHOWN.map(({ id, label, icon: Icon, colors }, i) => {
                 const current = id === need.id;
                 const spot = SPOTS[i] ?? { left: "50%", top: "50%" };
                 return (
@@ -278,7 +290,7 @@ export function MatchFinder({ topColor }: { topColor: string }) {
               What does your smile need?
             </h2>
             <p className="mx-auto mt-3 max-w-md text-base text-slate-600 sm:text-lg lg:mx-0">
-              Choose a need around the circle to see the toothpaste and mouthwash made for it.
+              Choose a need to see the toothpaste and mouthwash we suggest for it.
             </p>
           </motion.div>
 
@@ -311,8 +323,8 @@ export function MatchFinder({ topColor }: { topColor: string }) {
                     </span>
                   </motion.h3>
                   <ul className="mx-auto mt-5 flex max-w-lg flex-col gap-3 lg:mx-0">
-                    <PickRow pick={need.toothpaste} shared={need.shared} ink={need.colors.ink} />
-                    <PickRow pick={need.mouthwash} shared={need.shared} ink={need.colors.ink} />
+                    <PickRow pick={need.toothpaste} inBoth={inBoth} ink={need.colors.ink} />
+                    <PickRow pick={need.mouthwash} inBoth={inBoth} ink={need.colors.ink} />
                   </ul>
                   {/* What the two have in common, in one line */}
                   <motion.p
@@ -321,7 +333,7 @@ export function MatchFinder({ topColor }: { topColor: string }) {
                     style={{ backgroundColor: `${need.colors.soft}cc` }}
                   >
                     <span className="font-extrabold" style={{ color: need.colors.ink }}>
-                      Both have:
+                      {need.sharedLabel ?? "Both have"}:
                     </span>
                     {need.shared.map((item) => (
                       <span key={item} className="inline-flex items-center gap-1">
@@ -335,14 +347,20 @@ export function MatchFinder({ topColor }: { topColor: string }) {
                       </span>
                     ))}
                   </motion.p>
+                  {/* Age guidance, on its own line above the disclaimer */}
+                  {need.note && (
+                    <motion.p
+                      variants={line}
+                      className="mx-auto mt-4 max-w-lg text-sm font-semibold text-primary lg:mx-0"
+                    >
+                      {need.note}
+                    </motion.p>
+                  )}
                   <motion.p
                     variants={line}
-                    className="mx-auto mt-4 max-w-lg text-sm text-slate-600 lg:mx-0"
+                    className={`mx-auto max-w-lg text-sm text-slate-600 lg:mx-0 ${need.note ? "mt-1" : "mt-4"}`}
                   >
-                    {need.note && (
-                      <span className="mr-1 font-semibold text-primary">{need.note}</span>
-                    )}
-                    Suggestions only: For lasting problems, see your dentist.
+                    These are suggestions only. If a problem persists, please see your dentist.
                   </motion.p>
                 </motion.div>
               </AnimatePresence>

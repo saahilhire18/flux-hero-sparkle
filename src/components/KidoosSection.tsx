@@ -22,7 +22,10 @@ type Kidoo = {
   ink: string;
 };
 
-/** From the Totalflux product sheets and the Kidoos packs. Plus (3+) first, then Advance (6+). */
+/**
+ * Worded as the website content audit of 17 October 2026 recommends (checked against Totalflux's
+ * Scientific Detailer and Training Manual). Plus (3+) first, then Advance (6+).
+ */
 const KIDOOS: Kidoo[] = [
   {
     id: "kidoos-plus",
@@ -30,12 +33,16 @@ const KIDOOS: Kidoo[] = [
     age: "3+",
     tag: "Fluoride-free first years",
     summary:
-      "A genuinely fluoride-free formula with hydroxyapatite for remineralization, for zero fluoride ingestion risk.",
+      "Formulated without fluoride, with 3% hydroxyapatite, the mineral tooth enamel is made of. A choice for families who prefer a fluoride-free paste, or whose drinking water is already high in fluoride.",
     actives: [
       ["Hydroxyapatite", "3%"],
       ["Xylitol", "3%"],
     ],
-    perks: ["No SLS · No fluoride", "Enamel protection", "Strawberry Bliss flavour"],
+    perks: [
+      "No SLS · No fluoride",
+      "Sweetened with xylitol, not sugar",
+      "Strawberry Bliss flavour",
+    ],
     image: { src: "/kidoos-plus.webp", width: 266, height: 800 },
     wordmark: { src: "/wordmark-kidoos-plus.webp", width: 1036, height: 360 },
     gradient: "linear-gradient(135deg, #CDEBFF 0%, #DCE4FF 50%, #EBDDFF 100%)",
@@ -47,12 +54,12 @@ const KIDOOS: Kidoo[] = [
     age: "6+",
     tag: "Reduced-dose fluoride",
     summary:
-      "A pediatric-calibrated step between fluoride-free and adult-strength paste, for reduced-dose fluoride protection as teeth grow.",
+      "498 ppm fluoride for children aged 6+, between our fluoride-free Kidoos Plus and our adult pastes. Sweetened with xylitol instead of sugar.",
     actives: [
       ["Sodium Fluoride", "498 ppm"],
       ["Xylitol", "3%"],
     ],
-    perks: ["SLS free · Non-cariogenic", "Cavity protection with fluoride", "Fresh breath all day"],
+    perks: ["SLS-free · Sugar-free", "Age-appropriate fluoride", "Strawberry flavour"],
     image: { src: "/kidoos-advance.webp", width: 266, height: 800 },
     gradient: "linear-gradient(135deg, #FFD1DC 0%, #FFE3EC 45%, #FFE9D6 100%)",
     ink: "#8E2442",
@@ -225,8 +232,7 @@ export function KidoosSection({ topColor = "#DDE4F2" }: { topColor?: string }) {
               />
             </h2>
             <p className="mx-auto mt-4 max-w-xl text-base text-slate-600 sm:text-lg">
-              Gentle, SLS-free care made for children&apos;s teeth, with a Strawberry Bliss taste
-              they&apos;ll love.
+              Gentle, SLS-free toothpastes made for children, with a fruity strawberry flavour.
             </p>
           </motion.div>
 

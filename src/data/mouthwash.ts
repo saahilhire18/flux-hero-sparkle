@@ -1,19 +1,19 @@
 // data/mouthwash.ts
 //
-// The Totalflux mouthwash range, from the product booklet ("Booklet Updated Design"): each
-// mouthwash's one-line benefit, its group, description and ingredients, a cut-out photo of
+// The Totalflux mouthwash range: each mouthwash's heading, group, description and key
+// ingredients, worded as the website content audit of 17 October 2026 recommends (checked
+// against Totalflux's Scientific Detailer and Training Manual), its ingredient list from the
+// product booklet ("Booklet Updated Design"), a cut-out photo of
 // the bottle (WebP copies of the supplied product renders, trimmed to the bottle) and its
 // colours, which are only ever the label's own (the "Hexa Codes" sheet: three per label).
 import type { LucideIcon } from "lucide-react";
 import {
-  BugOff,
   Candy,
   Droplet,
   Flower2,
   Leaf,
   ShieldCheck,
   ShieldPlus,
-  Sparkles,
   Sprout,
   ThermometerSnowflake,
   TreePine,
@@ -27,12 +27,16 @@ export type Mouthwash = {
   name: string;
   /** Printed next to the name where two share it, e.g. "No Alcohol" for the alcohol-free Turmeric. */
   variant?: string;
-  /** The booklet's heading for it, e.g. "Multi-Protection". */
+  /** Its heading in the range section, e.g. "Cool mint freshness". */
   benefit: string;
+  /** The short line under its name tag in the hero, e.g. "Cool mint". */
+  descriptor: string;
+  /** Kept off the site, and why. */
+  hidden?: string;
   group: MouthwashGroup;
-  /** From the booklet; a lead before the first ": " is shown in bold, as the booklet does. */
+  /** Its description; a lead before the first ": " is shown in bold, as the booklet does. */
   description: string;
-  /** Its key actives, from the description and ingredients (for Chlorhexidine, the claims on its pack). */
+  /** Its key ingredients (with strengths where known), around the bottle. */
   highlights: { label: string; icon: LucideIcon }[];
   /** As printed in the booklet (none is given for Chlorhexidine). */
   ingredients?: string;
@@ -54,14 +58,15 @@ const BOTTLE = { width: 388, height: 1000 };
  * Kidoos in the middle. The range section groups them (alcohol-based, medicinal, alcohol-free)
  * in this same order.
  */
-export const MOUTHWASHES: Mouthwash[] = [
+const ALL_MOUTHWASHES: Mouthwash[] = [
   {
     id: "mintfresh",
     name: "Mintfresh",
-    benefit: "Multi-Protection",
+    benefit: "Cool mint freshness",
+    descriptor: "Cool mint",
     group: "alcohol-based",
     description:
-      "Comprehensive oral defence: formulated with alcohol and a blend of essential oils (Eucalyptus, Thyme, Peppermint and Wintergreen), it actively kills germs to prevent plaque build-up, tooth decay and gingivitis.",
+      "A classic alcohol-based rinse with a blend of eucalyptus, thyme, peppermint and wintergreen oils, for a cool, fresh feel after brushing.",
     highlights: [
       { label: "Eucalyptus", icon: Leaf },
       { label: "Thyme", icon: Sprout },
@@ -78,10 +83,11 @@ export const MOUTHWASHES: Mouthwash[] = [
     // The bottle with the "Detox" badge; the alcohol-free Turmeric ("No Alcohol") is further on
     id: "turmeric",
     name: "Turmeric",
-    benefit: "Natural Detox",
+    benefit: "Turmeric & clove",
+    descriptor: "Turmeric & clove",
     group: "alcohol-based",
     description:
-      "Natural healing and cleansing: infused with Curcumin (Turmeric) and Clove Oil, it uses natural anti-inflammatory properties to cleanse the mouth, heal gum issues and reduce harmful bacteria.",
+      "An alcohol-based rinse with turmeric oil and clove oil, for those who enjoy a traditional flavour.",
     highlights: [
       { label: "Turmeric Oil", icon: Droplet },
       { label: "Clove Oil", icon: Flower2 },
@@ -95,10 +101,11 @@ export const MOUTHWASHES: Mouthwash[] = [
   {
     id: "sensitive",
     name: "Sensitive",
-    benefit: "Relief & Repair",
+    benefit: "For sensitive teeth",
+    descriptor: "For sensitive teeth",
     group: "alcohol-free",
     description:
-      "Gentle sensitivity relief: this alcohol-free formula combines Potassium Nitrate and Sodium Fluoride with Clove Oil to soothe tooth sensitivity, strengthen enamel and fight decay without harsh irritation.",
+      "Gentle on sensitive teeth: an alcohol-free rinse with potassium nitrate, fluoride and clove oil. Use it alongside Totalflux Sensitive toothpaste, not instead of it, to reach areas a brush can miss. Relief builds over 2–4 weeks.",
     highlights: [
       { label: "Potassium Nitrate", icon: ThermometerSnowflake },
       { label: "Sodium Fluoride", icon: ShieldCheck },
@@ -113,13 +120,14 @@ export const MOUTHWASHES: Mouthwash[] = [
   {
     id: "kidoos",
     name: "Kidoos",
-    benefit: "Cavity Protection",
+    benefit: "Made for kids 6+",
+    descriptor: "For kids 6+",
     group: "alcohol-free",
     description:
-      "Kid-friendly cavity defence: designed for children, this alcohol-free, strawberry-flavoured formula has a safe quantity of fluoride to protect against cavities, plaque and bad breath.",
+      "An alcohol-free, strawberry-flavoured rinse with 226 ppm fluoride, for children aged 6 and over who can rinse and spit without swallowing. If your drinking water is high in fluoride, ask your dentist before adding a fluoride rinse.",
     highlights: [
-      { label: "Kid-Safe Fluoride", icon: ShieldCheck },
-      { label: "Strawberry Flavour", icon: Candy },
+      { label: "Fluoride 226 ppm", icon: ShieldCheck },
+      { label: "Strawberry flavour", icon: Candy },
     ],
     ingredients:
       "Aqua, Sorbitol, Poloxamer 407, Sodium Benzoate, Sodium Saccharin, Flavour, Peppermint Oil, PEG-40 Hydrogenated Castor Oil, Sodium Fluoride, CI 16255.",
@@ -131,14 +139,15 @@ export const MOUTHWASHES: Mouthwash[] = [
   {
     id: "neem",
     name: "Neem",
-    benefit: "Herbal Healing",
+    benefit: "Traditional neem, alcohol-free",
+    descriptor: "Neem, alcohol-free",
     group: "alcohol-free",
     description:
-      "Powerful antibacterial action to fight plaque and prevent cavities, with natural anti-inflammatory properties that soothe bleeding gums and promote long-term oral hygiene.",
+      "An alcohol-free daily rinse with 0.05% CPC (cetylpyridinium chloride) and 226 ppm fluoride, with neem, clove and peppermint oils for a traditional flavour.",
     highlights: [
+      { label: "CPC 0.05%", icon: ShieldPlus },
+      { label: "Sodium Fluoride 226 ppm", icon: ShieldCheck },
       { label: "Neem Oil", icon: Leaf },
-      { label: "Clove Oil", icon: Flower2 },
-      { label: "Sodium Fluoride", icon: ShieldCheck },
     ],
     ingredients:
       "Aqua, Sorbitol, PEG-40 Hydrogenated Castor Oil, Poloxamer 407, Sodium Benzoate, Potassium Sorbate, Azadirachta Indica Oil, Eugenia Caryophyllus Oil, Mentha Piperita Oil, Sodium Fluoride, Cetylpyridinium Chloride, Sodium Saccharin, CI 15985, CI 42090, Citric Acid.",
@@ -150,14 +159,15 @@ export const MOUTHWASHES: Mouthwash[] = [
     id: "turmeric-no-alcohol",
     name: "Turmeric",
     variant: "No Alcohol",
-    benefit: "Herbal Protection",
+    benefit: "Turmeric, alcohol-free",
+    descriptor: "Turmeric, alcohol-free",
     group: "alcohol-free",
     description:
-      "A non-alcoholic mouthwash enriched with turmeric oil and fluoride, designed to protect against cavities, support gum health and reduce oral bacteria.",
+      "An alcohol-free daily rinse with 0.05% CPC (cetylpyridinium chloride) and 226 ppm fluoride, with turmeric and clove oils for a traditional flavour.",
     highlights: [
+      { label: "CPC 0.05%", icon: ShieldPlus },
+      { label: "Sodium Fluoride 226 ppm", icon: ShieldCheck },
       { label: "Turmeric Oil", icon: Droplet },
-      { label: "Clove Oil", icon: Flower2 },
-      { label: "Sodium Fluoride", icon: ShieldCheck },
     ],
     ingredients:
       "Aqua, Sorbitol, PEG-40 Hydrogenated Castor Oil, Flavour, Poloxamer 407, Sodium Benzoate, Potassium Sorbate, Curcuma Longa Oil, Eugenia Caryophyllus Oil, Sodium Fluoride, Cetylpyridinium Chloride, Sodium Saccharin, Caramel, Citric Acid.",
@@ -168,21 +178,23 @@ export const MOUTHWASHES: Mouthwash[] = [
   {
     id: "chlorhexidine",
     name: "Chlorhexidine",
-    benefit: "Medical-Grade",
+    benefit: "",
+    descriptor: "",
+    // Held back (audit MW-08, Q-01): a medicated product outside the cosmetic licence. Its
+    // claims are removed; if Regulatory and Legal approve it, add only its label-approved
+    // indications and "Use only as directed by your dentist or doctor."
+    hidden: "Awaiting Regulatory and Legal (audit Q-01)",
     group: "medicinal",
-    description:
-      "A powerful medical-grade antiseptic that eliminates harmful bacteria and prevents plaque build-up, designed to treat gingivitis and speed up healing after dental procedures.",
-    highlights: [
-      { label: "Antiseptic", icon: ShieldPlus },
-      { label: "Antiplaque", icon: Sparkles },
-      { label: "Antiviral", icon: BugOff },
-      { label: "Antifungal", icon: ShieldCheck },
-    ],
+    description: "",
+    highlights: [],
     image: { src: "/mouthwash-chlorhexidine.webp", ...BOTTLE },
     // Label: #00a4ef, #ee0800, #59d2fd (ink: the bottle's blue, as asked, over the red)
     colors: { liquid: "#59d2fd", ink: "#00a4ef" },
   },
 ];
+
+/** The mouthwashes on the site: every one not held back. */
+export const MOUTHWASHES = ALL_MOUTHWASHES.filter((mouthwash) => !mouthwash.hidden);
 
 /** The mouthwash's full name, e.g. "Turmeric No Alcohol". */
 export const fullName = (mouthwash: Mouthwash) =>
@@ -192,8 +204,18 @@ export const fullName = (mouthwash: Mouthwash) =>
  * The groups, as the booklet sets them out. accent: the colour of the booklet's band over the
  * group (for small marks, not text); note: printed with the group in the booklet.
  */
-export const MOUTHWASH_GROUPS: { id: MouthwashGroup; label: string; accent: string; note?: string }[] = [
+const ALL_GROUPS: { id: MouthwashGroup; label: string; accent: string; note?: string }[] = [
   { id: "alcohol-based", label: "Alcohol-based", accent: "#375A8C" },
-  { id: "alcohol-free", label: "Alcohol-free", accent: "#4FA3CF", note: "250 ppm maximum available fluoride" },
+  {
+    id: "alcohol-free",
+    label: "Alcohol-free",
+    accent: "#4FA3CF",
+    note: "250 ppm maximum available fluoride",
+  },
   { id: "medicinal", label: "Medicinal", accent: "#D7263D" },
 ];
+
+/** The groups with a mouthwash on the site (no "Medicinal" while Chlorhexidine is held back). */
+export const MOUTHWASH_GROUPS = ALL_GROUPS.filter((group) =>
+  MOUTHWASHES.some((mouthwash) => mouthwash.group === group.id),
+);

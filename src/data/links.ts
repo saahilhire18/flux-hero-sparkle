@@ -3,7 +3,7 @@
 // Where Totalflux is sold and found online (as on the brand's live site, totalflux-me.com).
 // External: open them in a new tab.
 
-/** The Totalflux brand store on Amazon India: "Where to Buy" and "Buy Online". */
+/** The Totalflux brand store on Amazon India: "Buy on Amazon" and "Where to Buy". */
 export const AMAZON_STORE =
   "https://www.amazon.in/stores/Totalflux/page/5C4DB79E-4F47-46E5-9771-CEED95C4BE91";
 

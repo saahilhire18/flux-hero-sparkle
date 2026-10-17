@@ -8,7 +8,7 @@ import { MatchFinder, MATCH_END } from "@/components/home/MatchFinder";
 import { RangeCards, RANGES_END } from "@/components/home/RangeCards";
 
 const DESCRIPTION =
-  "Totalflux complete oral care: SLS-free toothpastes, mouthwashes that kill 99.9% of oral germs, and the Oralbrush with a built-in tongue scraper. For every mouth, every age.";
+  "Totalflux complete oral care: SLS-free toothpastes, mouthwashes including four alcohol-free rinses, and the Oralbrush with a built-in tongue scraper. For the whole family, from age 3 up.";
 
 export const Route = createFileRoute("/")({
   head: () => ({

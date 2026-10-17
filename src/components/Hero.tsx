@@ -762,7 +762,7 @@ export function Hero({ transitionColor }: { transitionColor?: string }) {
                 >
                   <Button asChild variant="glass" size="hero" className="btn-shine letter-fx">
                     <a href="#toothpaste">
-                      <RollText text="Explore Our Range" />
+                      <RollText text="Explore the range" />
                       <ArrowRight className="transition-transform duration-200 group-hover:translate-x-1" />
                     </a>
                   </Button>

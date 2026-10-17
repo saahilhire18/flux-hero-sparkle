@@ -1,20 +1,22 @@
 // data/home.ts
 //
 // The home page's content: the routine, the "find your match" pairings and the promises.
-// Every claim comes from the product sheets, the booklets or the packs (see product-pages.ts,
-// mouthwash.ts, oralbrush.ts and KidoosSection).
+// The claims follow the website content audit of 17 October 2026, which checks them against
+// Totalflux's Scientific Detailer and Training Manual (see product-pages.ts, mouthwash.ts,
+// oralbrush.ts and KidoosSection).
 import type { LucideIcon } from "lucide-react";
 import {
   Baby,
+  Droplets,
+  Feather,
   FlaskConicalOff,
   Leaf,
-  ShieldCheck,
-  ShieldPlus,
-  Sparkles,
+  ListChecks,
   ThermometerSnowflake,
+  Users,
   Wind,
 } from "lucide-react";
-import { ToothShield, ToothSparkle } from "@/components/icons/Tooth";
+import { ToothShield } from "@/components/icons/Tooth";
 import { MOUTHWASHES } from "@/data/mouthwash";
 import { ORALBRUSH } from "@/data/oralbrush";
 import { PRODUCT_PAGES } from "@/data/product-pages";
@@ -92,35 +94,37 @@ export const ROUTINE: {
   link: string;
 }[] = [
   {
-    step: "Brush & scrape",
+    step: "The brush",
     title: "Clean teeth, gums and tongue",
     text: "Brush with the Oralbrush, then slide it open: a gentle tongue scraper is built right in.",
     product: BRUSH,
     link: "Meet the Oralbrush",
   },
   {
-    step: "Brush with your paste",
+    step: "The paste",
     title: "The toothpaste made for you",
-    text: "Advance, Sensitive, Essential or Kidoos: every Totalflux toothpaste is SLS free.",
+    text: "Advance, Sensitive, Essential or Kidoos: every Totalflux toothpaste is SLS-free.",
     product: toothpaste("essential"),
     link: "See the toothpastes",
   },
   {
-    step: "Rinse",
-    title: "Finish fresh and protected",
-    text: "A Totalflux mouthwash kills 99.9% of oral germs, for a healthier mouth.",
+    step: "The rinse",
+    title: "Finish fresh",
+    text: "Pick the rinse that suits you, including four alcohol-free options.",
     product: mouthwash("mintfresh"),
     link: "See the mouthwashes",
   },
 ];
 
-/** A need, and the toothpaste and mouthwash pair for it, each with why. */
-/** One of a need's two picks: everything here is from its product sheet or the booklet. */
+/**
+ * One of a need's two picks. The wording is the website content audit's (17 October 2026),
+ * which checks every claim against the Scientific Detailer and Training Manual.
+ */
 export type Pick = {
   product: HomeProduct;
   /** One line on why it suits the need (beside its photo). */
   why: string;
-  /** Its key actives, as on its pack or product sheet; one both picks share is ticked. */
+  /** Its key ingredients (and facts such as an age), as chips; one both picks list is ticked. */
   actives: { name: string; amount?: string }[];
 };
 
@@ -130,9 +134,13 @@ export type Need = {
   icon: LucideIcon;
   toothpaste: Pick;
   mouthwash: Pick;
-  /** What the two have in common, in a word or two each. */
+  /** What the two have in common, in a word or two each, after "Both have:" (or `sharedLabel`). */
   shared: string[];
+  sharedLabel?: string;
+  /** A line of guidance on its own, above the disclaimer. */
   note?: string;
+  /** Kept out of the selector, and why (see the need). */
+  hidden?: string;
   /**
    * The need's colour, from the packs of the products it suggests: ink, a deep shade for its
    * circle (filled when chosen) and its marks; soft, a pale wash of it for its circle's glass.
@@ -148,7 +156,7 @@ export const NEEDS: Need[] = [
     icon: ThermometerSnowflake,
     toothpaste: {
       product: toothpaste("sensitive"),
-      why: "Our only paste made for sensitivity: Potassium Nitrate calms teeth that react to hot, cold or sweet.",
+      why: "5% potassium nitrate helps soothe teeth that react to hot, cold or sweet. Relief builds over 2–4 weeks of twice-daily brushing.",
       actives: [
         { name: "Potassium Nitrate", amount: "5%" },
         { name: "Sodium Fluoride", amount: "950 ppm" },
@@ -157,7 +165,7 @@ export const NEEDS: Need[] = [
     },
     mouthwash: {
       product: mouthwash("sensitive"),
-      why: "Our only rinse with Potassium Nitrate, alcohol-free to soothe without irritation.",
+      why: "Alcohol-free rinse with potassium nitrate and fluoride. Use it alongside Totalflux Sensitive toothpaste, not instead of it.",
       actives: [{ name: "Potassium Nitrate" }, { name: "Sodium Fluoride" }, { name: "Clove Oil" }],
     },
     shared: ["Potassium Nitrate", "Sodium Fluoride", "Clove Oil"],
@@ -169,59 +177,46 @@ export const NEEDS: Need[] = [
     icon: ToothShield,
     toothpaste: {
       product: toothpaste("essential"),
-      why: "Clinically balanced fluoride for reliable protection, every day, with nothing extra.",
+      why: "995 ppm fluoride, just under India’s 1,000 ppm legal limit for toothpaste, in an SLS-free base.",
       actives: [{ name: "Sodium Fluoride", amount: "995 ppm" }],
     },
     mouthwash: {
       product: mouthwash("turmeric-no-alcohol"),
-      why: "The alcohol-free rinse designed to protect against cavities, with fluoride and turmeric.",
-      actives: [{ name: "Sodium Fluoride" }, { name: "Turmeric Oil" }, { name: "Clove Oil" }],
-    },
-    shared: ["Sodium Fluoride", "No SLS or alcohol"],
-  },
-  {
-    id: "plaque",
-    colors: { ink: "#8A6512", soft: "#F4EACB" },
-    label: "Plaque & tartar",
-    icon: ToothSparkle,
-    toothpaste: {
-      product: toothpaste("advance"),
-      why: "Our only paste with tartar-control actives: anti-tartar and anti-plaque in one.",
+      why: "Alcohol-free daily rinse with CPC and 226 ppm fluoride, with turmeric and clove oils for flavour.",
       actives: [
-        { name: "Arginine Bicarbonate", amount: "2%" },
-        { name: "Sodium Fluoride", amount: "995 ppm" },
-        { name: "Zinc Citrate", amount: "0.3%" },
-        { name: "TSPP", amount: "0.3%" },
+        { name: "CPC", amount: "0.05%" },
+        { name: "Sodium Fluoride", amount: "226 ppm" },
+        { name: "Turmeric Oil" },
       ],
     },
-    mouthwash: {
-      product: mouthwash("turmeric"),
-      why: "Reduces harmful bacteria and calms gums, with natural Curcumin and Clove Oil.",
-      actives: [{ name: "Turmeric Oil" }, { name: "Clove Oil" }],
-    },
-    shared: ["Multi-action", "Teeth and gums"],
+    shared: ["Fluoride", "No SLS in the paste", "No alcohol in the rinse"],
   },
+  // "Plaque & tartar" is withdrawn: no product can support its claims (audit HOME-09). The
+  // audit proposes "Herbal choice" in its place (Neem and Turmeric rinses, no toothpaste),
+  // which needs a two-rinse panel here first; it waits for Management (Q-16).
   {
-    id: "gums",
+    // "Gum care" is withdrawn for the same reason (HOME-06); this is the audit's "Gentle care"
+    // in its place, ready but hidden until Management approves it (Q-16)
+    id: "gentle",
+    hidden: "Awaiting Management approval of the restructure (audit Q-16)",
     colors: { ink: "#007843", soft: "#DCEEDB" },
-    label: "Gum care",
-    icon: ShieldPlus,
+    label: "Gentle care",
+    icon: Feather,
     toothpaste: {
-      product: toothpaste("advance"),
-      why: "Keeps plaque and tartar, the build-up that irritates gums, in check.",
-      actives: [
-        { name: "Arginine Bicarbonate", amount: "2%" },
-        { name: "Sodium Fluoride", amount: "995 ppm" },
-        { name: "Zinc Citrate", amount: "0.3%" },
-        { name: "TSPP", amount: "0.3%" },
-      ],
+      product: toothpaste("essential"),
+      why: "SLS-free fluoride toothpaste, formulated to be gentle on the delicate lining of your mouth.",
+      actives: [{ name: "Sodium Fluoride", amount: "995 ppm" }, { name: "SLS-free" }],
     },
     mouthwash: {
       product: mouthwash("neem"),
-      why: "Our rinse made for gums: natural Neem soothes bleeding gums, alcohol-free.",
-      actives: [{ name: "Neem Oil" }, { name: "Clove Oil" }, { name: "Sodium Fluoride" }],
+      why: "Alcohol-free daily rinse with CPC and fluoride, in a traditional neem flavour.",
+      actives: [
+        { name: "CPC", amount: "0.05%" },
+        { name: "Sodium Fluoride", amount: "226 ppm" },
+        { name: "Neem Oil" },
+      ],
     },
-    shared: ["Sodium Fluoride", "Fight plaque"],
+    shared: ["Fluoride", "No SLS in the paste", "No alcohol in the rinse"],
   },
   {
     id: "breath",
@@ -230,12 +225,14 @@ export const NEEDS: Need[] = [
     icon: Wind,
     toothpaste: {
       product: toothpaste("essential"),
-      why: "A Minty White formula that freshens breath and keeps teeth strong.",
+      // The audit's wording for keeping Essential here, until Management decides on moving
+      // Advance (zinc citrate) into this need (HOME-07.2)
+      why: "A fresh, minty fluoride toothpaste for everyday brushing.",
       actives: [{ name: "Sodium Fluoride", amount: "995 ppm" }],
     },
     mouthwash: {
       product: mouthwash("mintfresh"),
-      why: "Four essential oils kill germs and leave a cool, fresh feel.",
+      why: "Eucalyptus, thyme, peppermint and wintergreen oils for a cool, fresh feel. Contains alcohol.",
       actives: [
         { name: "Eucalyptus" },
         { name: "Thyme" },
@@ -243,7 +240,8 @@ export const NEEDS: Need[] = [
         { name: "Wintergreen" },
       ],
     },
-    shared: ["Minty fresh", "Against tooth decay"],
+    sharedLabel: "Both",
+    shared: ["Help freshen breath", "Cool, minty feel"],
   },
   {
     id: "kids",
@@ -252,7 +250,7 @@ export const NEEDS: Need[] = [
     icon: Baby,
     toothpaste: {
       product: KIDOOS_ADVANCE,
-      why: "Reduced-dose fluoride for growing teeth, ages 6+, SLS free.",
+      why: "Children’s fluoride toothpaste (498 ppm) for ages 6+, SLS-free and sweetened with xylitol instead of sugar.",
       actives: [
         { name: "Sodium Fluoride", amount: "498 ppm" },
         { name: "Xylitol", amount: "3%" },
@@ -260,23 +258,27 @@ export const NEEDS: Need[] = [
     },
     mouthwash: {
       product: mouthwash("kidoos"),
-      why: "Our only rinse made for children: alcohol-free, with a safe amount of fluoride.",
-      actives: [{ name: "Sodium Fluoride", amount: "kid-safe" }],
+      why: "Alcohol-free, strawberry-flavoured rinse with 226 ppm fluoride, for children aged 6+ who can rinse and spit.",
+      actives: [{ name: "Sodium Fluoride", amount: "226 ppm" }, { name: "Ages 6+" }],
     },
-    shared: ["Sodium Fluoride", "Strawberry flavour", "Made for kids"],
-    note: "Under 6? Kidoos Plus is fluoride free, made for ages 3+.",
+    shared: ["Fluoride", "Strawberry flavour", "For ages 6+"],
+    note: "Under 6? Kidoos Plus toothpaste is fluoride-free and made for ages 3+. Kidoos mouthwash is for ages 6+.",
   },
 ];
 
 /** What every Totalflux product stands for. */
 export const PROMISES: { label: string; text: string; icon: LucideIcon }[] = [
-  { label: "SLS free", text: "Every toothpaste, from Essential to Kidoos.", icon: FlaskConicalOff },
+  { label: "SLS-free", text: "Every toothpaste, from Essential to Kidoos.", icon: FlaskConicalOff },
   { label: "100% vegetarian", text: "As printed on every toothpaste pack.", icon: Leaf },
-  { label: "Clinically tested", text: "100% secure, clinically tested care.", icon: ShieldCheck },
   {
-    label: "Kills 99.9% of germs",
-    text: "Totalflux mouthwash, for a healthier mouth.",
-    icon: Sparkles,
+    label: "Know what’s inside",
+    text: "We show the key ingredients and their strengths for our toothpastes and rinses.",
+    icon: ListChecks,
   },
-  { label: "For every age", text: "From Kidoos Plus at 3+ to grown-up care.", icon: Baby },
+  {
+    label: "Alcohol-free options",
+    text: "Four of our rinses contain no alcohol, including Kidoos for ages 6+.",
+    icon: Droplets,
+  },
+  { label: "For the whole family", text: "From Kidoos Plus at age 3 to adult care.", icon: Users },
 ];

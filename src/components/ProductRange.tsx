@@ -78,7 +78,11 @@ function ProductPanel({ product, flip }: { product: ProductPage; flip: boolean }
             className="font-mono text-xs uppercase leading-6 tracking-[0.22em] text-slate-700 sm:text-sm"
           >
             {eyebrowTop}
-            <br />– {eyebrowBottom}
+            {eyebrowBottom && (
+              <>
+                <br />– {eyebrowBottom}
+              </>
+            )}
           </motion.p>
 
           {/* Gradient heading with a soft drop for depth */}
@@ -101,7 +105,9 @@ function ProductPanel({ product, flip }: { product: ProductPage; flip: boolean }
                 style={{ filter: `drop-shadow(0 6px 10px ${colors.ink}40)` }}
               />
             ) : (
-              <span style={{ color: colors.ink, filter: `drop-shadow(0 6px 10px ${colors.ink}40)` }}>
+              <span
+                style={{ color: colors.ink, filter: `drop-shadow(0 6px 10px ${colors.ink}40)` }}
+              >
                 {product.name}
               </span>
             )}
@@ -116,7 +122,7 @@ function ProductPanel({ product, flip }: { product: ProductPage; flip: boolean }
 
           <p className="mt-10 hidden items-center gap-4 font-mono text-xs uppercase tracking-[0.3em] text-slate-600 lg:flex">
             <span className="h-px w-12" style={{ backgroundColor: colors.ink }} />
-            Daily Care. Lasting Protection.
+            Daily care. SLS-free.
           </p>
         </motion.div>
 

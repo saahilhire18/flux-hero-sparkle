@@ -1,11 +1,19 @@
 // data/product-pages.ts
 //
 // The adult toothpastes, as the toothpaste page's sections show them (ProductRange): what each is
-// for, its key actives and its benefits, from the Totalflux product sheets, and colours taken
-// from its pack.
+// for, its key actives and the points around its tube, worded as the website content audit of
+// 17 October 2026 recommends (checked against Totalflux's Scientific Detailer and Training
+// Manual), and colours taken from its pack.
 import type { LucideIcon } from "lucide-react";
-import { FlaskConicalOff, Leaf, ShieldPlus, ThermometerSnowflake, Wind } from "lucide-react";
-import { ToothShield, ToothSparkle } from "@/components/icons/Tooth";
+import {
+  Feather,
+  FlaskConical,
+  FlaskConicalOff,
+  Leaf,
+  ThermometerSnowflake,
+  Wind,
+} from "lucide-react";
+import { ToothShield } from "@/components/icons/Tooth";
 
 export type ProductPageId = "advance" | "sensitive" | "essential";
 
@@ -13,13 +21,13 @@ export type ProductPage = {
   id: ProductPageId;
   /** The product's name after "Totalflux". */
   name: string;
-  /** What the pack is for (the product sheet's tag line). */
-  tag: string;
-  /** Who it's for. */
+  /** Who it's for: the eyebrow's first line. */
   audience: string;
+  /** The eyebrow's second line, if it has one. */
+  tag?: string;
   summary: string;
   actives: { name: string; amount: string }[];
-  /** stat: a figure shown with it, e.g. the active's strength. */
+  /** The points around the tube. stat: a figure shown with it, e.g. the active's strength. */
   benefits: { icon: LucideIcon; title: string; text: string; stat?: string }[];
   /** A cut-out photo of the tube (transparent WebP in public/, cropped to the tube) and its size in pixels. */
   image: { src: string; width: number; height: number };
@@ -41,10 +49,10 @@ export const PRODUCT_PAGES: Record<ProductPageId, ProductPage> = {
   advance: {
     id: "advance",
     name: "Advance",
-    tag: "Total Defense, Multi-Action",
-    audience: "For adults wanting enhanced protection",
+    audience: "For adults",
+    tag: "Multi-action, arginine + fluoride",
     summary:
-      "Combines anti-tartar, anti-plaque and sensitivity-support actives not typically found together in a single mass-market paste, for patients who ask for something more.",
+      "Arginine helps neutralise plaque acids, 995 ppm fluoride helps strengthen enamel, and zinc citrate helps keep breath fresh, all in an SLS-free paste.",
     actives: [
       { name: "Arginine Bicarbonate", amount: "2%" },
       { name: "Sodium Fluoride", amount: "995 ppm" },
@@ -53,28 +61,27 @@ export const PRODUCT_PAGES: Record<ProductPageId, ProductPage> = {
     ],
     benefits: [
       {
-        icon: ShieldPlus,
-        title: "Total Defense",
+        icon: FlaskConical,
+        title: "Arginine bicarbonate",
         stat: "2%",
-        text: "Arginine Bicarbonate anchors an anti-tartar, anti-plaque foundation.",
+        text: "Helps neutralise plaque acids.",
       },
       {
         icon: ToothShield,
-        title: "Cavity Shield",
+        title: "Sodium fluoride",
         stat: "995 ppm",
-        text: "Clinically balanced sodium fluoride for enhanced daily protection.",
+        text: "Helps strengthen enamel.",
       },
       {
-        icon: ThermometerSnowflake,
-        title: "Sensitivity Comfort",
+        icon: Wind,
+        title: "Zinc citrate",
         stat: "0.3%",
-        text: "Zinc Citrate adds sensitivity support to the multi-action formula.",
+        text: "Helps keep breath fresh.",
       },
       {
-        icon: ToothSparkle,
-        title: "Tartar Control",
-        stat: "0.3%",
-        text: "TSPP rounds out the defense, helping keep tartar and plaque in check.",
+        icon: FlaskConicalOff,
+        title: "SLS-free",
+        text: "Made without sodium lauryl sulphate.",
       },
     ],
     image: { src: "/advance.webp", width: 304, height: 1000 },
@@ -90,10 +97,9 @@ export const PRODUCT_PAGES: Record<ProductPageId, ProductPage> = {
   sensitive: {
     id: "sensitive",
     name: "Sensitive",
-    tag: "Desensitizing Recommendation",
     audience: "For teeth that react to hot, cold or sweet",
     summary:
-      "Provides established desensitizing action with Potassium Nitrate (5%), which stops nerve fibres from firing in response to stimuli, and keeps cavity protection with Sodium Fluoride.",
+      "5% potassium nitrate helps calm the nerve’s response to hot, cold and sweet, with relief building over 2–4 weeks of twice-daily brushing. Also contains 950 ppm fluoride, in an SLS-free base. If sensitivity persists, see your dentist.",
     actives: [
       { name: "Potassium Nitrate", amount: "5%" },
       { name: "Sodium Fluoride", amount: "950 ppm" },
@@ -101,25 +107,25 @@ export const PRODUCT_PAGES: Record<ProductPageId, ProductPage> = {
     benefits: [
       {
         icon: ThermometerSnowflake,
-        title: "Established Relief",
+        title: "Potassium nitrate",
         stat: "5%",
-        text: "Calms the response to hot, cold and sweet, brush after brush.",
+        text: "Relief builds over 2–4 weeks of twice-daily brushing.",
       },
       {
         icon: ToothShield,
-        title: "Cavity Protection",
+        title: "Sodium fluoride",
         stat: "950 ppm",
-        text: "950 ppm Sodium Fluoride, alongside the desensitizing formula.",
-      },
-      {
-        icon: FlaskConicalOff,
-        title: "Mild Cleansing",
-        text: "SLS free and paraben free, gentle on sensitive teeth and gums.",
+        text: "Fluoride, alongside the potassium nitrate.",
       },
       {
         icon: Leaf,
-        title: "With Clove Oil",
-        text: "Formulated with clove oil for sensitivity to hot, cold or sweet.",
+        title: "With clove oil",
+        text: "As on the pack.",
+      },
+      {
+        icon: FlaskConicalOff,
+        title: "SLS-free",
+        text: "Made without sodium lauryl sulphate.",
       },
     ],
     image: { src: "/sensitive.webp", width: 304, height: 1000 },
@@ -134,32 +140,31 @@ export const PRODUCT_PAGES: Record<ProductPageId, ProductPage> = {
   essential: {
     id: "essential",
     name: "Essential",
-    tag: "For Daily Protection",
-    audience: "For everyday adult use and general maintenance",
+    audience: "For everyday adult use",
     summary:
-      "A clean, no-frills fluoride toothpaste for reliable daily protection without added complexity, SLS free from the ground up.",
+      "Everyday toothpaste with 995 ppm fluoride, just under India’s 1,000 ppm legal limit for toothpaste. Formulated without SLS to be gentle on the delicate lining of your mouth.",
     actives: [{ name: "Sodium Fluoride", amount: "995 ppm" }],
     benefits: [
       {
         icon: ToothShield,
-        title: "Daily Protection",
+        title: "Fluoride",
         stat: "995 ppm",
-        text: "Clinically balanced sodium fluoride, built for everyday use.",
-      },
-      {
-        icon: ToothSparkle,
-        title: "Gum & Plaque Care",
-        text: "Helps guard gums and keep plaque in check, brush after brush.",
-      },
-      {
-        icon: Wind,
-        title: "Fresh Breath",
-        text: "A Minty White formula that freshens breath and keeps teeth strong.",
+        text: "Just under India’s 1,000 ppm legal limit for toothpaste.",
       },
       {
         icon: FlaskConicalOff,
-        title: "SLS Free",
-        text: "Gentle, everyday care with nothing extra added.",
+        title: "SLS-free",
+        text: "Made without sodium lauryl sulphate.",
+      },
+      {
+        icon: Feather,
+        title: "Gentle formula",
+        text: "Formulated to be gentle on the delicate lining of your mouth.",
+      },
+      {
+        icon: Leaf,
+        title: "Minty flavour",
+        text: "A Minty White flavour.",
       },
     ],
     image: { src: "/essential.webp", width: 299, height: 1000 },

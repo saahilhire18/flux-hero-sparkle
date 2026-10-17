@@ -112,7 +112,7 @@ const RANGES: Range[] = [
     name: "Toothpaste",
     to: "/toothpaste",
     badge: "5 formulas",
-    text: "SLS free from first teeth to grown-up care: Advance, Sensitive, Essential and the Kidoos range.",
+    text: "Every paste is SLS-free, from Kidoos for children aged 3+ to Advance, Sensitive and Essential for adults.",
     link: "Explore toothpaste",
     background: `linear-gradient(180deg, ${RANGE_PHOTO.backdrop} 0%, ${RANGE_PHOTO.backdrop} 46%, #EEF1F6 100%)`,
     ink: "#2B4270",
@@ -122,8 +122,9 @@ const RANGES: Range[] = [
     id: "mouthwash",
     name: "Mouthwash",
     to: "/mouthwash",
-    badge: "7 formulas",
-    text: "Kills 99.9% of oral germs, in alcohol-based, alcohol-free and medicinal formulas.",
+    // As many as the Mouthwash page shows
+    badge: `${MOUTHWASHES.length} formulas`,
+    text: "Minty, herbal, sensitive and kids’ rinses, with four alcohol-free options.",
     link: "Explore mouthwash",
     background: "linear-gradient(180deg, #D3EDF2 0%, #E4F3F6 50%, #EFF5F9 100%)",
     // Mintfresh's, from its label (mouthwash.ts)

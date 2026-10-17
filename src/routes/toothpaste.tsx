@@ -4,6 +4,7 @@ import { Footer } from "@/components/Footer";
 import { Hero } from "@/components/Hero";
 import { KidoosSection } from "@/components/KidoosSection";
 import { ProductRange } from "@/components/ProductRange";
+import { WhereToBuySection } from "@/components/WhereToBuy";
 import { PRODUCT_PAGES } from "@/data/product-pages";
 
 const { advance, sensitive, essential } = PRODUCT_PAGES;
@@ -19,10 +20,13 @@ export const Route = createFileRoute("/toothpaste")({
       {
         name: "description",
         content:
-          "Discover Totalflux SLS-free toothpastes for healthy smiles, fresh breath, and everyday cavity protection.",
+          "Five Totalflux SLS-free toothpastes for adults and children aged 3 and up: Advance, Sensitive, Essential, Kidoos Advance and Kidoos Plus.",
       },
       { property: "og:title", content: "Totalflux Toothpaste | Complete Oral Care" },
-      { property: "og:description", content: "SLS-free oral care for every mouth and every age." },
+      {
+        property: "og:description",
+        content: "Five SLS-free toothpastes for adults and children aged 3 and up.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -38,12 +42,14 @@ function ToothpastePage() {
   return (
     <main>
       <Hero transitionColor={SEAM_COLOR} />
-      {/* Target of the hero's "Explore Our Range" button and the navbar's "Toothpaste" link */}
+      {/* Target of the hero's "Explore the range" button and the navbar's "Toothpaste" link */}
       <div id="toothpaste">
         <ProductRange products={[advance, sensitive, essential]} topColor={SEAM_COLOR} />
         {/* Starts from Essential's colour, where the range above ends */}
         <KidoosSection topColor={essential.colors.bg} />
       </div>
+      {/* Starts from the colour the Kidoos section ends with */}
+      <WhereToBuySection topColor="#F4F6FF" />
       <Footer />
     </main>
   );

@@ -13,7 +13,6 @@ import {
 import { ArrowDown, ShieldCheck, ShoppingBag } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { mouthwash, type HomeProduct } from "@/data/home";
-import { AMAZON_STORE, EXTERNAL } from "@/data/links";
 import { ORALBRUSH } from "@/data/oralbrush";
 import { cn } from "@/lib/utils";
 
@@ -183,7 +182,7 @@ export function HomeHero() {
                 strokeWidth={2}
                 aria-hidden="true"
               />
-              SLS Free | Clinically Tested
+              Every toothpaste SLS-free
             </motion.p>
             <motion.h1
               variants={word}
@@ -206,8 +205,8 @@ export function HomeHero() {
               variants={word}
               className="mt-2 max-w-4xl text-base text-slate-600 sm:text-lg"
             >
-              Toothpaste, Mouthwash and the Oralbrush: everything for a healthy mouth, for every
-              age.
+              Toothpastes, mouthwashes and the Oralbrush: daily oral care for the whole family, from
+              age 3 up.
             </motion.p>
             <motion.div
               variants={word}
@@ -221,9 +220,9 @@ export function HomeHero() {
                 Explore the range
                 <ArrowDown className="size-4" aria-hidden="true" />
               </a>
+              {/* Down to the Where to buy band at the foot of the page */}
               <a
-                href={AMAZON_STORE}
-                {...EXTERNAL}
+                href="#where-to-buy"
                 className={cn(
                   GLASS,
                   "inline-flex items-center gap-2 rounded-full px-5 py-3 text-base font-semibold transition-colors hover:bg-white/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
@@ -232,7 +231,6 @@ export function HomeHero() {
               >
                 <ShoppingBag className="size-4" aria-hidden="true" />
                 Where to Buy
-                <span className="sr-only"> (Amazon, opens in a new tab)</span>
               </a>
             </motion.div>
           </motion.div>
@@ -250,7 +248,7 @@ export function HomeHero() {
 
             {/* The range, standing together on the platform */}
             <motion.ul
-              aria-label="The Totalflux range"
+              aria-label="The Totalflux range of toothpastes, mouthwashes and the Oralbrush"
               style={{ x: stageX }}
               className="absolute inset-x-0 bottom-[6%] flex items-end justify-center gap-[2.5cqw] lg:gap-[2.2cqw]"
             >

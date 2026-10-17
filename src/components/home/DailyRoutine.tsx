@@ -49,7 +49,8 @@ export function DailyRoutine({ topColor }: { topColor: string }) {
               Brush. Paste. Rinse.
             </h2>
             <p className="mx-auto mt-4 max-w-xl text-base text-slate-600 sm:text-lg">
-              Three steps, morning and night, for complete care of teeth, gums and tongue.
+              Brush morning and night, clean your tongue, and add a daily rinse: a simple routine
+              for teeth, gums and tongue.
             </p>
           </motion.div>
 

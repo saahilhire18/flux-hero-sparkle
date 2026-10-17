@@ -3,14 +3,14 @@ import { Facebook, Instagram, Mail, MapPin, Phone, Youtube } from "lucide-react"
 import { AMAZON_STORE, EXTERNAL, SOCIAL_PROFILES } from "@/data/links";
 
 const PRODUCT_LINKS = [
-  { label: "Mouthwash", href: "/mouthwash" },
   { label: "Toothpaste", href: "/toothpaste" },
+  { label: "Mouthwash", href: "/mouthwash" },
   { label: "Oralbrush", href: "/oralbrush" },
 ];
 /** external: it leaves the site (a new tab). */
 const COMPANY_LINKS = [
   { label: "Contact Us", href: "#contact-us", external: false },
-  { label: "Buy Online", href: AMAZON_STORE, external: true },
+  { label: "Buy on Amazon", href: AMAZON_STORE, external: true },
 ];
 const SOCIAL_LINKS = [
   { label: "Facebook", icon: Facebook, href: SOCIAL_PROFILES.facebook },

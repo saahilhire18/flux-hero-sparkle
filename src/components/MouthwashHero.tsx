@@ -264,11 +264,11 @@ function Bottle({
             className="rounded-md px-2 py-1 text-[0.6rem] font-bold uppercase tracking-[0.18em] text-white shadow-[0_6px_14px_-8px_rgba(15,40,80,0.6)] sm:px-2.5 sm:text-[0.68rem] sm:tracking-[0.2em]"
             style={{ backgroundColor: colors.ink }}
           >
-            {mouthwash.name}
+            {fullName(mouthwash)}
           </span>
         )}
         <span className="text-[0.68rem] font-medium leading-tight text-slate-600 sm:text-xs">
-          {mouthwash.benefit}
+          {mouthwash.descriptor}
         </span>
       </motion.div>
     </li>
@@ -276,10 +276,9 @@ function Bottle({
 }
 
 /**
- * The mouthwash page's hero: the booklet's promise ("Advanced oral care. Clinically proven.")
- * over the whole range, every bottle standing on a glass platform (clicking one goes to its
+ * The mouthwash page's hero: "A rinse for every routine." over the whole range, every bottle standing on a glass platform (clicking one goes to its
  * details in the range section below). A filter highlights the
- * alcohol-based, alcohol-free or medicinal ones. The layers move at different depths as the
+ * alcohol-based or alcohol-free ones. The layers move at different depths as the
  * mouse moves and as the page scrolls (parallax).
  */
 export function MouthwashHero() {
@@ -371,7 +370,7 @@ export function MouthwashHero() {
                 strokeWidth={2}
                 aria-hidden="true"
               />
-              100% Secure | Clinically Tested
+              Four alcohol-free options
             </motion.p>
 
             <motion.h1
@@ -383,7 +382,7 @@ export function MouthwashHero() {
               // Scales with the screen's width and, on short screens, its height
               className="mt-4 text-[clamp(2.2rem,min(3.9vw,7vh),3.75rem)] font-black leading-[1.03] tracking-tight text-primary"
             >
-              <span className="block">Advanced Oral Care.</span>
+              <span className="block">A rinse for</span>
               <span
                 className="block bg-clip-text pb-[0.08em] text-transparent"
                 style={{
@@ -391,7 +390,7 @@ export function MouthwashHero() {
                   filter: "drop-shadow(0 6px 10px rgba(23,110,140,0.22))",
                 }}
               >
-                Clinically Proven.
+                every routine.
               </span>
             </motion.h1>
 
@@ -402,8 +401,8 @@ export function MouthwashHero() {
               }}
               className="mt-2 max-w-xl text-base text-slate-600 sm:text-lg"
             >
-              Kills <strong className="font-bold text-primary">99.9%</strong> of oral germs for a
-              healthier mouth.
+              Minty, herbal, sensitive and kids’ formulas, including four alcohol-free rinses with
+              fluoride.
             </motion.p>
 
             <motion.div

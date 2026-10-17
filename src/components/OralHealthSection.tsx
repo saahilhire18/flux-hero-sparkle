@@ -9,10 +9,11 @@ import {
   useScroll,
   useTransform,
 } from "motion/react";
-import { ArrowUp, Laugh, ShieldCheck, Wind } from "lucide-react";
-import { BrandName } from "@/components/BrandName";
+import { Link } from "@tanstack/react-router";
+import { ArrowRight, CalendarCheck, Laugh, Wind } from "lucide-react";
 import { ToothSparkle } from "@/components/icons/Tooth";
 import { OrbitCircles, OrbitFrame, type OrbitItem } from "@/components/Orbit";
+import { MOUTHWASHES } from "@/data/mouthwash";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -29,25 +30,30 @@ const reveal = (delay = 0) =>
     transition: { duration: 0.7, delay, ease: EASE },
   }) as const;
 
-/** The booklet's two figures, as it words them, with its sources. */
-const MAIN_STAT = {
-  value: 90,
-  text: "of Indians aged 15–49 suffer from tooth decay.",
-  source: "National Oral Health Survey & Fluoride Mapping, 2021",
-};
-const SECOND_STAT = {
-  value: 48,
-  text: "of Indians above the age of 35 suffer from oral cavity issues, according to a WHO report.",
-  source:
-    "Multicentric study, Director of Health Services, Ministry of Health and Family Welfare, Government of India & WHO Collaboration Programme",
-};
+type Figure = { value: number; text: string; source: string };
 
-/** The booklet's back-cover promises, set around the orbit, each icon in its own colour. */
+/**
+ * The two figures. The booklet's (90% and 48%+) are withdrawn: the website content audit of
+ * 17 October 2026 found them contradicted or unsourced. Its replacements, from Totalflux's
+ * Scientific Detailer, wait for their full citations (audit Q-06):
+ * - main: 54, "of people in India have tooth decay."
+ * - second: 64.9, "of Indian adults aged 35–44 have experienced tooth decay."
+ * Until then there are none, and the orbit shows the alcohol-free rinses instead.
+ */
+const FIGURES = null as { main: Figure; second: Figure } | null;
+
+/** In the orbit while there are no figures: three of the alcohol-free rinses. */
+const TRIO = ["neem", "sensitive", "kidoos"].flatMap((id) => {
+  const found = MOUTHWASHES.find((each) => each.id === id);
+  return found ? [found] : [];
+});
+
+/** The range's promises (the booklet's back cover, as the audit words them), around the orbit. */
 const PROMISES: OrbitItem[] = [
-  { label: "Safe for Daily Use", icon: ShieldCheck, color: "#2B6CB0" },
-  { label: "Gently Reduces Bad Breath", icon: Wind, color: TEAL },
-  { label: "Sensitivity Relief Formula", icon: ToothSparkle, color: "#2E8B57" },
-  { label: "Kid-Friendly Taste & Fluoride", icon: Laugh, color: "#B83B72" },
+  { label: "Made for daily use", icon: CalendarCheck, color: "#2B6CB0" },
+  { label: "Gently reduces bad breath", icon: Wind, color: TEAL },
+  { label: "Sensitive-teeth formula", icon: ToothSparkle, color: "#2E8B57" },
+  { label: "Kids’ rinse for ages 6+", icon: Laugh, color: "#B83B72" },
 ];
 
 /**
@@ -138,24 +144,23 @@ function ProgressRing({
 }
 
 /**
- * The close of a product page, from the booklet, staged like the showcase above it: the
- * same turning orbit and glass disc, with the headline figure (90%) inside, its ring filling
- * and the number counting up as it comes into view, and the range's four promises in glass
- * circles around it. Beside it: why oral health matters, the second figure, "Let's change the
- * stats!" and a closing line. Bubbles rise behind.
+ * The close of the mouthwash page, staged like the showcase above it: the same turning orbit
+ * and glass disc, with the headline figure inside (its ring filling and the number counting
+ * up as it comes into view) or, while there are no figures, three of the rinses; the range's
+ * four promises in glass circles around it. Beside it: why daily oral care matters, the second
+ * figure (when there is one), "Let's change the stats!" and a link to "What does your smile
+ * need?" on the home page. Bubbles rise behind.
  * topColor: the colour above it, which it starts from. promises and closing: the range's own
- * (the mouthwash booklet's back cover by default). rangeHref: where "Explore the range" goes.
+ * (the mouthwash booklet's back cover by default).
  */
 export function OralHealthSection({
   topColor = "#E4F1F8",
   promises = PROMISES,
   closing,
-  rangeHref = "#range",
 }: {
   topColor?: string;
   promises?: readonly OrbitItem[];
   closing?: ReactNode;
-  rangeHref?: string;
 }) {
   const ref = useRef<HTMLElement>(null);
   const orbitRef = useRef<HTMLDivElement>(null);
@@ -226,7 +231,7 @@ export function OralHealthSection({
               id="oral-health-title"
               className="mt-5 text-[clamp(2.2rem,4.4vw,4rem)] font-black leading-[1] tracking-tight text-primary"
             >
-              The Silent Oral Health{" "}
+              Why daily oral care{" "}
               <span
                 className="bg-clip-text text-transparent"
                 style={{
@@ -234,48 +239,50 @@ export function OralHealthSection({
                   filter: "drop-shadow(0 6px 10px rgba(23,110,140,0.22))",
                 }}
               >
-                Epidemic.
+                matters.
               </span>
             </motion.h2>
             <motion.p
               {...reveal(0.16)}
               className="mx-auto mt-4 max-w-md text-base leading-7 text-slate-700 sm:text-lg lg:mx-0"
             >
-              Tooth decay is more than just cavities. Poor oral health is linked to heart disease,
-              systemic inflammation and oral cancer.
+              Healthy habits start at home: brush twice a day, keep up regular dental check-ups, and
+              choose products that suit your needs.
             </motion.p>
 
-            {/* The second figure: a small ring, in a glass pill */}
-            <motion.div
-              ref={figureRef}
-              {...reveal(0.22)}
-              className="mx-auto mt-6 flex max-w-md items-center gap-4 rounded-[1.75rem] border border-white/85 bg-white/55 p-3 pr-5 text-left shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_18px_40px_-26px_rgba(20,60,120,0.45)] backdrop-blur-md lg:mx-0"
-            >
-              <div className="relative size-20 shrink-0">
-                <ProgressRing
-                  value={SECOND_STAT.value}
-                  start={figureSeen}
-                  radius={40}
-                  width={9}
-                  id="second-stat-ring"
-                />
-                <p className="absolute inset-0 grid place-items-center text-lg font-black tracking-tight text-primary">
-                  <span aria-hidden="true">
-                    <CountUp to={SECOND_STAT.value} start={figureSeen} />
-                    %+
-                  </span>
-                  <span className="sr-only">More than {SECOND_STAT.value}%</span>
-                </p>
-              </div>
-              <div>
-                <p className="text-sm font-semibold leading-snug text-slate-800">
-                  {SECOND_STAT.text}
-                </p>
-                <p className="mt-1 text-[0.65rem] leading-snug text-slate-500">
-                  Source: {SECOND_STAT.source}
-                </p>
-              </div>
-            </motion.div>
+            {/* The second figure (when there is one): a small ring, in a glass pill */}
+            {FIGURES && (
+              <motion.div
+                ref={figureRef}
+                {...reveal(0.22)}
+                className="mx-auto mt-6 flex max-w-md items-center gap-4 rounded-[1.75rem] border border-white/85 bg-white/55 p-3 pr-5 text-left shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_18px_40px_-26px_rgba(20,60,120,0.45)] backdrop-blur-md lg:mx-0"
+              >
+                <div className="relative size-20 shrink-0">
+                  <ProgressRing
+                    value={FIGURES.second.value}
+                    start={figureSeen}
+                    radius={40}
+                    width={9}
+                    id="second-stat-ring"
+                  />
+                  <p className="absolute inset-0 grid place-items-center text-lg font-black tracking-tight text-primary">
+                    <span aria-hidden="true">
+                      <CountUp to={FIGURES.second.value} start={figureSeen} />
+                      %+
+                    </span>
+                    <span className="sr-only">More than {FIGURES.second.value}%</span>
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm font-semibold leading-snug text-slate-800">
+                    {FIGURES.second.text}
+                  </p>
+                  <p className="mt-1 text-[0.65rem] leading-snug text-slate-500">
+                    Source: {FIGURES.second.source}
+                  </p>
+                </div>
+              </motion.div>
+            )}
 
             <motion.p
               {...reveal(0.3)}
@@ -285,29 +292,25 @@ export function OralHealthSection({
                 filter: "drop-shadow(0 6px 10px rgba(23,110,140,0.22))",
               }}
             >
-              Let&apos;s change the stats!
+              Let’s change the stats!
             </motion.p>
 
-            {/* The booklet's closing line */}
+            {/* The closing line, and on to "What does your smile need?" on the home page */}
             <motion.div
               {...reveal(0.38)}
               className="mt-5 flex flex-col items-center gap-4 sm:flex-row lg:items-center"
             >
               <p className="max-w-sm text-base font-semibold leading-snug text-slate-700">
-                {closing ?? (
-                  <>
-                    Discover <BrandName className="font-bold text-primary" />
-                    &apos;s targeted solutions for complete oral hygiene.
-                  </>
-                )}
+                {closing ?? "Find the toothpaste and mouthwash that suit your needs."}
               </p>
-              <a
-                href={rangeHref}
+              <Link
+                to="/"
+                hash="match"
                 className="inline-flex shrink-0 items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-[0_16px_32px_-14px_rgba(15,40,80,0.55)] transition-transform duration-200 hover:scale-[1.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
               >
-                Explore the range
-                <ArrowUp className="size-4" aria-hidden="true" />
-              </a>
+                Find your match
+                <ArrowRight className="size-4" aria-hidden="true" />
+              </Link>
             </motion.div>
           </div>
 
@@ -321,37 +324,61 @@ export function OralHealthSection({
             className="relative mx-auto aspect-square w-full max-w-[26rem] [container-type:inline-size] sm:max-w-[32rem] lg:w-[min(100%,70svh,42rem)] lg:max-w-none"
           >
             <OrbitFrame glow="#9BD3DC" ink={NAVY} podium={false} discTop="50%" />
-            {/* The figure's ring, just inside the glass disc */}
-            <div className="absolute inset-[19%]">
-              <ProgressRing
-                value={MAIN_STAT.value}
-                start={orbitSeen}
-                radius={47}
-                width={2.6}
-                id="main-stat-ring"
-              />
-            </div>
-            <div className="absolute inset-[22%] flex flex-col items-center justify-center text-center">
-              <p
-                className="bg-clip-text font-black leading-none tracking-tight text-transparent"
-                style={{
-                  backgroundImage: GRADIENT,
-                  filter: `drop-shadow(0 8px 12px rgba(23,110,140,0.28))`,
-                  fontSize: "clamp(2.5rem, 16cqw, 6.5rem)",
-                }}
+            {FIGURES ? (
+              <>
+                {/* The figure's ring, just inside the glass disc */}
+                <div className="absolute inset-[19%]">
+                  <ProgressRing
+                    value={FIGURES.main.value}
+                    start={orbitSeen}
+                    radius={47}
+                    width={2.6}
+                    id="main-stat-ring"
+                  />
+                </div>
+                <div className="absolute inset-[22%] flex flex-col items-center justify-center text-center">
+                  <p
+                    className="bg-clip-text font-black leading-none tracking-tight text-transparent"
+                    style={{
+                      backgroundImage: GRADIENT,
+                      filter: `drop-shadow(0 8px 12px rgba(23,110,140,0.28))`,
+                      fontSize: "clamp(2.5rem, 16cqw, 6.5rem)",
+                    }}
+                  >
+                    <span aria-hidden="true">
+                      <CountUp to={FIGURES.main.value} start={orbitSeen} />%
+                    </span>
+                    <span className="sr-only">{FIGURES.main.value}%</span>
+                  </p>
+                  <p className="mt-2 max-w-[85%] text-[0.8rem] font-semibold leading-snug text-slate-800 sm:text-sm">
+                    {FIGURES.main.text}
+                  </p>
+                  <p className="mt-1.5 max-w-[80%] text-[0.6rem] leading-snug text-slate-500 sm:text-[0.65rem]">
+                    Source: {FIGURES.main.source}
+                  </p>
+                </div>
+              </>
+            ) : (
+              // Three of the alcohol-free rinses, standing in the glass disc
+              <div
+                aria-hidden="true"
+                className="absolute inset-[24%] flex items-end justify-center gap-[2%] pb-[6%]"
               >
-                <span aria-hidden="true">
-                  <CountUp to={MAIN_STAT.value} start={orbitSeen} />%
-                </span>
-                <span className="sr-only">{MAIN_STAT.value}%</span>
-              </p>
-              <p className="mt-2 max-w-[85%] text-[0.8rem] font-semibold leading-snug text-slate-800 sm:text-sm">
-                {MAIN_STAT.text}
-              </p>
-              <p className="mt-1.5 max-w-[80%] text-[0.6rem] leading-snug text-slate-500 sm:text-[0.65rem]">
-                Source: {MAIN_STAT.source}
-              </p>
-            </div>
+                {TRIO.map((rinse, i) => (
+                  <img
+                    key={rinse.id}
+                    src={rinse.image.src}
+                    width={rinse.image.width}
+                    height={rinse.image.height}
+                    alt=""
+                    loading="lazy"
+                    draggable={false}
+                    className={`w-auto select-none object-contain drop-shadow-[0_18px_18px_rgba(20,50,90,0.28)] ${i === 1 ? "relative z-10 h-[88%]" : "h-[74%]"}`}
+                    style={{ aspectRatio: `${rinse.image.width} / ${rinse.image.height}` }}
+                  />
+                ))}
+              </div>
+            )}
             <OrbitCircles items={promises} ink={NAVY} label="Our promises" />
           </motion.div>
         </div>
