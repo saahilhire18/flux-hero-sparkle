@@ -100,8 +100,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      // Comfortaa: the closest free match to the Totalflux logo's lettering (font-brand).
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Comfortaa:wght@700&family=Poppins:wght@400;500;600;700;800&display=swap" },
+      // Comfortaa: the closest free match to the Totalflux logo's lettering (font-brand). The
+      // site's own typeface, Cooper Hewitt, is served with the site (styles.css).
+      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Comfortaa:wght@700&display=swap" },
       // The logo's "T" on its navy (made from public/logo-transparent.png)
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
       { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },

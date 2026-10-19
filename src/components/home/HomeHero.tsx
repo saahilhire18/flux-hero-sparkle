@@ -191,8 +191,9 @@ export function HomeHero() {
               style={{ color: NAVY }}
             >
               Your journey to a
+              {/* A little apart from the first line */}
               <span
-                className="block bg-clip-text pb-[0.08em] text-transparent"
+                className="mt-[0.32em] block bg-clip-text pb-[0.08em] text-transparent"
                 style={{
                   backgroundImage: `linear-gradient(90deg, ${TEAL} 0%, #2B6CB0 55%, ${NAVY} 100%)`,
                   filter: "drop-shadow(0 6px 10px rgba(23,110,140,0.22))",

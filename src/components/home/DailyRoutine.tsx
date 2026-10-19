@@ -1,6 +1,6 @@
 // components/home/DailyRoutine.tsx
 import { Link } from "@tanstack/react-router";
-import { motion, MotionConfig } from "motion/react";
+import { motion, MotionConfig, useReducedMotion, type Variants } from "motion/react";
 import { ArrowRight } from "lucide-react";
 import { ROUTINE } from "@/data/home";
 
@@ -16,6 +16,19 @@ const LEAN = [-8, 6, 0];
 /** The line joining the steps, through the three circles' middles. */
 const LINE = "M0 50 C 100 0, 200 100, 300 50 S 500 0, 600 50";
 
+/** Each step rises into place, one after another (custom: its index). */
+const stepVariants: Variants = {
+  hidden: { opacity: 0, y: 50 },
+  show: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.8, delay: i * 0.15, ease: EASE },
+  }),
+};
+
+/** When the line starts drawing (s): once the last step has nearly landed. */
+const LINE_DELAY = 0.15 * (ROUTINE.length - 1) + 0.6;
+
 /**
  * The daily routine in three steps (brush and scrape, brush with your toothpaste, rinse), each
  * product in a glass circle with a slowly turning dashed ring, joined by a line running from
@@ -23,6 +36,19 @@ const LINE = "M0 50 C 100 0, 200 100, 300 50 S 500 0, 600 50";
  * Each step links to its range. topColor: the colour above it, which its background starts from.
  */
 export function DailyRoutine({ topColor }: { topColor: string }) {
+  const reduceMotion = useReducedMotion();
+  // The line drawing from the brush to the mouthwash, after the steps (a clip widening over
+  // it: the line's own pathLength repeats in dashes with a non-scaling stroke)
+  const lineVariants: Variants = {
+    hidden: { width: 0 },
+    show: {
+      width: 640,
+      transition: reduceMotion
+        ? { duration: 0 }
+        : { duration: 1.2, delay: LINE_DELAY, ease: [0.45, 0, 0.25, 1] },
+    },
+  };
+
   return (
     <MotionConfig reducedMotion="user">
       <section
@@ -54,7 +80,13 @@ export function DailyRoutine({ topColor }: { topColor: string }) {
             </p>
           </motion.div>
 
-          <div className="relative mt-14">
+          {/* The steps and the line come in together: the steps first, then the line */}
+          <motion.div
+            className="relative mt-14"
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true, amount: 0.3 }}
+          >
             {/* The line joining the steps (wide screens), through the circles' middles */}
             <svg
               aria-hidden="true"
@@ -64,6 +96,7 @@ export function DailyRoutine({ topColor }: { topColor: string }) {
             >
               <path
                 d={LINE}
+                clipPath="url(#routine-line-reveal)"
                 fill="none"
                 stroke="url(#routine-line)"
                 strokeWidth="3"
@@ -71,6 +104,9 @@ export function DailyRoutine({ topColor }: { topColor: string }) {
                 vectorEffect="non-scaling-stroke"
               />
               <defs>
+                <clipPath id="routine-line-reveal">
+                  <motion.rect x={-20} y={-50} height={200} variants={lineVariants} />
+                </clipPath>
                 <linearGradient id="routine-line" x1="0" x2="1" y1="0" y2="0">
                   <stop offset="0" stopColor="#178AA0" />
                   <stop offset="1" stopColor={NAVY} />
@@ -82,15 +118,13 @@ export function DailyRoutine({ topColor }: { topColor: string }) {
               {ROUTINE.map(({ step, title, text, product, link }, i) => (
                 <motion.li
                   key={step}
-                  initial={{ opacity: 0, y: 50 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, amount: 0.4 }}
-                  transition={{ duration: 0.8, delay: i * 0.15, ease: EASE }}
+                  custom={i}
+                  variants={stepVariants}
                   className="group flex flex-col items-center text-center"
                 >
                   {/* The product in its glass circle */}
                   <div className="relative size-[var(--circle)]">
-                    <div className="absolute inset-0 rounded-full border border-white/85 bg-white/45 shadow-[inset_0_2px_14px_rgba(255,255,255,0.9),0_24px_50px_-28px_rgba(20,60,120,0.5)] backdrop-blur-md" />
+                    <div className="absolute inset-0 rounded-full border border-white/85 bg-white/45 shadow-[inset_0_2px_14px_rgba(255,255,255,0.9),0_24px_50px_-28px_rgba(20,60,120,0.5)] backdrop-blur-[3px]" />
                     <svg
                       aria-hidden="true"
                       viewBox="0 0 100 100"
@@ -150,7 +184,7 @@ export function DailyRoutine({ topColor }: { topColor: string }) {
                 </motion.li>
               ))}
             </ol>
-          </div>
+          </motion.div>
         </div>
       </section>
     </MotionConfig>

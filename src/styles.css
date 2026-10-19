@@ -1,6 +1,16 @@
 @import "tailwindcss" source(none);
 @source "../src";
 @import "tw-animate-css";
+/* Cooper Hewitt, the site's typeface (SIL Open Font License), served from the site itself:
+   every weight from Thin (100) to Heavy (800); font-black (900) uses Heavy */
+@import "@fontsource/cooper-hewitt/100.css";
+@import "@fontsource/cooper-hewitt/200.css";
+@import "@fontsource/cooper-hewitt/300.css";
+@import "@fontsource/cooper-hewitt/400.css";
+@import "@fontsource/cooper-hewitt/500.css";
+@import "@fontsource/cooper-hewitt/600.css";
+@import "@fontsource/cooper-hewitt/700.css";
+@import "@fontsource/cooper-hewitt/800.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -19,9 +29,11 @@
  */
 
 @theme inline {
-  --font-sans: "Poppins", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Cooper Hewitt", ui-sans-serif, system-ui, sans-serif;
+  /* The small spaced-out labels (eyebrows, taglines): the same typeface */
+  --font-mono: "Cooper Hewitt", ui-sans-serif, system-ui, sans-serif;
   /* The "Totalflux" name, lettered like the logo */
-  --font-brand: "Comfortaa", "Poppins", ui-sans-serif, system-ui, sans-serif;
+  --font-brand: "Comfortaa", "Cooper Hewitt", ui-sans-serif, system-ui, sans-serif;
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
