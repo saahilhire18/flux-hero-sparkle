@@ -6,6 +6,7 @@ import { ArrowRight, Check } from "lucide-react";
 import { BrandName } from "@/components/BrandName";
 import { OrbitFrame } from "@/components/Orbit";
 import { NEEDS, type Need, type Pick } from "@/data/home";
+import { lazyImage } from "@/lib/images";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 const NAVY = "#24467A";
@@ -68,11 +69,10 @@ function PickRow({ pick, inBoth, ink }: { pick: Pick; inBoth: string[]; ink: str
     >
       <span className="relative h-36 w-[5.5rem] shrink-0 rounded-2xl bg-white/70">
         <img
-          src={product.image.src}
+          {...lazyImage(product.image, "88px")}
           width={product.image.width}
           height={product.image.height}
           alt=""
-          loading="lazy"
           draggable={false}
           className="absolute inset-0 m-auto h-[90%] w-auto select-none object-contain drop-shadow-[0_10px_10px_rgba(20,50,90,0.25)]"
           style={{ aspectRatio: `${product.image.width} / ${product.image.height}` }}
@@ -115,7 +115,7 @@ function PickRow({ pick, inBoth, ink }: { pick: Pick; inBoth: string[]; ink: str
         <Link
           to={product.to}
           {...(product.hash ? { hash: product.hash } : {})}
-          className="mt-1.5 inline-flex items-center gap-1.5 rounded-full text-sm font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="mt-1 inline-flex min-h-6 items-center gap-1.5 rounded-full text-sm font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           style={{ color: product.ink }}
         >
           See {product.name}
@@ -157,7 +157,7 @@ function Pair({ need }: { need: Need }) {
           <motion.img
             custom={0}
             variants={productVariants}
-            src={tube.image.src}
+            {...lazyImage(tube.image, "20vw")}
             width={tube.image.width}
             height={tube.image.height}
             alt={`Totalflux ${tube.name} toothpaste`}
@@ -168,7 +168,7 @@ function Pair({ need }: { need: Need }) {
           <motion.img
             custom={0.15}
             variants={productVariants}
-            src={bottle.image.src}
+            {...lazyImage(bottle.image, "20vw")}
             width={bottle.image.width}
             height={bottle.image.height}
             alt={`Totalflux ${bottle.name} mouthwash`}

@@ -13,10 +13,15 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { SHARE_IMAGE } from "@/data/site";
+import { Navbar } from "@/components/Navbar";
 
 function NotFoundComponent() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
+    <main
+      id="main"
+      tabIndex={-1}
+      className="flex min-h-screen items-center justify-center bg-background px-4 outline-none"
+    >
       <div className="max-w-md text-center">
         <h1 className="text-7xl font-bold text-foreground">404</h1>
         <h2 className="mt-4 text-xl font-semibold text-foreground">Page not found</h2>
@@ -32,7 +37,7 @@ function NotFoundComponent() {
           </Link>
         </div>
       </div>
-    </div>
+    </main>
   );
 }
 
@@ -44,7 +49,11 @@ function ErrorComponent({ error, reset }: ErrorComponentProps) {
   }, [error]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
+    <main
+      id="main"
+      tabIndex={-1}
+      className="flex min-h-screen items-center justify-center bg-background px-4 outline-none"
+    >
       <div className="max-w-md text-center">
         <h1 className="text-xl font-semibold tracking-tight text-foreground">
           This page didn't load
@@ -70,7 +79,7 @@ function ErrorComponent({ error, reset }: ErrorComponentProps) {
           </a>
         </div>
       </div>
-    </div>
+    </main>
   );
 }
 
@@ -98,11 +107,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: appCss,
       },
-      { rel: "preconnect", href: "https://fonts.googleapis.com" },
-      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      // Comfortaa: the closest free match to the Totalflux logo's lettering (font-brand). The
-      // site's own typeface, Cooper Hewitt, is served with the site (styles.css).
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Comfortaa:wght@700&display=swap" },
+      // The fonts (Cooper Hewitt, and Comfortaa for the "Totalflux" name) are served with the
+      // site, from styles.css
       // The logo's "T" on its navy (made from public/logo-transparent.png)
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
       { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
@@ -116,7 +122,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en-IN">
       <head>
         <HeadContent />
       </head>
@@ -133,6 +139,16 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
+      {/* For keyboard and screen-reader users: past the navbar, straight to the page. Kept just
+          above the screen, and slides down when Tab reaches it */}
+      <a
+        href="#main"
+        className="fixed left-4 top-4 z-[60] -translate-y-[calc(100%+2rem)] rounded-full bg-white px-5 py-2.5 font-semibold text-primary shadow-lg transition-transform focus:translate-y-0 focus:outline-none focus:ring-2 focus:ring-ring"
+      >
+        Skip to content
+      </a>
+      {/* One navbar for every page, above everything as the page scrolls */}
+      <Navbar />
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
     </QueryClientProvider>

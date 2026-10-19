@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- The site's pages, for search engines. The address is the one the site is published at
+     (SITE_URL in src/data/site.ts): keep the two the same. -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://totalflux-me.com/</loc></url>
+  <url><loc>https://totalflux-me.com/toothpaste</loc></url>
+  <url><loc>https://totalflux-me.com/mouthwash</loc></url>
+  <url><loc>https://totalflux-me.com/oralbrush</loc></url>
+</urlset>

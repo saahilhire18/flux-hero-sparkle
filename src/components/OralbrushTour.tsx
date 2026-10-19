@@ -14,6 +14,7 @@ import { OrbitFrame } from "@/components/Orbit";
 import { useStepGestures } from "@/hooks/use-step-gestures";
 import { useWideScreen } from "@/hooks/use-wide-screen";
 import { BRUSH_FEATURES, ORALBRUSH, type BrushFeature } from "@/data/oralbrush";
+import { lazyImage } from "@/lib/images";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 const COUNT = BRUSH_FEATURES.length;
@@ -80,7 +81,7 @@ function BrushPhoto({ feature }: { feature: BrushFeature }) {
         }}
       >
         <img
-          src={image.src}
+          {...lazyImage(image, "30vw")}
           width={image.width}
           height={image.height}
           alt=""

@@ -14,6 +14,7 @@ import { ArrowRight, CalendarCheck, Laugh, Wind } from "lucide-react";
 import { ToothSparkle } from "@/components/icons/Tooth";
 import { OrbitCircles, OrbitFrame, type OrbitItem } from "@/components/Orbit";
 import { MOUTHWASHES } from "@/data/mouthwash";
+import { lazyImage } from "@/lib/images";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -284,16 +285,19 @@ export function OralHealthSection({
               </motion.div>
             )}
 
-            <motion.p
-              {...reveal(0.3)}
-              className="mt-6 bg-clip-text pb-[0.06em] text-3xl font-black tracking-tight text-transparent sm:text-4xl"
-              style={{
-                backgroundImage: GRADIENT,
-                filter: "drop-shadow(0 6px 10px rgba(23,110,140,0.22))",
-              }}
-            >
-              Let’s change the stats!
-            </motion.p>
+            {/* Only with the figures it speaks of (back when their citations are in) */}
+            {FIGURES && (
+              <motion.p
+                {...reveal(0.3)}
+                className="mt-6 bg-clip-text pb-[0.06em] text-3xl font-black tracking-tight text-transparent sm:text-4xl"
+                style={{
+                  backgroundImage: GRADIENT,
+                  filter: "drop-shadow(0 6px 10px rgba(23,110,140,0.22))",
+                }}
+              >
+                Let’s change the stats!
+              </motion.p>
+            )}
 
             {/* The closing line, and on to "What does your smile need?" on the home page */}
             <motion.div
@@ -367,11 +371,10 @@ export function OralHealthSection({
                 {TRIO.map((rinse, i) => (
                   <img
                     key={rinse.id}
-                    src={rinse.image.src}
+                    {...lazyImage(rinse.image, "10vw")}
                     width={rinse.image.width}
                     height={rinse.image.height}
                     alt=""
-                    loading="lazy"
                     draggable={false}
                     className={`w-auto select-none object-contain drop-shadow-[0_18px_18px_rgba(20,50,90,0.28)] ${i === 1 ? "relative z-10 h-[88%]" : "h-[74%]"}`}
                     style={{ aspectRatio: `${rinse.image.width} / ${rinse.image.height}` }}

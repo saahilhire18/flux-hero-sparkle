@@ -1,5 +1,5 @@
 // components/home/HomeHero.tsx
-import { type PointerEvent } from "react";
+import { type CSSProperties, type PointerEvent } from "react";
 import { Link } from "@tanstack/react-router";
 import {
   motion,
@@ -8,15 +8,13 @@ import {
   useReducedMotion,
   useSpring,
   useTransform,
-  type Variants,
 } from "motion/react";
 import { ArrowDown, ShieldCheck, ShoppingBag } from "lucide-react";
-import { Navbar } from "@/components/Navbar";
 import { mouthwash, type HomeProduct } from "@/data/home";
 import { ORALBRUSH } from "@/data/oralbrush";
 import { cn } from "@/lib/utils";
+import { eagerImage } from "@/lib/images";
 
-const EASE = [0.22, 1, 0.36, 1] as const;
 const NAVY = "#24467A";
 const TEAL = "#178AA0";
 
@@ -110,14 +108,8 @@ const LINEUP: {
   },
 ];
 
-const words: Variants = {
-  hidden: {},
-  show: { transition: { staggerChildren: 0.1, delayChildren: 0.15 } },
-};
-const word: Variants = {
-  hidden: { opacity: 0, y: 22 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.75, ease: EASE } },
-};
+/** The words' entrance (styles.css, .enter-rise): each rises in a beat after the one before. */
+const rise = (i: number) => ({ "--enter-delay": `${0.15 + i * 0.1}s` }) as CSSProperties;
 
 /**
  * The home page's hero, in the same calm style as the mouthwash and toothpaste pages': the
@@ -141,9 +133,6 @@ export function HomeHero() {
 
   return (
     <MotionConfig reducedMotion="user">
-      {/* Outside the hero, so it stays above every section as the page scrolls (inside, the
-          hero's own layering would let the sections below paint over it) */}
-      <Navbar />
       <section
         id="top"
         aria-labelledby="home-title"
@@ -162,19 +151,15 @@ export function HomeHero() {
 
         <div className="relative mx-auto flex w-full max-w-[90rem] flex-1 flex-col justify-center px-5 pb-6 pt-[5.25rem] lg:justify-start sm:px-8 lg:min-h-0 lg:px-12 lg:pb-4">
           {/* The words */}
-          <motion.div
-            variants={words}
-            initial="hidden"
-            animate="show"
-            className="relative z-20 mx-auto flex max-w-4xl flex-col items-center text-center"
-          >
+          {/* Rising in with CSS, so it shows as soon as the page paints */}
+          <div className="relative z-20 mx-auto flex max-w-4xl flex-col items-center text-center">
             {/* The promise, a shine sweeping across it every few seconds (styles.css) */}
-            <motion.p
-              variants={word}
+            <p
+              style={rise(0)}
               className={cn(
                 GLASS,
                 // A soft teal-to-blue tint, so the white light shows as it passes
-                "pill-shine inline-flex items-center gap-2 rounded-full bg-[linear-gradient(100deg,rgba(214,240,242,0.92)_0%,rgba(226,236,250,0.92)_100%)] px-3.5 py-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-primary",
+                "enter-rise pill-shine inline-flex items-center gap-2 rounded-full bg-[linear-gradient(100deg,rgba(214,240,242,0.92)_0%,rgba(226,236,250,0.92)_100%)] px-3.5 py-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-primary",
               )}
             >
               <ShieldCheck
@@ -183,15 +168,13 @@ export function HomeHero() {
                 aria-hidden="true"
               />
               Every toothpaste SLS-free
-            </motion.p>
-            <motion.h1
-              variants={word}
+            </p>
+            <h1
               id="home-title"
-              className="mt-3 text-[clamp(2rem,min(3.4vw,6vh),3.25rem)] font-black leading-[1.03] tracking-tight"
-              style={{ color: NAVY }}
+              className="enter-rise mt-3 text-[clamp(2rem,min(3.4vw,6vh),3.25rem)] font-black leading-[1.03] tracking-tight"
+              style={{ color: NAVY, ...rise(1) }}
             >
-              Your journey to a
-              {/* A little apart from the first line */}
+              Your journey to a{/* A little apart from the first line */}
               <span
                 className="mt-[0.32em] block bg-clip-text pb-[0.08em] text-transparent"
                 style={{
@@ -201,17 +184,17 @@ export function HomeHero() {
               >
                 better smile.
               </span>
-            </motion.h1>
-            <motion.p
-              variants={word}
-              className="mt-2 max-w-4xl text-base text-slate-600 sm:text-lg"
+            </h1>
+            <p
+              style={rise(2)}
+              className="enter-rise mt-2 max-w-4xl text-base text-slate-600 sm:text-lg"
             >
               Toothpastes, mouthwashes and the Oralbrush: daily oral care for the whole family, from
               age 3 up.
-            </motion.p>
-            <motion.div
-              variants={word}
-              className="mt-4 flex flex-wrap items-center justify-center gap-3"
+            </p>
+            <div
+              style={rise(3)}
+              className="enter-rise mt-4 flex flex-wrap items-center justify-center gap-3"
             >
               <a
                 href="#ranges"
@@ -233,8 +216,8 @@ export function HomeHero() {
                 <ShoppingBag className="size-4" aria-hidden="true" />
                 Where to Buy
               </a>
-            </motion.div>
-          </motion.div>
+            </div>
+          </div>
 
           {/* The range on its platform. A size container: the products size themselves from it */}
           <div className="relative mt-6 h-[15rem] [container-type:size] sm:h-[24rem] lg:mt-1 lg:h-auto lg:min-h-0 lg:flex-1">
@@ -257,12 +240,17 @@ export function HomeHero() {
                 const fromCentre = Math.abs(i - (LINEUP.length - 1) / 2);
                 const { image } = item.product;
                 return (
-                  <motion.li
+                  <li
                     key={image.src}
-                    initial={{ opacity: 0, y: 70 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 1, delay: 0.45 + fromCentre * 0.14, ease: EASE }}
-                    className={cn("relative", item.wideOnly && "hidden lg:block")}
+                    // Rising into place, from the middle out (CSS, as the words)
+                    style={
+                      {
+                        "--enter-y": "70px",
+                        "--enter-duration": "1s",
+                        "--enter-delay": `${0.45 + fromCentre * 0.14}s`,
+                      } as CSSProperties
+                    }
+                    className={cn("enter-rise relative", item.wideOnly && "hidden lg:block")}
                   >
                     {/* A soft shadow where it stands (first, so the product stands over it) */}
                     <span
@@ -281,11 +269,19 @@ export function HomeHero() {
                       )}
                     >
                       <img
-                        src={image.src}
+                        {...eagerImage(
+                          image,
+                          item.product === BOXES
+                            ? "(max-width: 1023px) 48vw, 39vw"
+                            : item.product === BRUSH_OPEN
+                              ? "(max-width: 1023px) 16vw, 13vw"
+                              : "(max-width: 1023px) 10vw, 6vw",
+                        )}
                         width={image.width}
                         height={image.height}
                         alt=""
                         draggable={false}
+                        fetchPriority={item.product === BOXES ? "high" : undefined}
                         className={cn(
                           item.height,
                           "w-auto max-w-none select-none object-contain transition-[translate] duration-500 ease-out group-hover:-translate-y-2",
@@ -295,7 +291,7 @@ export function HomeHero() {
                         style={{ aspectRatio: `${image.width} / ${image.height}` }}
                       />
                     </Link>
-                  </motion.li>
+                  </li>
                 );
               })}
             </motion.ul>

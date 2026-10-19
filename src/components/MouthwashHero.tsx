@@ -12,7 +12,6 @@ import {
   type MotionValue,
 } from "motion/react";
 import { ShieldCheck } from "lucide-react";
-import { Navbar } from "@/components/Navbar";
 import {
   fullName,
   MOUTHWASHES,
@@ -21,6 +20,7 @@ import {
   type MouthwashGroup,
 } from "@/data/mouthwash";
 import { cn } from "@/lib/utils";
+import { eagerImage } from "@/lib/images";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -161,6 +161,12 @@ function Bottle({
   const arc = ARC[index] ?? { lift: "0%", scale: 1 };
   // 0 in the middle, growing outwards: they rise in from the middle out
   const fromCentre = Math.max(0, Math.abs(index - (MOUTHWASHES.length - 1) / 2) - 0.5);
+  // Its name tag comes in after it, from the middle out (CSS, as the bottles)
+  const tagEnter = {
+    "--enter-y": "10px",
+    "--enter-duration": "0.6s",
+    "--enter-delay": `${0.9 + fromCentre * 0.14}s`,
+  } as CSSProperties;
 
   // Clicking a bottle glides down to its details in the range section
   const openDetails = (event: MouseEvent<HTMLAnchorElement>) => {
@@ -205,11 +211,17 @@ function Bottle({
             />
           </div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 90 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.9, delay: 0.45 + fromCentre * 0.14, ease: EASE }}
-            className="relative h-full"
+          {/* Rises into place when the page opens, from the middle out (CSS, so before the
+              scripts load) */}
+          <div
+            className="enter-rise relative h-full"
+            style={
+              {
+                "--enter-y": "90px",
+                "--enter-duration": "0.9s",
+                "--enter-delay": `${0.45 + fromCentre * 0.14}s`,
+              } as CSSProperties
+            }
           >
             <motion.a
               href={`#${mouthwash.id}`}
@@ -221,7 +233,7 @@ function Bottle({
               className="block h-full rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               <img
-                src={image.src}
+                {...eagerImage(image, "(max-width: 767px) 21vw, (max-width: 1023px) 13vw, 10vw")}
                 width={image.width}
                 height={image.height}
                 alt={`Totalflux ${fullName(mouthwash)} mouthwash`}
@@ -229,7 +241,7 @@ function Bottle({
                 className="size-full select-none object-contain drop-shadow-[0_22px_22px_rgba(20,50,90,0.22)]"
               />
             </motion.a>
-          </motion.div>
+          </div>
 
           {/* Contact shadow where it stands */}
           <span
@@ -244,36 +256,48 @@ function Bottle({
           width of its own (a long name overhangs its bottle's slot into the gap), so the row
           is only as wide as the bottles. */}
       <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: active ? 1 : 0.45, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.9 + fromCentre * 0.14, ease: EASE }}
+        initial={false}
+        animate={{ opacity: active ? 1 : 0.45 }}
+        transition={{ duration: 0.6, ease: EASE }}
         className="flex h-[var(--tag-h)] flex-col items-center justify-end gap-1 whitespace-nowrap text-center lg:w-0 lg:min-w-full"
       >
         {/* Or the name as lettered on the pack, where we have it */}
         {mouthwash.wordmark ? (
           <img
-            src={mouthwash.wordmark.src}
+            style={tagEnter}
+            {...eagerImage(mouthwash.wordmark, "86px")}
             width={mouthwash.wordmark.width}
             height={mouthwash.wordmark.height}
             alt={mouthwash.name}
             draggable={false}
-            className="h-7 w-auto select-none drop-shadow-[0_6px_10px_rgba(15,40,80,0.25)]"
+            className="enter-rise h-7 w-auto select-none drop-shadow-[0_6px_10px_rgba(15,40,80,0.25)]"
           />
         ) : (
           <span
-            className="rounded-md px-2 py-1 text-[0.6rem] font-bold uppercase tracking-[0.18em] text-white shadow-[0_6px_14px_-8px_rgba(15,40,80,0.6)] sm:px-2.5 sm:text-[0.68rem] sm:tracking-[0.2em]"
-            style={{ backgroundColor: colors.ink }}
+            className="enter-rise rounded-md px-2 py-1 text-[0.6rem] font-bold uppercase tracking-[0.18em] text-white shadow-[0_6px_14px_-8px_rgba(15,40,80,0.6)] sm:px-2.5 sm:text-[0.68rem] sm:tracking-[0.2em]"
+            style={{ backgroundColor: colors.ink, ...tagEnter }}
           >
             {fullName(mouthwash)}
           </span>
         )}
-        <span className="text-[0.68rem] font-medium leading-tight text-slate-600 sm:text-xs">
+        <span
+          className="enter-rise text-[0.68rem] font-medium leading-tight text-slate-600 sm:text-xs"
+          style={tagEnter}
+        >
           {mouthwash.descriptor}
         </span>
       </motion.div>
     </li>
   );
 }
+
+/** The headline's entrance (styles.css, .enter-rise): each part a beat after the one before. */
+const rise = (i: number, y: string, duration = "0.6s") =>
+  ({
+    "--enter-delay": `${0.15 + i * 0.1}s`,
+    "--enter-y": y,
+    "--enter-duration": duration,
+  }) as CSSProperties;
 
 /**
  * The mouthwash page's hero: "A rinse for every routine." over the whole range, every bottle standing on a glass platform (clicking one goes to its
@@ -318,9 +342,6 @@ export function MouthwashHero() {
 
   return (
     <MotionConfig reducedMotion="user">
-      {/* Outside the hero, so it stays above every section as the page scrolls (inside, the
-          hero's own layering would let the sections below paint over it) */}
-      <Navbar />
       <section
         ref={sectionRef}
         id="top"
@@ -344,22 +365,14 @@ export function MouthwashHero() {
           {/* Headline */}
           <motion.div
             style={{ y: textY }}
-            initial="hidden"
-            animate="show"
-            variants={{
-              hidden: {},
-              show: { transition: { staggerChildren: 0.1, delayChildren: 0.15 } },
-            }}
             className="relative z-20 mx-auto flex max-w-3xl flex-col items-center text-center"
           >
             {/* The promise, highlighted like the home hero's: a shine sweeping across it every few
                 seconds and a blinking blue ring (styles.css) */}
-            <motion.p
-              variants={{
-                hidden: { opacity: 0, y: 14 },
-                show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: EASE } },
-              }}
+            <p
+              style={rise(0, "14px")}
               className={cn(
+                "enter-rise",
                 GLASS,
                 // A soft teal-to-blue tint, so the white light shows as it passes
                 "pill-shine inline-flex items-center gap-2 rounded-full bg-[linear-gradient(100deg,rgba(214,240,242,0.92)_0%,rgba(226,236,250,0.92)_100%)] px-3.5 py-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-primary",
@@ -371,16 +384,13 @@ export function MouthwashHero() {
                 aria-hidden="true"
               />
               Four alcohol-free options
-            </motion.p>
+            </p>
 
-            <motion.h1
+            <h1
               id="mouthwash-title"
-              variants={{
-                hidden: { opacity: 0, y: 26 },
-                show: { opacity: 1, y: 0, transition: { duration: 0.8, ease: EASE } },
-              }}
+              style={rise(1, "26px", "0.8s")}
               // Scales with the screen's width and, on short screens, its height
-              className="mt-4 text-[clamp(2.2rem,min(3.9vw,7vh),3.75rem)] font-black leading-[1.03] tracking-tight text-primary"
+              className="enter-rise mt-4 text-[clamp(2.2rem,min(3.9vw,7vh),3.75rem)] font-black leading-[1.03] tracking-tight text-primary"
             >
               <span className="block">A rinse for</span>
               <span
@@ -392,28 +402,19 @@ export function MouthwashHero() {
               >
                 every routine.
               </span>
-            </motion.h1>
+            </h1>
 
-            <motion.p
-              variants={{
-                hidden: { opacity: 0, y: 14 },
-                show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: EASE } },
-              }}
-              className="mt-2 max-w-xl text-base text-slate-600 sm:text-lg"
+            <p
+              style={rise(2, "14px")}
+              className="enter-rise mt-2 max-w-xl text-base text-slate-600 sm:text-lg"
             >
               Minty, herbal, sensitive and kids’ formulas, including four alcohol-free rinses with
               fluoride.
-            </motion.p>
+            </p>
 
-            <motion.div
-              variants={{
-                hidden: { opacity: 0, y: 14 },
-                show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: EASE } },
-              }}
-              className="mt-5"
-            >
+            <div style={rise(3, "14px")} className="enter-rise mt-5">
               <FilterBar value={filter} onChange={setFilter} />
-            </motion.div>
+            </div>
           </motion.div>
 
           {/* The range, on its platform */}

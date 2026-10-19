@@ -15,6 +15,7 @@ import { BrandName } from "@/components/BrandName";
 import { OrbitCircles, OrbitFrame, type OrbitItem } from "@/components/Orbit";
 import { useStepGestures } from "@/hooks/use-step-gestures";
 import { useWideScreen } from "@/hooks/use-wide-screen";
+import { lazyImage } from "@/lib/images";
 
 /*
  * A product range, one product at a time, shared by the mouthwash and toothpaste pages: its
@@ -113,7 +114,7 @@ function ProductImage({ item, pose }: { item: ShowcaseItem; pose: Pose }) {
     return (
       <div className="absolute inset-[6%] flex items-center justify-center">
         <img
-          src={image.src}
+          {...lazyImage(image, "25vw")}
           width={image.width}
           height={image.height}
           alt={item.alt}
@@ -128,7 +129,7 @@ function ProductImage({ item, pose }: { item: ShowcaseItem; pose: Pose }) {
     <div className="absolute inset-x-0 bottom-[9.5%] top-[5%] flex items-end justify-center">
       <div className="relative h-full">
         <img
-          src={image.src}
+          {...lazyImage(image, "25vw")}
           width={image.width}
           height={image.height}
           alt={item.alt}
@@ -287,7 +288,7 @@ function Words({
             colour. Either way with a soft glow under it */}
         {item.wordmark ? (
           <img
-            src={item.wordmark.src}
+            {...lazyImage(item.wordmark, "40vw")}
             width={item.wordmark.width}
             height={item.wordmark.height}
             alt={item.name}

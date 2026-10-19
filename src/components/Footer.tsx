@@ -1,12 +1,14 @@
 // components/Footer.tsx
+import { Link } from "@tanstack/react-router";
 import { Facebook, Instagram, Mail, MapPin, Phone, Youtube } from "lucide-react";
 import { AMAZON_STORE, EXTERNAL, SOCIAL_PROFILES } from "@/data/links";
 
+/** Router links, so they switch pages at once as the navbar's do (no full reload). */
 const PRODUCT_LINKS = [
-  { label: "Toothpaste", href: "/toothpaste" },
-  { label: "Mouthwash", href: "/mouthwash" },
-  { label: "Oralbrush", href: "/oralbrush" },
-];
+  { label: "Toothpaste", to: "/toothpaste" },
+  { label: "Mouthwash", to: "/mouthwash" },
+  { label: "Oralbrush", to: "/oralbrush" },
+] as const;
 /** external: it leaves the site (a new tab). */
 const COMPANY_LINKS = [
   { label: "Contact Us", href: "#contact-us", external: false },
@@ -35,7 +37,7 @@ const CONTACT = [
 ];
 
 const LINK =
-  "text-[0.95rem] font-medium uppercase tracking-wide text-white/90 transition-colors hover:text-white";
+  "inline-block py-1 text-[0.95rem] font-medium uppercase tracking-wide text-white/90 transition-colors hover:text-white";
 
 /** Site footer: logo, links, social icons, contact details and the company line. */
 export function Footer() {
@@ -50,23 +52,27 @@ export function Footer() {
           className="justify-self-center md:justify-self-start"
         >
           <img
-            src="/logo-transparent.png"
+            src="/logo-800.webp"
+            srcSet="/logo-480.webp 480w, /logo-800.webp 800w"
+            sizes="auto, 253px"
+            loading="lazy"
+            decoding="async"
             alt="Totalflux"
-            width={1626}
-            height={515}
+            width={800}
+            height={253}
             className="h-16 w-auto brightness-0 invert sm:h-20"
           />
         </a>
 
-        <nav aria-label="Products" className="flex flex-col items-center gap-5 md:items-start">
+        <nav aria-label="Products" className="flex flex-col items-center gap-3 md:items-start">
           {PRODUCT_LINKS.map((link) => (
-            <a key={link.label} href={link.href} className={LINK}>
+            <Link key={link.label} to={link.to} className={LINK}>
               {link.label}
-            </a>
+            </Link>
           ))}
         </nav>
 
-        <div className="flex flex-col items-center gap-5 md:items-start">
+        <div className="flex flex-col items-center gap-3 md:items-start">
           {COMPANY_LINKS.map((link) => (
             <a key={link.label} href={link.href} {...(link.external && EXTERNAL)} className={LINK}>
               {link.label}
@@ -125,6 +131,8 @@ export function Footer() {
         {/* nbw: Neova Biogene Wellness's logo (from the product booklet), white on the footer */}
         <img
           src="/nbw-logo.png"
+          loading="lazy"
+          decoding="async"
           alt="Neova Biogene Wellness"
           width={131}
           height={80}

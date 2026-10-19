@@ -11,6 +11,9 @@
 @import "@fontsource/cooper-hewitt/600.css";
 @import "@fontsource/cooper-hewitt/700.css";
 @import "@fontsource/cooper-hewitt/800.css";
+/* Comfortaa Bold, for the "Totalflux" name (font-brand), served from the site too, so no
+   stylesheet from another server holds up the first paint */
+@import "@fontsource/comfortaa/latin-700.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -651,4 +654,50 @@ html {
   .aurora-drift {
     animation: none;
   }
+}
+
+/*
+ * A hero's entrance: rising into place as soon as the page paints, in CSS rather than
+ * JavaScript, so the first screen shows while the scripts are still loading (and even if they
+ * fail). Set --enter-delay (s), --enter-y (how far below it starts), --enter-duration, and
+ * if it should also come in from the side or turned, --enter-x and --enter-rotate. It starts
+ * faint rather than invisible: on screen from the very first frame (browsers don't count a
+ * fully transparent element as shown), settling in as it rises.
+ */
+@keyframes enter-rise {
+  from {
+    opacity: 0.12;
+    transform: translate(var(--enter-x, 0px), var(--enter-y, 22px)) rotate(var(--enter-rotate, 0deg));
+  }
+}
+.enter-rise {
+  animation: enter-rise var(--enter-duration, 0.75s) cubic-bezier(0.22, 1, 0.36, 1)
+    var(--enter-delay, 0s) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .enter-rise {
+    animation: none;
+  }
+}
+
+/*
+ * Phones: the frosted glass and the soft colour blobs at half strength. A blur costs a phone
+ * work in proportion to its radius, and at phone sizes the difference hardly shows. (Tailwind's
+ * blur classes read these variables; outside any layer, this wins over its theme.)
+ */
+@media (max-width: 767px) {
+  :root {
+    --blur-md: 6px;
+    --blur-xl: 12px;
+    --blur-3xl: 32px;
+  }
+}
+
+/*
+ * A section off the screen pauses its looping animations (rings, bubbles, shines): nothing
+ * there to see, so nothing for the device to keep drawing. use-pause-offscreen.ts marks them.
+ */
+section[data-offscreen],
+section[data-offscreen] * {
+  animation-play-state: paused !important;
 }

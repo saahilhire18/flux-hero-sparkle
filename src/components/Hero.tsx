@@ -20,11 +20,11 @@ import {
 import { ArrowLeft, ArrowRight } from "lucide-react";
 
 import { BrandName } from "@/components/BrandName";
-import { Navbar } from "@/components/Navbar";
 import { RollText, WaveText } from "@/components/TextEffects";
 import { Button } from "@/components/ui/button";
 import { HERO_PRODUCTS, HERO_STEPS, type HeroStep } from "@/data/hero-range";
 import { cn } from "@/lib/utils";
+import { eagerImage } from "@/lib/images";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -129,16 +129,11 @@ const HEADLINE_GRADIENT: CSSProperties = {
   filter: "drop-shadow(0 6px 10px rgba(23,110,140,0.2))",
 };
 
-// The pills and the button come in while the heading is still rising.
-const container = {
-  hidden: {},
-  show: { transition: { staggerChildren: 0.12, delayChildren: 0.8 } },
-};
-
-const item = {
-  hidden: { opacity: 0, y: 20 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: EASE } },
-};
+/**
+ * The page-load entrance (styles.css, .enter-rise): in CSS, so the hero shows as soon as the
+ * page paints; the text first, then the pills and the button while it's still rising.
+ */
+const enter = (delay: number) => ({ "--enter-delay": `${delay}s` }) as CSSProperties;
 
 /**
  * A step's text: the outgoing step fades out while the new one starts, then eyebrow, heading
@@ -178,7 +173,8 @@ function HeroText({ activeIndex }: { activeIndex: number }) {
           <motion.div
             key={step.id}
             variants={stepText}
-            initial="hidden"
+            // Rendered as it is (not from hidden), so the page shows it before the scripts run
+            initial={false}
             animate={active ? "show" : "hidden"}
             // Centred in the block: the intro, with no eyebrow, is shorter than the product steps
             className="flex flex-col items-center justify-center [grid-area:1/1]"
@@ -350,7 +346,7 @@ function StepPills({
           <motion.ul
             key={step.id}
             variants={pillSet}
-            initial="hidden"
+            initial={false}
             animate={active ? "show" : "hidden"}
             aria-label={step.product ? `${step.product.name} highlights` : "Our toothpastes"}
             aria-hidden={!active}
@@ -482,12 +478,16 @@ function Tube({
       }}
       onClick={(event) => onPress(product, event.detail > 0 && pointerType.current === "mouse")}
     >
-      {/* Rises into place when the page opens, from the middle out */}
-      <motion.div
-        initial={{ opacity: 0, y: 80 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 1.1, delay: 0.45 + fromCentre * 0.14, ease: EASE }}
-        className="relative"
+      {/* Rises into place when the page opens, from the middle out (CSS, so before the scripts) */}
+      <div
+        className="enter-rise relative"
+        style={
+          {
+            "--enter-y": "80px",
+            "--enter-duration": "1.1s",
+            "--enter-delay": `${0.45 + fromCentre * 0.14}s`,
+          } as CSSProperties
+        }
       >
         <motion.button
           type="button"
@@ -512,7 +512,8 @@ function Tube({
           />
           <span className="relative block">
             <img
-              src={image.src}
+              // As wide as it can be shown: lying down it's a little under 1.5 times as big
+              {...eagerImage(image, "(max-width: 1023px) 24vw, 13vw")}
               width={image.width}
               height={image.height}
               alt=""
@@ -550,7 +551,7 @@ function Tube({
           animate={shadow}
           transition={MOVE}
         />
-      </motion.div>
+      </div>
     </li>
   );
 }
@@ -697,9 +698,6 @@ export function Hero({ transitionColor }: { transitionColor?: string }) {
 
   return (
     <MotionConfig reducedMotion="user">
-      {/* Outside the hero, so it stays above every section as the page scrolls (inside, the
-          hero's own layering would let the sections below paint over it) */}
-      <Navbar />
       <section
         id="top"
         aria-labelledby="hero-title"
@@ -742,19 +740,16 @@ export function Hero({ transitionColor }: { transitionColor?: string }) {
 
           <div className="relative mx-auto flex min-h-0 w-full max-w-[90rem] flex-1 flex-col px-5 pb-3 pt-[5.5rem] sm:px-8 lg:px-12">
             {/* The text, the pills and the button */}
-            <motion.div
-              variants={container}
-              initial="hidden"
-              animate="show"
-              className="relative z-30 flex flex-col items-center text-center"
-            >
-              <HeroText activeIndex={activeIndex} />
+            <div className="relative z-30 flex flex-col items-center text-center">
+              <div className="enter-rise w-full" style={enter(0.15)}>
+                <HeroText activeIndex={activeIndex} />
+              </div>
 
-              <div className="mt-4 w-full">
+              <div className="enter-rise mt-4 w-full" style={enter(0.5)}>
                 <StepPills activeIndex={activeIndex} onSelect={pick} />
               </div>
 
-              <motion.div variants={item} className="mt-5">
+              <div className="enter-rise mt-5" style={enter(0.8)}>
                 <motion.div
                   whileHover={{ scale: 1.04 }}
                   whileTap={{ scale: 0.97 }}
@@ -767,8 +762,8 @@ export function Hero({ transitionColor }: { transitionColor?: string }) {
                     </a>
                   </Button>
                 </motion.div>
-              </motion.div>
-            </motion.div>
+              </div>
+            </div>
 
             {/* The range. A size container: --tube-h, the adult tubes' height, follows the space
                 the text leaves (and, on narrow screens, the width, so the row fits across) */}

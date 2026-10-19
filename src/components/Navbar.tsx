@@ -1,5 +1,5 @@
 // components/Navbar.tsx
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { Link, useRouterState, type LinkProps } from "@tanstack/react-router";
 import { motion } from "motion/react";
 import { Menu, X } from "lucide-react";
@@ -24,20 +24,13 @@ const NAV_ITEMS: NavItem[] = [
   { label: "Mouthwash", to: "/mouthwash", pages: ["/mouthwash"] },
   { label: "Oralbrush", to: "/oralbrush", pages: ["/oralbrush"] },
 ];
-const EASE = [0.22, 1, 0.36, 1] as const;
 
 const GLASS_PILL =
   "border border-white/70 bg-white/45 shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_10px_24px_-14px_rgba(20,60,120,0.45)] backdrop-blur-md";
 
-const links = {
-  hidden: {},
-  show: { transition: { staggerChildren: 0.08, delayChildren: 0.35 } },
-};
-
-const linkItem = {
-  hidden: { opacity: 0, y: -10 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: EASE } },
-};
+/** The entrance (styles.css, .enter-rise): in CSS, so the bar shows before the scripts load. */
+const enter = (delay: number, y: string, duration = "0.5s") =>
+  ({ "--enter-delay": `${delay}s`, "--enter-y": y, "--enter-duration": duration }) as CSSProperties;
 
 function NavLink({
   item,
@@ -75,6 +68,8 @@ export function Navbar({
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const headerRef = useRef<HTMLElement>(null);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   const isCurrent = (item: NavItem) => item.pages.includes(pathname);
 
@@ -84,6 +79,25 @@ export function Navbar({
     window.addEventListener("scroll", update, { passive: true });
     return () => window.removeEventListener("scroll", update);
   }, []);
+
+  // While the phone menu is open: Escape closes it (focus back on the menu button), the page
+  // behind doesn't scroll, and focus starts on its first link
+  useEffect(() => {
+    if (!open) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      setOpen(false);
+      menuButtonRef.current?.focus();
+    };
+    const { overflow } = document.documentElement.style;
+    document.documentElement.style.overflow = "hidden";
+    menuRef.current?.querySelector<HTMLElement>("a")?.focus();
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+      document.documentElement.style.overflow = overflow;
+    };
+  }, [open]);
 
   // Measures the real rendered navbar height (whatever it actually resolves to,
   // responsive breakpoint included) and exposes it as a CSS var so any section
@@ -100,13 +114,11 @@ export function Navbar({
   }, []);
 
   return (
-    <motion.header
+    <header
       ref={headerRef}
-      initial={{ y: -28, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.7, ease: EASE }}
+      style={enter(0, "-28px", "0.7s")}
       className={cn(
-        "fixed inset-x-0 top-0 z-50 transition-[background-color,box-shadow,backdrop-filter] duration-300",
+        "enter-rise fixed inset-x-0 top-0 z-50 transition-[background-color,box-shadow,backdrop-filter] duration-300",
         // Frosted glass once scrolled (or while the menu is open). No border — the bottom edge
         // is a very diffuse, low-opacity shadow, so it reads as depth, not a crisp line.
         // Otherwise nothing at all, not even blur, so no band or line shows over the page.
@@ -123,27 +135,25 @@ export function Navbar({
           to="/"
           className="shrink-0 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
-          {/* logo-transparent.png: public/logo.png with its white background made transparent */}
+          {/* The logo with a transparent background, at the sizes it's shown (made from
+              public/logo-transparent.png) */}
           <img
-            src="/logo-transparent.png"
+            src="/logo-480.webp"
+            srcSet="/logo-480.webp 480w, /logo-800.webp 800w"
+            sizes="(min-width: 1024px) 152px, 139px"
             alt="Totalflux — Complete Oral Care"
-            width={1626}
-            height={515}
+            width={480}
+            height={152}
             draggable={false}
             className="h-11 w-auto select-none lg:h-12"
           />
         </Link>
 
-        <motion.div
-          variants={links}
-          initial="hidden"
-          animate="show"
-          className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-1 lg:flex"
-        >
-          {NAV_ITEMS.map((item) => {
+        <div className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-1 lg:flex">
+          {NAV_ITEMS.map((item, i) => {
             const current = isCurrent(item);
             return (
-              <motion.div key={item.label} variants={linkItem}>
+              <div key={item.label} className="enter-rise" style={enter(0.35 + i * 0.08, "-10px")}>
                 <NavLink
                   item={item}
                   current={current}
@@ -155,31 +165,28 @@ export function Navbar({
                       : "border-transparent font-medium hover:bg-white/30",
                   )}
                 />
-              </motion.div>
+              </div>
             );
           })}
-        </motion.div>
+        </div>
 
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ type: "spring", stiffness: 260, damping: 16, delay: 0.7 }}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.97 }}
-          className="hidden lg:block"
-        >
-          <Button asChild variant="glass" size="default" className="letter-fx px-5">
-            <a href={AMAZON_STORE} {...EXTERNAL}>
-              <RollText text="Buy on Amazon" />
-              <span className="sr-only"> (Amazon, opens in a new tab)</span>
-            </a>
-          </Button>
-        </motion.div>
+        <div className="enter-rise hidden lg:block" style={enter(0.7, "0px")}>
+          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.97 }}>
+            <Button asChild variant="glass" size="default" className="letter-fx px-5">
+              <a href={AMAZON_STORE} {...EXTERNAL}>
+                <RollText text="Buy on Amazon" />
+                <span className="sr-only"> (Amazon, opens in a new tab)</span>
+              </a>
+            </Button>
+          </motion.div>
+        </div>
 
         <Button
+          ref={menuButtonRef}
           variant="ghost"
           size="icon"
           className="rounded-full text-primary lg:hidden"
+          aria-controls="phone-menu"
           aria-label={open ? "Close navigation menu" : "Open navigation menu"}
           aria-expanded={open}
           onClick={() => setOpen((value) => !value)}
@@ -188,7 +195,11 @@ export function Navbar({
         </Button>
       </nav>
 
+      {/* Closed, it's out of reach of the keyboard and screen readers as well as out of sight */}
       <div
+        id="phone-menu"
+        ref={menuRef}
+        inert={!open}
         className={cn(
           "overflow-hidden border-t border-white/50 transition-[max-height,opacity] duration-300 lg:hidden",
           open ? "max-h-96 opacity-100" : "max-h-0 border-transparent opacity-0",
@@ -220,6 +231,6 @@ export function Navbar({
           </Button>
         </div>
       </div>
-    </motion.header>
+    </header>
   );
 }

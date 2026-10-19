@@ -3,6 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { motion, MotionConfig, useReducedMotion, type Variants } from "motion/react";
 import { ArrowRight } from "lucide-react";
 import { ROUTINE } from "@/data/home";
+import { lazyImage } from "@/lib/images";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 const NAVY = "#24467A";
@@ -143,11 +144,10 @@ export function DailyRoutine({ topColor }: { topColor: string }) {
                       <circle cx="50" cy="2" r="1.3" fill={product.ink} />
                     </svg>
                     <img
-                      src={product.image.src}
+                      {...lazyImage(product.image, "15vw")}
                       width={product.image.width}
                       height={product.image.height}
                       alt={`Totalflux ${product.name}${product.kind === "Oralbrush" ? "" : ` ${product.kind.toLowerCase()}`}`}
-                      loading="lazy"
                       draggable={false}
                       className="absolute left-1/2 top-1/2 h-[78%] w-auto -translate-x-1/2 -translate-y-1/2 select-none object-contain drop-shadow-[0_18px_18px_rgba(20,50,90,0.28)] transition-transform duration-500 ease-out group-hover:-translate-y-[54%]"
                       style={{
@@ -172,7 +172,7 @@ export function DailyRoutine({ topColor }: { topColor: string }) {
                   <p className="mt-2 max-w-xs text-[0.95rem] leading-7 text-slate-600">{text}</p>
                   <Link
                     to={product.to}
-                    className="mt-4 inline-flex items-center gap-2 rounded-full px-1 text-sm font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    className="mt-3.5 inline-flex min-h-6 items-center gap-2 rounded-full px-1 text-sm font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                     style={{ color: product.ink }}
                   >
                     {link}

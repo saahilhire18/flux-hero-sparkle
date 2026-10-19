@@ -3,6 +3,7 @@ import { BrandName } from "@/components/BrandName";
 import { useRef } from "react";
 import { motion, MotionConfig, useScroll, useTransform } from "motion/react";
 import type { ProductPage } from "@/data/product-pages";
+import { lazyImage } from "@/lib/images";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -96,7 +97,7 @@ function ProductPanel({ product, flip }: { product: ProductPage; flip: boolean }
                 pack's colour. Either way with a soft shadow for depth */}
             {product.wordmark ? (
               <img
-                src={product.wordmark.src}
+                {...lazyImage(product.wordmark, "40vw")}
                 width={product.wordmark.width}
                 height={product.wordmark.height}
                 alt={product.name}
@@ -162,7 +163,7 @@ function ProductPanel({ product, flip }: { product: ProductPage; flip: boolean }
 
           <div className="absolute inset-0 flex items-center justify-center">
             <motion.img
-              src={product.image.src}
+              {...lazyImage(product.image, "25vw")}
               width={product.image.width}
               height={product.image.height}
               alt={`Totalflux ${product.name} toothpaste`}

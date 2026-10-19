@@ -8,15 +8,13 @@ import {
   useScroll,
   useSpring,
   useTransform,
-  type Variants,
 } from "motion/react";
 import { ArrowDown, ShoppingBag } from "lucide-react";
 import { BrandName } from "@/components/BrandName";
-import { Navbar } from "@/components/Navbar";
 import { OrbitCircles, OrbitFrame } from "@/components/Orbit";
 import { BRUSH_HIGHLIGHTS, ORALBRUSH } from "@/data/oralbrush";
+import { eagerImage } from "@/lib/images";
 
-const EASE = [0.22, 1, 0.36, 1] as const;
 const { colors, images } = ORALBRUSH;
 
 /** The hero's bottom colour, which "How it works" below starts from. */
@@ -45,14 +43,8 @@ const BUBBLE_STYLE: CSSProperties = {
 const GLASS =
   "border border-white/85 bg-white/55 shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_12px_30px_-16px_rgba(20,60,120,0.4)] backdrop-blur-md";
 
-const words: Variants = {
-  hidden: {},
-  show: { transition: { staggerChildren: 0.1, delayChildren: 0.15 } },
-};
-const word: Variants = {
-  hidden: { opacity: 0, y: 22 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.75, ease: EASE } },
-};
+/** The words' entrance (styles.css, .enter-rise): each rises a beat after the one before. */
+const rise = (i: number) => ({ "--enter-delay": `${0.15 + i * 0.1}s` }) as CSSProperties;
 
 /**
  * The Oralbrush page's hero: "Introducing Oralbrush" and its promise beside the brush, closed
@@ -95,9 +87,6 @@ export function OralbrushHero() {
 
   return (
     <MotionConfig reducedMotion="user">
-      {/* Outside the hero, so it stays above every section as the page scrolls (inside, the
-          hero's own layering would let the sections below paint over it) */}
-      <Navbar />
       <section
         ref={ref}
         id="top"
@@ -149,21 +138,15 @@ export function OralbrushHero() {
 
         <div className="relative mx-auto grid w-full max-w-[90rem] flex-1 items-center gap-10 px-5 pb-14 pt-24 sm:px-8 lg:grid-cols-[0.95fr_1.05fr] lg:px-12 lg:pb-10">
           {/* Words */}
-          <motion.div
-            style={{ y: textY }}
-            variants={words}
-            initial="hidden"
-            animate="show"
-            className="relative z-10 text-center lg:text-left"
-          >
-            <motion.p
-              variants={word}
-              className={`${GLASS} inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-xs font-bold uppercase tracking-[0.18em] text-primary`}
+          <motion.div style={{ y: textY }} className="relative z-10 text-center lg:text-left">
+            <p
+              style={rise(0)}
+              className={`enter-rise ${GLASS} inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-xs font-bold uppercase tracking-[0.18em] text-primary`}
             >
               <span className="size-2 rounded-full" style={{ backgroundColor: colors.sky }} />
               Introducing
-            </motion.p>
-            <motion.h1 variants={word} id="oralbrush-title" className="mt-5 leading-[0.95]">
+            </p>
+            <h1 style={rise(1)} id="oralbrush-title" className="enter-rise mt-5 leading-[0.95]">
               <BrandName className="block text-[clamp(1.3rem,2vw,2rem)] font-bold text-slate-800" />
               <span
                 className="block text-[clamp(3.2rem,7vw,6.75rem)] font-black tracking-tight"
@@ -171,16 +154,16 @@ export function OralbrushHero() {
               >
                 Oralbrush
               </span>
-            </motion.h1>
-            <motion.p
-              variants={word}
-              className="mx-auto mt-5 max-w-lg text-base leading-7 text-slate-700 sm:text-lg lg:mx-0"
+            </h1>
+            <p
+              style={rise(2)}
+              className="enter-rise mx-auto mt-5 max-w-lg text-base leading-7 text-slate-700 sm:text-lg lg:mx-0"
             >
               {ORALBRUSH.tagline}
-            </motion.p>
-            <motion.div
-              variants={word}
-              className="mt-8 flex flex-wrap items-center justify-center gap-3 lg:justify-start"
+            </p>
+            <div
+              style={rise(3)}
+              className="enter-rise mt-8 flex flex-wrap items-center justify-center gap-3 lg:justify-start"
             >
               <a
                 href={ORALBRUSH.buyUrl}
@@ -200,7 +183,7 @@ export function OralbrushHero() {
                 See how it opens
                 <ArrowDown className="size-4" aria-hidden="true" />
               </a>
-            </motion.div>
+            </div>
           </motion.div>
 
           {/* The brush in its orbit, its features around it */}
@@ -214,14 +197,20 @@ export function OralbrushHero() {
             {/* The brush closed, and beside it opened up (the handle swung round on its
                 hinge, so the tongue scraper shows) */}
             <div className="absolute inset-[4%] flex items-center justify-center">
-              <motion.div
-                initial={{ opacity: 0, y: 90, rotate: 18 }}
-                animate={{ opacity: 1, y: 0, rotate: 0 }}
-                transition={{ duration: 1.1, delay: 0.25, ease: EASE }}
-                className="relative z-10 flex h-full items-center"
+              {/* Rising and turning upright when the page opens (CSS, so before the scripts) */}
+              <div
+                className="enter-rise relative z-10 flex h-full items-center"
+                style={
+                  {
+                    "--enter-y": "90px",
+                    "--enter-rotate": "18deg",
+                    "--enter-duration": "1.1s",
+                    "--enter-delay": "0.25s",
+                  } as CSSProperties
+                }
               >
                 <motion.img
-                  src={images.front.src}
+                  {...eagerImage(images.front, "(max-width: 767px) 17vw, 13vw")}
                   width={images.front.width}
                   height={images.front.height}
                   alt="The Totalflux Oralbrush in sky blue, closed"
@@ -233,15 +222,23 @@ export function OralbrushHero() {
                     y: brushY,
                   }}
                 />
-              </motion.div>
-              <motion.div
-                initial={{ opacity: 0, x: 40, y: 60 }}
-                animate={{ opacity: 1, x: 0, y: 0 }}
-                transition={{ duration: 1.1, delay: 0.55, ease: EASE }}
-                className="relative ml-[5%] flex h-full items-center"
+              </div>
+              <div
+                className="enter-rise relative ml-[5%] flex h-full items-center"
+                style={
+                  {
+                    "--enter-x": "40px",
+                    "--enter-y": "60px",
+                    "--enter-duration": "1.1s",
+                    "--enter-delay": "0.55s",
+                  } as CSSProperties
+                }
               >
                 <motion.img
-                  src={images.open.src}
+                  {...eagerImage(
+                    images.open,
+                    "(max-width: 767px) 39vw, (max-width: 1023px) 29vw, 20vw",
+                  )}
                   width={images.open.width}
                   height={images.open.height}
                   alt="The Totalflux Oralbrush opened up, showing its tongue scraper"
@@ -249,7 +246,7 @@ export function OralbrushHero() {
                   className="h-[60%] w-auto -rotate-[6deg] select-none object-contain drop-shadow-[0_26px_24px_rgba(20,50,90,0.28)]"
                   style={{ aspectRatio: `${images.open.width} / ${images.open.height}`, y: brushY }}
                 />
-              </motion.div>
+              </div>
             </div>
             <OrbitCircles items={BRUSH_HIGHLIGHTS} ink={colors.ink} label="Oralbrush highlights" />
           </motion.div>

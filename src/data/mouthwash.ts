@@ -95,8 +95,9 @@ const ALL_MOUTHWASHES: Mouthwash[] = [
     ingredients:
       "Aqua, Alcohol, Sorbitol, PEG-40 Hydrogenated Castor Oil, Poloxamer 407, Sodium Benzoate, Turmeric Oil, Benzoic Acid, Flavour, Sodium Saccharin, Clove Oil, Caramel.",
     image: { src: "/mouthwash-turmeric.webp", ...BOTTLE },
-    // Label: #d08804, #00a049, #eee07f
-    colors: { liquid: "#eee07f", ink: "#00a049" },
+    // Label: #d08804, #00a049, #eee07f (ink: the label's green, a shade deeper so white text on
+    // it, and it as text on the page, read clearly: at least 4.5:1)
+    colors: { liquid: "#eee07f", ink: "#007c39" },
   },
   {
     id: "sensitive",
@@ -114,8 +115,8 @@ const ALL_MOUTHWASHES: Mouthwash[] = [
     ingredients:
       "Aqua, Sorbitol, Potassium Nitrate, PEG-40 Hydrogenated Castor Oil, Flavour, Poloxamer 407, Sodium Benzoate, Clove Oil, Sodium Fluoride, Sodium Saccharin, CI 42090.",
     image: { src: "/mouthwash-sensitive.webp", ...BOTTLE },
-    // Label: #06b4e2, #db434b, #59d2eb
-    colors: { liquid: "#59d2eb", ink: "#db434b" },
+    // Label: #06b4e2, #db434b, #59d2eb (ink: the label's red, a shade deeper to read clearly)
+    colors: { liquid: "#59d2eb", ink: "#d02831" },
   },
   {
     id: "kidoos",
@@ -133,8 +134,8 @@ const ALL_MOUTHWASHES: Mouthwash[] = [
       "Aqua, Sorbitol, Poloxamer 407, Sodium Benzoate, Sodium Saccharin, Flavour, Peppermint Oil, PEG-40 Hydrogenated Castor Oil, Sodium Fluoride, CI 16255.",
     image: { src: "/mouthwash-kidoos.webp", ...BOTTLE },
     wordmark: { src: "/wordmark-kidoos-mouthwash.webp", width: 1006, height: 330 },
-    // Label: #3eb6f4, #f160af, #8ccbff (the pink is the liquid's colour and the most readable)
-    colors: { liquid: "#f160af", ink: "#f160af" },
+    // Label: #3eb6f4, #f160af, #8ccbff (ink: the label's pink, a shade deeper to read clearly)
+    colors: { liquid: "#f160af", ink: "#d1127a" },
   },
   {
     id: "neem",

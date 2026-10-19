@@ -3,6 +3,7 @@ import { useRef } from "react";
 import { Check } from "lucide-react";
 import { motion, MotionConfig, useScroll, useTransform } from "motion/react";
 import { BrandName } from "@/components/BrandName";
+import { lazyImage } from "@/lib/images";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -110,7 +111,7 @@ function KidooCard({ kidoo, index }: { kidoo: Kidoo; index: number }) {
         {/* Tube with its age badge */}
         <div className="relative mx-auto h-60 w-28 sm:h-72 sm:w-32">
           <motion.img
-            src={kidoo.image.src}
+            {...lazyImage(kidoo.image, "128px")}
             width={kidoo.image.width}
             height={kidoo.image.height}
             alt={`Totalflux ${kidoo.name} toothpaste`}
@@ -141,7 +142,7 @@ function KidooCard({ kidoo, index }: { kidoo: Kidoo; index: number }) {
             {/* The name as lettered on the pack where we have it */}
             {kidoo.wordmark ? (
               <img
-                src={kidoo.wordmark.src}
+                {...lazyImage(kidoo.wordmark, "200px")}
                 width={kidoo.wordmark.width}
                 height={kidoo.wordmark.height}
                 alt={kidoo.name}
@@ -223,7 +224,7 @@ export function KidoosSection({ topColor = "#DDE4F2" }: { topColor?: string }) {
               {/* The logo, a little taller than the text and set just below its baseline, so
                   its letters line up with "Totalflux" */}
               <img
-                src={KIDOOS_LOGO.src}
+                {...lazyImage(KIDOOS_LOGO, "30vw")}
                 width={KIDOOS_LOGO.width}
                 height={KIDOOS_LOGO.height}
                 alt="Kidoos"

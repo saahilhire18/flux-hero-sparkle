@@ -6,6 +6,7 @@ import { ArrowRight } from "lucide-react";
 import { BrandName } from "@/components/BrandName";
 import { MOUTHWASHES } from "@/data/mouthwash";
 import { ORALBRUSH } from "@/data/oralbrush";
+import { lazyImage } from "@/lib/images";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -40,11 +41,10 @@ type Range = {
 function ToothpasteVisual() {
   return (
     <img
-      src={RANGE_PHOTO.src}
+      {...lazyImage(RANGE_PHOTO, "33vw")}
       width={RANGE_PHOTO.width}
       height={RANGE_PHOTO.height}
       alt="The Totalflux toothpaste range: Essential, Sensitive, Advance and Kidoos Plus, each tube with its box"
-      loading="lazy"
       draggable={false}
       className="absolute inset-x-0 top-0 h-full w-full select-none object-cover object-center [mask-image:linear-gradient(to_bottom,#000_70%,transparent)]"
     />
@@ -65,11 +65,10 @@ function MouthwashVisual() {
         return (
           <img
             key={bottle.id}
-            src={bottle.image.src}
+            {...lazyImage(bottle.image, "8vw")}
             width={bottle.image.width}
             height={bottle.image.height}
             alt={i === Math.round(middle) ? "The Totalflux mouthwash range" : ""}
-            loading="lazy"
             draggable={false}
             className="relative -mx-[3%] w-auto origin-bottom select-none object-contain drop-shadow-[0_18px_18px_rgba(20,50,90,0.25)]"
             style={{
@@ -94,11 +93,10 @@ function OralbrushVisual() {
         className="absolute left-1/2 top-1/2 aspect-square h-[82%] -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/80 bg-white/35 shadow-[inset_0_2px_14px_rgba(255,255,255,0.9)]"
       />
       <img
-        src={open.src}
+        {...lazyImage(open, "15vw")}
         width={open.width}
         height={open.height}
         alt="The Totalflux Oralbrush, open to show its tongue scraper"
-        loading="lazy"
         draggable={false}
         className="relative h-full w-auto select-none object-contain drop-shadow-[0_22px_22px_rgba(20,50,90,0.25)]"
       />

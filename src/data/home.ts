@@ -245,7 +245,8 @@ export const NEEDS: Need[] = [
   },
   {
     id: "kids",
-    colors: { ink: "#f160af", soft: "#F9DEE9" },
+    // The Kidoos pink, deep enough for its label on the pale circle and white on the filled one
+    colors: { ink: "#b80f6b", soft: "#F9DEE9" },
     label: "For kids",
     icon: Baby,
     toothpaste: {

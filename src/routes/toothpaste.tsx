@@ -6,6 +6,8 @@ import { KidoosSection } from "@/components/KidoosSection";
 import { ProductRange } from "@/components/ProductRange";
 import { WhereToBuySection } from "@/components/WhereToBuy";
 import { PRODUCT_PAGES } from "@/data/product-pages";
+import { absoluteUrl } from "@/data/site";
+import { usePauseOffscreenAnimations } from "@/hooks/use-pause-offscreen";
 
 const { advance, sensitive, essential } = PRODUCT_PAGES;
 
@@ -29,7 +31,10 @@ export const Route = createFileRoute("/toothpaste")({
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { property: "og:url", content: absoluteUrl("/toothpaste") },
     ],
+    // The address this page lives at, so search engines list it once, under that
+    links: [{ rel: "canonical", href: absoluteUrl("/toothpaste") }],
   }),
   component: ToothpastePage,
 });
@@ -39,18 +44,21 @@ export const Route = createFileRoute("/toothpaste")({
 // blending from each one's colour into the next, then the Kidoos. Clicking a tube in the hero
 // (on a touch screen, tapping it a second time) scrolls straight to its section.
 function ToothpastePage() {
+  usePauseOffscreenAnimations();
   return (
-    <main>
-      <Hero transitionColor={SEAM_COLOR} />
-      {/* Target of the hero's "Explore the range" button and the navbar's "Toothpaste" link */}
-      <div id="toothpaste">
-        <ProductRange products={[advance, sensitive, essential]} topColor={SEAM_COLOR} />
-        {/* Starts from Essential's colour, where the range above ends */}
-        <KidoosSection topColor={essential.colors.bg} />
-      </div>
-      {/* Starts from the colour the Kidoos section ends with */}
-      <WhereToBuySection topColor="#F4F6FF" />
+    <>
+      <main id="main" tabIndex={-1} className="outline-none">
+        <Hero transitionColor={SEAM_COLOR} />
+        {/* Target of the hero's "Explore the range" button and the navbar's "Toothpaste" link */}
+        <div id="toothpaste">
+          <ProductRange products={[advance, sensitive, essential]} topColor={SEAM_COLOR} />
+          {/* Starts from Essential's colour, where the range above ends */}
+          <KidoosSection topColor={essential.colors.bg} />
+        </div>
+        {/* Starts from the colour the Kidoos section ends with */}
+        <WhereToBuySection topColor="#F4F6FF" />
+      </main>
       <Footer />
-    </main>
+    </>
   );
 }

@@ -50,13 +50,13 @@ export function WhereToBuyBand() {
             <span className="sr-only"> (opens in a new tab)</span>
           </a>
           <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-sm text-white/85">
-            <a href="tel:18005324561" className="inline-flex items-center gap-1.5 hover:text-white">
+            <a href="tel:18005324561" className="inline-flex min-h-6 items-center gap-1.5 hover:text-white">
               <Phone className="size-4" aria-hidden="true" />
               <span className="sr-only">Customer care: </span>1800-532-4561
             </a>
             <a
               href="mailto:info@neovabiogene.com"
-              className="inline-flex items-center gap-1.5 hover:text-white"
+              className="inline-flex min-h-6 items-center gap-1.5 hover:text-white"
             >
               <Mail className="size-4" aria-hidden="true" />
               <span className="sr-only">Email: </span>info@neovabiogene.com
