@@ -43,7 +43,7 @@ type Figure = { value: number; text: string; source: string };
 const FIGURES = null as { main: Figure; second: Figure } | null;
 
 /** In the orbit while there are no figures: three of the alcohol-free rinses. */
-const TRIO = ["neem", "sensitive", "kidoos"].flatMap((id) => {
+const TRIO = ["kidoos", "sensitive", "neem"].flatMap((id) => {
   const found = MOUTHWASHES.find((each) => each.id === id);
   return found ? [found] : [];
 });
