@@ -45,22 +45,22 @@ export function Footer() {
     // bg-primary: the site's dark blue, the same as its headings and text
     <footer className="bg-primary text-white">
       <div className="mx-auto grid max-w-6xl gap-10 px-6 pb-8 pt-14 sm:px-10 md:grid-cols-2 md:items-center lg:grid-cols-[1.1fr_0.8fr_1fr_1.4fr]">
-        {/* The navy logo, turned white for the dark footer */}
+        {/* The white logo, for the dark footer */}
         <a
           href="#top"
           aria-label="Totalflux, back to top"
           className="justify-self-center md:justify-self-start"
         >
           <img
-            src="/logo-800.webp"
-            srcSet="/logo-480.webp 480w, /logo-800.webp 800w"
-            sizes="auto, 253px"
+            src="/logo-footer-800.webp"
+            srcSet="/logo-footer-480.webp 480w, /logo-footer-800.webp 800w"
+            sizes="auto, (min-width: 640px) 280px, 224px"
             loading="lazy"
             decoding="async"
             alt="Totalflux"
             width={800}
-            height={253}
-            className="h-16 w-auto brightness-0 invert sm:h-20"
+            height={229}
+            className="h-auto w-56 max-w-full sm:w-70"
           />
         </a>
 
