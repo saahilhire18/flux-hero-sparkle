@@ -14,6 +14,14 @@ const EASE = [0.22, 1, 0.36, 1] as const;
 /** The turning ring's radius, in % of the box (its centre is the box's). */
 const RING = 44;
 
+/**
+ * The ring's dashes, measured in degrees around it (it has a pathLength of 360): 16 dashes to
+ * every 60°, ending in a shorter gap. The offset puts that gap's middle on each of the dots
+ * (0°, 60° …), so the line runs into every dot from both sides.
+ */
+const RING_DASHES = [...Array<string>(15).fill("1.6 2.2"), "1.6 1.4"].join(" ");
+const RING_DASH_OFFSET = 60 - 1.4 / 2;
+
 /** A point on the ring, `angle` degrees clockwise from its right-hand side, in % of the box. */
 function onRing(angle: number) {
   const radians = (angle * Math.PI) / 180;
@@ -54,17 +62,17 @@ export function OrbitFrame({
           cx="50"
           cy="50"
           r={RING}
+          pathLength={360}
           fill="none"
           stroke="currentColor"
           strokeWidth="0.3"
-          strokeDasharray="1.1 1.7"
+          strokeDasharray={RING_DASHES}
+          strokeDashoffset={RING_DASH_OFFSET}
           opacity="0.5"
         />
         {[0, 60, 120, 180, 240, 300].map((angle) => {
           const dot = onRing(angle);
-          return (
-            <circle key={angle} cx={dot.x} cy={dot.y} r="0.9" fill="currentColor" opacity="0.7" />
-          );
+          return <circle key={angle} cx={dot.x} cy={dot.y} r="0.9" fill="currentColor" />;
         })}
       </svg>
       {podium && (
