@@ -135,15 +135,14 @@ export function Navbar({
           to="/"
           className="shrink-0 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
-          {/* The logo with a transparent background, at the sizes it's shown (made from
-              public/logo-transparent.png) */}
+          {/* The logo, with its navy wave, on a transparent background, at the sizes it's shown */}
           <img
-            src="/logo-480.webp"
-            srcSet="/logo-480.webp 480w, /logo-800.webp 800w"
-            sizes="(min-width: 1024px) 152px, 139px"
+            src="/logo-navbar-480.webp"
+            srcSet="/logo-navbar-480.webp 480w, /logo-navbar-800.webp 800w"
+            sizes="(min-width: 1024px) 166px, 152px"
             alt="Totalflux — Complete Oral Care"
             width={480}
-            height={152}
+            height={139}
             draggable={false}
             className="h-11 w-auto select-none lg:h-12"
           />
