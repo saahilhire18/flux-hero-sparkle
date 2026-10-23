@@ -30,11 +30,9 @@ import { lazyImage } from "@/lib/images";
 export type ShowcaseItem = {
   /** Also the id of its place on the page, which links (e.g. the hero's products) scroll to. */
   id: string;
-  /** The big name. */
+  /** The big name, also the rail's (the family badge and heading say the rest). */
   name: string;
-  /** Printed beside the name where two share it, e.g. "No Alcohol". */
-  variant?: string | undefined;
-  /** For the rail and screen readers, e.g. "Turmeric No Alcohol". */
+  /** For screen readers, where two share a name, e.g. "Turmeric No Alcohol". */
   fullName: string;
   /** Its family: a badge, with a dot in `accent`. */
   family?: { label: string; accent: string } | undefined;
@@ -125,8 +123,9 @@ function ProductImage({ item, pose }: { item: ShowcaseItem; pose: Pose }) {
       </div>
     );
   }
+  // 80% of the box tall, standing on the podium: its cap stays clear below the dashed ring
   return (
-    <div className="absolute inset-x-0 bottom-[9.5%] top-[5%] flex items-end justify-center">
+    <div className="absolute inset-x-0 bottom-[9.5%] top-[10.5%] flex items-end justify-center">
       <div className="relative h-full">
         <img
           {...lazyImage(image, "25vw")}
@@ -310,14 +309,6 @@ function Words({
             {item.name}
           </span>
         )}
-        {item.variant && (
-          <span
-            className="ml-3 inline-block -translate-y-[0.6em] rounded-full px-3 py-1 align-middle text-xs font-bold uppercase tracking-[0.16em] text-white"
-            style={{ backgroundColor: ink }}
-          >
-            {item.variant}
-          </span>
-        )}
       </motion.h3>
 
       <motion.p
@@ -407,7 +398,9 @@ function ProgressRail({
                       <span
                         className={`hidden text-sm transition-[color,translate] duration-300 xl:inline-block ${i === index ? "font-bold text-(--ink)" : "font-medium text-slate-500 group-hover:translate-x-1 group-hover:text-(--ink) group-focus-visible:translate-x-1 group-focus-visible:text-(--ink)"}`}
                       >
-                        {item.fullName}
+                        {/* The name alone: the family heading above says the rest (the full
+                            name is the button's label, for screen readers) */}
+                        {item.name}
                       </span>
                     </button>
                   </li>

@@ -136,12 +136,12 @@ export function DailyRoutine({ topColor }: { topColor: string }) {
                         cy="50"
                         r="48"
                         fill="none"
-                        stroke={product.ink}
+                        stroke={NAVY}
                         strokeOpacity="0.4"
                         strokeWidth="0.5"
                         strokeDasharray="1.5 2.5"
                       />
-                      <circle cx="50" cy="2" r="1.3" fill={product.ink} />
+                      <circle cx="50" cy="2" r="1.3" fill={NAVY} />
                     </svg>
                     <img
                       {...lazyImage(product.image, "15vw")}
@@ -173,7 +173,7 @@ export function DailyRoutine({ topColor }: { topColor: string }) {
                   <Link
                     to={product.to}
                     className="mt-3.5 inline-flex min-h-6 items-center gap-2 rounded-full px-1 text-sm font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                    style={{ color: product.ink }}
+                    style={{ color: NAVY }}
                   >
                     {link}
                     <ArrowRight

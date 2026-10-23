@@ -10,13 +10,16 @@ import { lazyImage } from "@/lib/images";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
-/** The studio photo of the toothpaste range (public/toothpaste-range.webp) and its backdrop's grey. */
-const RANGE_PHOTO = {
-  src: "/toothpaste-range.webp",
-  width: 1400,
-  height: 977,
-  backdrop: "#E3DEDE",
-};
+/** Every card's colour, top to bottom, and the deep blue of its marks: the same for all three. */
+const CARD_BACKGROUND = "linear-gradient(180deg, #D9E7F6 0%, #E6EFF9 50%, #F0F4FA 100%)";
+const INK = "#24467A";
+
+/**
+ * The toothpaste range's studio photo with its backdrop cut away (public/toothpaste-boxes.webp,
+ * as in the home hero), so it sits on the card's colour. Its bottom 11% is only the boxes' soft
+ * shadow.
+ */
+const RANGE_PHOTO = { src: "/toothpaste-boxes.webp", width: 1400, height: 980 };
 
 /** The mouthwashes fanned out on the card, middle one nearest. */
 const FAN_IDS = ["mintfresh", "turmeric", "kidoos", "sensitive", "neem"];
@@ -31,23 +34,22 @@ type Range = {
   badge: string;
   text: string;
   link: string;
-  /** The card's soft colour, top to bottom, and a deep shade for its marks. */
-  background: string;
-  ink: string;
   visual: ReactNode;
 };
 
-/** The toothpaste range's studio photo, its grey running into the card's colour below. */
+/** The toothpaste range, its boxes standing a little above the card's text. */
 function ToothpasteVisual() {
   return (
-    <img
-      {...lazyImage(RANGE_PHOTO, "33vw")}
-      width={RANGE_PHOTO.width}
-      height={RANGE_PHOTO.height}
-      alt="The Totalflux toothpaste range: Essential, Sensitive, Advance and Kidoos Plus, each tube with its box"
-      draggable={false}
-      className="absolute inset-x-0 top-0 h-full w-full select-none object-cover object-center [mask-image:linear-gradient(to_bottom,#000_70%,transparent)]"
-    />
+    <div className="absolute inset-0 flex items-center justify-center px-[5%] pt-[4%]">
+      <img
+        {...lazyImage(RANGE_PHOTO, "33vw")}
+        width={RANGE_PHOTO.width}
+        height={RANGE_PHOTO.height}
+        alt="The Totalflux toothpaste range: Essential, Sensitive, Advance and Kidoos Plus, each tube with its box"
+        draggable={false}
+        className="h-full w-full translate-y-[5%] select-none object-contain"
+      />
+    </div>
   );
 }
 
@@ -112,8 +114,6 @@ const RANGES: Range[] = [
     badge: "5 formulas",
     text: "Every paste is SLS-free, from Kidoos for children aged 3+ to Advance, Sensitive and Essential for adults.",
     link: "Explore toothpaste",
-    background: `linear-gradient(180deg, ${RANGE_PHOTO.backdrop} 0%, ${RANGE_PHOTO.backdrop} 46%, #EEF1F6 100%)`,
-    ink: "#2B4270",
     visual: <ToothpasteVisual />,
   },
   {
@@ -124,9 +124,6 @@ const RANGES: Range[] = [
     badge: `${MOUTHWASHES.length} formulas`,
     text: "Minty, herbal, sensitive and kids’ rinses, with four alcohol-free options.",
     link: "Explore mouthwash",
-    background: "linear-gradient(180deg, #D3EDF2 0%, #E4F3F6 50%, #EFF5F9 100%)",
-    // Mintfresh's, from its label (mouthwash.ts)
-    ink: "#006ea2",
     visual: <MouthwashVisual />,
   },
   {
@@ -136,8 +133,6 @@ const RANGES: Range[] = [
     badge: "New",
     text: "A sustainable brush for teeth and gums that slides open into a gentle tongue scraper.",
     link: "Meet the Oralbrush",
-    background: "linear-gradient(180deg, #D9E7F6 0%, #E6EFF9 50%, #F0F4FA 100%)",
-    ink: ORALBRUSH.colors.ink,
     visual: <OralbrushVisual />,
   },
 ];
@@ -155,7 +150,7 @@ function RangeCard({ range, index }: { range: Range; index: number }) {
       viewport={{ once: true, amount: 0.25 }}
       transition={{ duration: 0.8, delay: index * 0.12, ease: EASE }}
       className="group relative flex flex-col rounded-[2rem] border border-white/80 shadow-[0_30px_70px_-35px_rgba(20,50,100,0.45)] transition-shadow duration-300 hover:shadow-[0_40px_80px_-35px_rgba(20,50,100,0.55)]"
-      style={{ background: range.background }}
+      style={{ background: CARD_BACKGROUND }}
     >
       {/* The picture (clipped to the card's rounded top) */}
       <div className="relative aspect-[1.5] overflow-hidden rounded-t-[2rem]">{range.visual}</div>
@@ -163,7 +158,7 @@ function RangeCard({ range, index }: { range: Range; index: number }) {
       <div className="flex flex-1 flex-col px-6 pb-6 pt-1">
         <p
           className="w-fit rounded-full bg-white/70 px-3 py-1 text-[0.7rem] font-bold uppercase tracking-[0.16em]"
-          style={{ color: range.ink }}
+          style={{ color: INK }}
         >
           {range.badge}
         </p>
@@ -171,7 +166,7 @@ function RangeCard({ range, index }: { range: Range; index: number }) {
           <BrandName className="block text-base font-bold text-slate-700" />
           <span
             className="text-[clamp(1.6rem,2.2vw,2rem)] font-black tracking-tight"
-            style={{ color: range.ink }}
+            style={{ color: INK }}
           >
             {range.name}
           </span>
@@ -180,7 +175,7 @@ function RangeCard({ range, index }: { range: Range; index: number }) {
         <span
           aria-hidden="true"
           className="mt-auto inline-flex items-center gap-2 pt-4 text-sm font-bold"
-          style={{ color: range.ink }}
+          style={{ color: INK }}
         >
           {range.link}
           <ArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-1" />

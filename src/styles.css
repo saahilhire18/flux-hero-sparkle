@@ -188,6 +188,15 @@ html {
   );
 }
 
+/* A hero headline's first line, as a gradient: blue into deep navy, lighter on the left like
+   the second line's teal-to-navy, but deeper, so the second line stays the bright one */
+@utility headline-lead {
+  background-image: linear-gradient(90deg, #2f64a8 0%, #24467a 55%, #1c3566 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
 @utility hero-ray {
   background: linear-gradient(
     128deg,

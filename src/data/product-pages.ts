@@ -37,7 +37,8 @@ export type ProductPage = {
    * Colours from the pack, checked for contrast (WCAG AA) against `tint`:
    * - brand: the pack's main colour, for glows, icon backgrounds and the platform, never
    *   text (Sensitive's sky blue is too light to read on its tint);
-   * - ink: a deeper shade of it, for text and icons (at least 5.8:1 on the tint);
+   * - ink: a deeper shade of it, for text, icons and the dashed ring (at least 4.5:1 on the
+   *   tint). Sensitive's is the red of its name on the pack instead, as on the mouthwash page;
    * - highlight: the pack's second colour, for small decorative marks only;
    * - tint: a pale version, for the hero's bottom edge;
    * - bg: the soft background of the product's section (ink text reads on it).
@@ -131,7 +132,8 @@ export const PRODUCT_PAGES: Record<ProductPageId, ProductPage> = {
     image: { src: "/sensitive.webp", width: 304, height: 1000 },
     colors: {
       brand: "#2398CA",
-      ink: "#15648A",
+      // The Sensitive red, the same as the Sensitive mouthwash's (mouthwash.ts)
+      ink: "#d02831",
       highlight: "#D75C60",
       tint: "#EAF5FB",
       bg: "#D5EBF6",

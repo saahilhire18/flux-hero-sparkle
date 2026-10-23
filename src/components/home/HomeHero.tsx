@@ -174,7 +174,8 @@ export function HomeHero() {
               className="enter-rise mt-3 text-[clamp(2rem,min(3.4vw,6vh),3.25rem)] font-black leading-[1.03] tracking-tight"
               style={{ color: NAVY, ...rise(1) }}
             >
-              Your journey to a{/* A little apart from the first line */}
+              <span className="headline-lead">Your journey to a</span>
+              {/* A little apart from the first line */}
               <span
                 className="mt-[0.32em] block bg-clip-text pb-[0.08em] text-transparent"
                 style={{

@@ -22,31 +22,30 @@ const ORBIT_SPOTS = [
   { left: "86%", top: "74%" },
   { left: "14%", top: "74%" },
 ];
-/** The dots on the dashed ring (% of the visual box). */
-const RING_DOTS = [
-  [32, 13],
-  [68, 13],
-  [91, 50],
-  [68, 87],
-  [32, 87],
-  [9, 50],
-];
+/**
+ * The dashed ring's radius (% of the visual box, as on the mouthwash page). The tube, upright
+ * and 72% of the box tall, stays inside it with room to spare, even at the ends of its drift.
+ */
+const RING = 44;
+/** The dots on the dashed ring, by angle (degrees clockwise from its right), in % of the box. */
+const RING_DOTS = [-116, -64, 0, 64, 116, 180].map((angle) => {
+  const radians = (angle * Math.PI) / 180;
+  return [50 + RING * Math.cos(radians), 50 + RING * Math.sin(radians)] as const;
+});
 
 /**
  * One product: eyebrow, a big gradient heading with depth, the summary and a button on the
- * left; on the right the tube, tilted, over a glass disc inside a dashed orbit, with its four
+ * left; on the right the tube, upright, over a glass disc inside a dashed orbit, with its four
  * benefits in glass circles around it. As the section scrolls past, the parts move at
- * different speeds (parallax): the tube rises and turns, the circles and the text drift.
+ * different speeds (parallax): the tube rises a little, the circles and the text drift.
  * flip: the tube on the left and the text on the right (stacked sections alternate).
  */
 function ProductPanel({ product, flip }: { product: ProductPage; flip: boolean }) {
   const ref = useRef<HTMLElement>(null);
   const { colors } = product;
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
-  const tubeY = useTransform(scrollYProgress, [0, 1], [90, -90]);
-  // Leans away from the text: top to the right when the tube is on the right, left when flipped
-  const lean = flip ? -1 : 1;
-  const tubeRotate = useTransform(scrollYProgress, [0, 1], [28 * lean, 14 * lean]);
+  // Of the tube's own height, so it stays inside the ring whatever the box's size
+  const tubeY = useTransform(scrollYProgress, [0, 1], ["4%", "-4%"]);
   const discScale = useTransform(scrollYProgress, [0, 0.5, 1], [0.85, 1, 0.9]);
   const orbitY = useTransform(scrollYProgress, [0, 1], [50, -50]);
   const textY = useTransform(scrollYProgress, [0, 1], [40, -40]);
@@ -140,7 +139,8 @@ function ProductPanel({ product, flip }: { product: ProductPage; flip: boolean }
               className="size-[46%] rounded-full border border-white/70 shadow-[inset_0_2px_12px_rgba(255,255,255,0.9)] backdrop-blur-md"
             />
           </div>
-          {/* The dashed ring and its dots, turning slowly, as on the mouthwash page */}
+          {/* The dashed ring and its dots in the ink colour, turning slowly, as on the mouthwash
+              page */}
           <svg
             aria-hidden="true"
             viewBox="0 0 100 100"
@@ -149,15 +149,15 @@ function ProductPanel({ product, flip }: { product: ProductPage; flip: boolean }
             <circle
               cx="50"
               cy="50"
-              r="41"
+              r={RING}
               fill="none"
-              stroke={colors.brand}
+              stroke={colors.ink}
               strokeWidth="0.35"
               strokeDasharray="1.2 1.6"
               opacity="0.7"
             />
             {RING_DOTS.map(([x, y]) => (
-              <circle key={`${x}-${y}`} cx={x} cy={y} r="1.1" fill={colors.brand} />
+              <circle key={`${x}-${y}`} cx={x} cy={y} r="1.1" fill={colors.ink} />
             ))}
           </svg>
 
@@ -168,8 +168,8 @@ function ProductPanel({ product, flip }: { product: ProductPage; flip: boolean }
               height={product.image.height}
               alt={`Totalflux ${product.name} toothpaste`}
               draggable={false}
-              className="h-[82%] w-auto select-none object-contain drop-shadow-[0_34px_40px_rgba(15,40,80,0.3)]"
-              style={{ y: tubeY, rotate: tubeRotate }}
+              className="h-[72%] w-auto select-none object-contain drop-shadow-[0_34px_40px_rgba(15,40,80,0.3)]"
+              style={{ y: tubeY }}
             />
           </div>
 

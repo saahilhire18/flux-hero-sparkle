@@ -252,14 +252,15 @@ function Bottle({
         </div>
       </div>
 
-      {/* Name tag, in the pack's colour like the booklet's name bars. On desktop it takes no
-          width of its own (a long name overhangs its bottle's slot into the gap), so the row
-          is only as wide as the bottles. */}
+      {/* Name tag, in the pack's colour like the booklet's name bars: the name alone (the
+          alcohol-free Turmeric's "No Alcohol" is on its pack, and in its photo's alt text). On
+          desktop it takes no width of its own (a long name overhangs its bottle's slot into the
+          gap), so the row is only as wide as the bottles. */}
       <motion.div
         initial={false}
         animate={{ opacity: active ? 1 : 0.45 }}
         transition={{ duration: 0.6, ease: EASE }}
-        className="flex h-[var(--tag-h)] flex-col items-center justify-end gap-1 whitespace-nowrap text-center lg:w-0 lg:min-w-full"
+        className="flex h-[var(--tag-h)] flex-col items-center justify-end whitespace-nowrap text-center lg:w-0 lg:min-w-full"
       >
         {/* Or the name as lettered on the pack, where we have it */}
         {mouthwash.wordmark ? (
@@ -277,15 +278,9 @@ function Bottle({
             className="enter-rise rounded-md px-2 py-1 text-[0.6rem] font-bold uppercase tracking-[0.18em] text-white shadow-[0_6px_14px_-8px_rgba(15,40,80,0.6)] sm:px-2.5 sm:text-[0.68rem] sm:tracking-[0.2em]"
             style={{ backgroundColor: colors.ink, ...tagEnter }}
           >
-            {fullName(mouthwash)}
+            {mouthwash.name}
           </span>
         )}
-        <span
-          className="enter-rise text-[0.68rem] font-medium leading-tight text-slate-600 sm:text-xs"
-          style={tagEnter}
-        >
-          {mouthwash.descriptor}
-        </span>
       </motion.div>
     </li>
   );
@@ -392,7 +387,9 @@ export function MouthwashHero() {
               // Scales with the screen's width and, on short screens, its height
               className="enter-rise mt-4 text-[clamp(2.2rem,min(3.9vw,7vh),3.75rem)] font-black leading-[1.03] tracking-tight text-primary"
             >
-              <span className="block">A rinse for</span>
+              <span className="block">
+                <span className="headline-lead">A rinse for</span>
+              </span>
               <span
                 className="block bg-clip-text pb-[0.08em] text-transparent"
                 style={{
@@ -450,17 +447,17 @@ export function MouthwashHero() {
                 line where the bottles stand. */}
             <motion.div
               style={{ x: stageX, y: stageY, "--bottle-max": BOTTLE_MAX } as MotionStyle}
-              className="relative [--bottle-h:13rem] [--tag-h:3.5rem] sm:[--bottle-h:15rem] md:[--bottle-h:16rem] lg:min-h-0 lg:flex-1 lg:[container-type:size] lg:[--tag-h:3.75rem]"
+              className="relative [--bottle-h:13rem] [--tag-h:2.5rem] sm:[--bottle-h:15rem] md:[--bottle-h:16rem] lg:min-h-0 lg:flex-1 lg:[container-type:size] lg:[--tag-h:3.5rem]"
             >
-              {/* Glass platform under the bottles' bases (desktop, where they stand in one row) */}
+              {/* Glass platform under the bottles' bases (desktop, where they stand in one row):
+                  a single disc with one edge and its shadow beneath. Its middle is a little
+                  behind the line the bottles stand on, so the arc's outer bottles, further back,
+                  stand on it too; its front edge stays clear of the name tags. */}
               <div
                 aria-hidden="true"
-                className="pointer-events-none absolute inset-x-[3%] hidden h-[4.75rem] lg:block"
-                style={{ bottom: "calc(var(--tag-h) - 2.375rem)" }}
-              >
-                <div className="absolute inset-x-[0.6%] bottom-0 top-[26%] rounded-[50%] border border-white/60 bg-linear-to-b from-white/45 to-[#a9cdf0]/25 shadow-[0_28px_48px_-26px_rgba(30,80,150,0.5)]" />
-                <div className="absolute inset-x-0 bottom-[26%] top-0 rounded-[50%] border border-white/90 bg-linear-to-br from-white/80 via-white/50 to-white/25 shadow-[inset_0_2px_8px_rgba(255,255,255,0.95),inset_0_-10px_24px_rgba(130,180,235,0.25)] backdrop-blur-md" />
-              </div>
+                className="pointer-events-none absolute inset-x-[3%] hidden h-20 rounded-[50%] border border-white/80 bg-linear-to-b from-white/75 via-white/45 to-white/15 shadow-[inset_0_2px_8px_rgba(255,255,255,0.9),0_22px_36px_-22px_rgba(30,80,150,0.45)] backdrop-blur-md lg:block"
+                style={{ bottom: "calc(var(--tag-h) - 1.25rem)" }}
+              />
 
               <ul
                 aria-label="The Totalflux mouthwash range"

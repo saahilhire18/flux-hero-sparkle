@@ -13,7 +13,6 @@ import {
   motion,
   MotionConfig,
   useMotionValue,
-  useSpring,
   type MotionValue,
   type Variants,
 } from "motion/react";
@@ -39,7 +38,7 @@ const HOVER = { dwell: 150, linger: 250, afterScroll: 300 };
 
 /**
  * The mouse over the row (mice only: touch and keys pick by clicking). over: the tube it's on
- * (its step index), for the "Click to know more" hint; previewed: the step shown for it, back
+ * (its step index), for the pulsing dot that hints at a click; previewed: the step shown for it, back
  * to null once the mouse has left the tubes. enter(stepIndex, event) and leave(event) are each
  * tube's pointer handlers.
  */
@@ -206,7 +205,7 @@ function HeroText({ activeIndex }: { activeIndex: number }) {
             >
               <motion.span variants={rise} className="block pb-[0.06em]">
                 {!step.product ? (
-                  `${step.title[0]},`
+                  <span className="headline-lead">{`${step.title[0]},`}</span>
                 ) : step.title[0] === "Totalflux" ? (
                   <BrandName className="font-bold" />
                 ) : (
@@ -382,7 +381,8 @@ const FOCUS = {
   lie: 1.45,
   kids: 1.4,
   forward: 0.03,
-  dim: { scale: 0.86, opacity: 0.38 },
+  // Clearly shorter and fainter, so the shown tube stands out and the middle ones sink behind it
+  dim: { scale: 0.7, opacity: 0.25 },
   settleMs: 600,
 };
 
@@ -435,7 +435,7 @@ function Tube({
   let shadow = { x: 0, y: 0, scaleX: 1, opacity: 1 };
   if (dimmed) {
     pose = { ...pose, scale: FOCUS.dim.scale, opacity: FOCUS.dim.opacity };
-    shadow = { ...shadow, scaleX: FOCUS.dim.scale, opacity: 0.4 };
+    shadow = { ...shadow, scaleX: FOCUS.dim.scale, opacity: 0.3 };
   } else if (shown && spot) {
     if (product.upright) {
       pose = { ...pose, x: spot.toCentre, y: forward, scale: FOCUS.kids };
@@ -466,8 +466,8 @@ function Tube({
     // on the tube: it gliding out from under the mouse doesn't count as leaving it, and a click
     // where it stood still counts. The button inside is for keys and screen readers; its
     // clicks come up to here.
-    // The pointer: the stage hides it (--tube-cursor: none) while the "Click to know more"
-    // badge takes its place
+    // The pointer: the stage hides it (--tube-cursor: none) while the pulsing dot (ClickHint)
+    // takes its place
     <li
       className="relative flex cursor-[var(--tube-cursor,pointer)] flex-col items-center"
       style={{ zIndex: shown ? 20 : Math.round(10 - fromCentre * 2) }}
@@ -600,9 +600,11 @@ function useSpots() {
 }
 
 /**
- * "Click to know more" in a round badge that takes the pointer's place while the mouse is on a
- * tube (the pointer itself is hidden there): centred on the mouse (at x, y in the stage),
- * trailing it a touch, in the tube's colour. product: the tube it's on, if any.
+ * A small frosted-glass circle with an arrow in the tube's colour, in the site's glass style,
+ * that takes the pointer's place while the mouse is on a tube (the pointer itself is hidden
+ * there), breathing gently larger and back to say it can be clicked: centred exactly on the
+ * mouse (at x, y in the stage), as the pointer would be. It keeps still for those who ask for
+ * less motion (the hero's MotionConfig). product: the tube it's on, if any.
  */
 function ClickHint({
   product,
@@ -613,14 +615,12 @@ function ClickHint({
   x: MotionValue<number>;
   y: MotionValue<number>;
 }) {
-  const followX = useSpring(x, { stiffness: 600, damping: 40, mass: 0.4 });
-  const followY = useSpring(y, { stiffness: 600, damping: 40, mass: 0.4 });
   return (
     <AnimatePresence>
       {product && (
         <motion.div
           aria-hidden="true"
-          style={{ x: followX, y: followY }}
+          style={{ x, y }}
           className="pointer-events-none absolute left-0 top-0 z-40"
         >
           <motion.span
@@ -628,18 +628,16 @@ function ClickHint({
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.4 }}
             transition={{ duration: 0.25, ease: EASE }}
-            className="absolute left-0 top-0 grid size-24 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full text-center text-white ring-4 ring-white/70 transition-colors duration-300"
-            style={{
-              backgroundColor: product.colors.ink,
-              boxShadow: `0 16px 34px -12px ${product.colors.ink}`,
-            }}
+            className="absolute left-0 top-0 block -translate-x-1/2 -translate-y-1/2"
           >
-            <span className="flex flex-col items-center gap-1 text-[0.72rem] font-bold leading-tight">
-              <ArrowRight className="size-4" strokeWidth={2.2} />
-              Click to
-              <br />
-              know more
-            </span>
+            <motion.span
+              animate={{ scale: [1, 1.1, 1] }}
+              transition={{ duration: 2, ease: "easeInOut", repeat: Infinity }}
+              className="grid size-11 place-items-center rounded-full border border-white/90 bg-white/75 shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_12px_26px_-12px_rgba(15,40,80,0.5)] backdrop-blur-md transition-colors duration-300"
+              style={{ color: product.colors.ink }}
+            >
+              <ArrowRight className="size-4" strokeWidth={2} />
+            </motion.span>
           </motion.span>
         </motion.div>
       )}
@@ -652,8 +650,8 @@ function ClickHint({
  * row, a giant word behind and soft colour drifting slowly behind that. Showing a product
  * floats its tube to the middle, lying down (the Kidoos grow standing), fades the others back
  * and names it above with its details. With a mouse, resting on a tube shows it until the
- * mouse moves off the tubes, and a click goes down to its section ("Click to know more"
- * follows the mouse); a tap (or a key) shows it and a second goes down. A product's pill
+ * mouse moves off the tubes, and a click goes down to its section (a pulsing dot follows the
+ * mouse); a tap (or a key) shows it and a second goes down. A product's pill
  * shows it too, until "All toothpastes". The page itself scrolls as usual: nothing here holds it.
  * transitionColor: the next section's background, which the hero's bottom edge fades into.
  */
@@ -684,14 +682,33 @@ export function Hero({ transitionColor }: { transitionColor?: string }) {
     [pick],
   );
 
-  // Where the mouse is in the stage, for the hint
+  // Where the mouse is in the stage, for the hint: from where it last was in the window and
+  // where the stage is now
   const pointerX = useMotionValue(0);
   const pointerY = useMotionValue(0);
+  const stageRef = useRef<HTMLDivElement>(null);
+  const lastPointer = useRef<{ x: number; y: number } | null>(null);
+  const placeHint = useCallback(() => {
+    const stage = stageRef.current?.getBoundingClientRect();
+    const pointer = lastPointer.current;
+    if (!stage || !pointer) return;
+    pointerX.set(pointer.x - stage.left);
+    pointerY.set(pointer.y - stage.top);
+  }, [pointerX, pointerY]);
   const trackPointer = (event: ReactPointerEvent<HTMLElement>) => {
-    const stage = event.currentTarget.getBoundingClientRect();
-    pointerX.set(event.clientX - stage.left);
-    pointerY.set(event.clientY - stage.top);
+    lastPointer.current = { x: event.clientX, y: event.clientY };
+    placeHint();
   };
+  // While the hint is up, keep it under the mouse every frame: showing a product changes the
+  // text above, which moves the stage (as scrolling does) while the mouse may be resting
+  useEffect(() => {
+    if (hover.over === null) return;
+    let frame = requestAnimationFrame(function follow() {
+      placeHint();
+      frame = requestAnimationFrame(follow);
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [hover.over, placeHint]);
 
   const focus = HERO_STEPS[activeIndex]?.product?.id;
   const { rowRef, measured } = useSpots();
@@ -768,11 +785,12 @@ export function Hero({ transitionColor }: { transitionColor?: string }) {
             {/* The range. A size container: --tube-h, the adult tubes' height, follows the space
                 the text leaves (and, on narrow screens, the width, so the row fits across) */}
             <div
+              ref={stageRef}
               // Over: as it comes onto a tube, so the hint starts where the mouse is
               onPointerOver={trackPointer}
               onPointerMove={trackPointer}
               className="relative mt-2 min-h-0 flex-1 [--tube-h:min(84cqh,58cqw)] [container-type:size] lg:[--tube-h:min(88cqh,32cqw)]"
-              // While the "Click to know more" badge is up, it stands in for the pointer
+              // While the pulsing dot is up, it stands in for the pointer
               style={(hover.over !== null ? { "--tube-cursor": "none" } : {}) as CSSProperties}
             >
               {/* A soft pool of light where they stand */}

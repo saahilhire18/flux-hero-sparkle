@@ -97,7 +97,8 @@ export const HERO_STEPS: HeroStep[] = [
         { label: "SLS & paraben-free", icon: FlaskConicalOff },
         { label: "With clove oil", icon: Leaf },
       ],
-      colors: { brand: "#2398CA", ink: "#15648A" },
+      // ink: the Sensitive red, as in product-pages.ts and on the mouthwash page
+      colors: { brand: "#2398CA", ink: "#d02831" },
       image: { src: "/sensitive.webp", width: 304, height: 1000 },
       height: 1,
     },

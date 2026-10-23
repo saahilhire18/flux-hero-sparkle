@@ -29,8 +29,6 @@ export type Mouthwash = {
   variant?: string;
   /** Its heading in the range section, e.g. "Cool mint freshness". */
   benefit: string;
-  /** The short line under its name tag in the hero, e.g. "Cool mint". */
-  descriptor: string;
   /** Kept off the site, and why. */
   hidden?: string;
   group: MouthwashGroup;
@@ -63,10 +61,9 @@ const ALL_MOUTHWASHES: Mouthwash[] = [
     id: "mintfresh",
     name: "Mintfresh",
     benefit: "Cool mint freshness",
-    descriptor: "Cool mint",
     group: "alcohol-based",
     description:
-      "A classic alcohol-based rinse with a blend of eucalyptus, thyme, peppermint and wintergreen oils, for a cool, fresh feel after brushing.",
+      "A classic rinse with a blend of eucalyptus, thyme, peppermint and wintergreen oils, for a cool, fresh feel after brushing.",
     highlights: [
       { label: "Eucalyptus", icon: Leaf },
       { label: "Thyme", icon: Sprout },
@@ -84,10 +81,9 @@ const ALL_MOUTHWASHES: Mouthwash[] = [
     id: "turmeric",
     name: "Turmeric",
     benefit: "Turmeric & clove",
-    descriptor: "Turmeric & clove",
     group: "alcohol-based",
     description:
-      "An alcohol-based rinse with turmeric oil and clove oil, for those who enjoy a traditional flavour.",
+      "A rinse with turmeric oil and clove oil, for those who enjoy a traditional flavour.",
     highlights: [
       { label: "Turmeric Oil", icon: Droplet },
       { label: "Clove Oil", icon: Flower2 },
@@ -103,10 +99,9 @@ const ALL_MOUTHWASHES: Mouthwash[] = [
     id: "sensitive",
     name: "Sensitive",
     benefit: "For sensitive teeth",
-    descriptor: "For sensitive teeth",
     group: "alcohol-free",
     description:
-      "Gentle on sensitive teeth: an alcohol-free rinse with potassium nitrate, fluoride and clove oil. Use it alongside Totalflux Sensitive toothpaste, not instead of it, to reach areas a brush can miss. Relief builds over 2–4 weeks.",
+      "Gentle on sensitive teeth: a rinse with potassium nitrate, fluoride and clove oil. Use it alongside Totalflux Sensitive toothpaste, not instead of it, to reach areas a brush can miss. Relief builds over 2–4 weeks.",
     highlights: [
       { label: "Potassium Nitrate", icon: ThermometerSnowflake },
       { label: "Sodium Fluoride", icon: ShieldCheck },
@@ -122,10 +117,9 @@ const ALL_MOUTHWASHES: Mouthwash[] = [
     id: "kidoos",
     name: "Kidoos",
     benefit: "Made for kids 6+",
-    descriptor: "For kids 6+",
     group: "alcohol-free",
     description:
-      "An alcohol-free, strawberry-flavoured rinse with 226 ppm fluoride, for children aged 6 and over who can rinse and spit without swallowing. If your drinking water is high in fluoride, ask your dentist before adding a fluoride rinse.",
+      "A strawberry-flavoured rinse with 226 ppm fluoride, for children aged 6 and over who can rinse and spit without swallowing. If your drinking water is high in fluoride, ask your dentist before adding a fluoride rinse.",
     highlights: [
       { label: "Fluoride 226 ppm", icon: ShieldCheck },
       { label: "Strawberry flavour", icon: Candy },
@@ -140,11 +134,10 @@ const ALL_MOUTHWASHES: Mouthwash[] = [
   {
     id: "neem",
     name: "Neem",
-    benefit: "Traditional neem, alcohol-free",
-    descriptor: "Neem, alcohol-free",
+    benefit: "Traditional neem",
     group: "alcohol-free",
     description:
-      "An alcohol-free daily rinse with 0.05% CPC (cetylpyridinium chloride) and 226 ppm fluoride, with neem, clove and peppermint oils for a traditional flavour.",
+      "A daily rinse with 0.05% CPC (cetylpyridinium chloride) and 226 ppm fluoride, with neem, clove and peppermint oils for a traditional flavour.",
     highlights: [
       { label: "CPC 0.05%", icon: ShieldPlus },
       { label: "Sodium Fluoride 226 ppm", icon: ShieldCheck },
@@ -160,11 +153,10 @@ const ALL_MOUTHWASHES: Mouthwash[] = [
     id: "turmeric-no-alcohol",
     name: "Turmeric",
     variant: "No Alcohol",
-    benefit: "Turmeric, alcohol-free",
-    descriptor: "Turmeric, alcohol-free",
+    benefit: "Turmeric & clove, with fluoride",
     group: "alcohol-free",
     description:
-      "An alcohol-free daily rinse with 0.05% CPC (cetylpyridinium chloride) and 226 ppm fluoride, with turmeric and clove oils for a traditional flavour.",
+      "A daily rinse with 0.05% CPC (cetylpyridinium chloride) and 226 ppm fluoride, with turmeric and clove oils for a traditional flavour.",
     highlights: [
       { label: "CPC 0.05%", icon: ShieldPlus },
       { label: "Sodium Fluoride 226 ppm", icon: ShieldCheck },
@@ -180,7 +172,6 @@ const ALL_MOUTHWASHES: Mouthwash[] = [
     id: "chlorhexidine",
     name: "Chlorhexidine",
     benefit: "",
-    descriptor: "",
     // Held back (audit MW-08, Q-01): a medicated product outside the cosmetic licence. Its
     // claims are removed; if Regulatory and Legal approve it, add only its label-approved
     // indications and "Use only as directed by your dentist or doctor."

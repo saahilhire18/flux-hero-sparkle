@@ -16,7 +16,6 @@ const ITEMS: ShowcaseItem[] = MOUTHWASHES.map((mouthwash) => {
   return {
     id: mouthwash.id,
     name: mouthwash.name,
-    variant: mouthwash.variant,
     fullName: fullName(mouthwash),
     family: group && { label: group.label, accent: group.accent },
     benefit: mouthwash.benefit,
